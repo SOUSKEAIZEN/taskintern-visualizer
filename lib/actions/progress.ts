@@ -1,8 +1,27 @@
 "use server";
 
-// Assuming you have a standard Prisma Client instantiation in prisma.config.ts
-import prisma from "../../prisma.config";
+import { PrismaClient } from "@prisma/client";
+import { Pool } from "pg";
+import { PrismaPg } from "@prisma/adapter-pg";
 import { logger } from "../logger";
+
+// Prisma 7 specific Singleton using the pg adapter
+const prismaClientSingleton = () => {
+  const connectionString = process.env.DATABASE_URL;
+  // Initialize the PostgreSQL connection pool
+  const pool = new Pool({ connectionString });
+  const adapter = new PrismaPg(pool);
+  
+  return new PrismaClient({ adapter });
+};
+
+declare const globalThis: {
+  prismaGlobal: ReturnType<typeof prismaClientSingleton>;
+} & typeof global;
+
+const prisma = globalThis.prismaGlobal ?? prismaClientSingleton();
+
+if (process.env.NODE_ENV !== "production") globalThis.prismaGlobal = prisma;
 
 /**
  * Server Action: Marks a specific educational module as complete or incomplete.
