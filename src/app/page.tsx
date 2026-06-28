@@ -2,13 +2,14 @@
 
 import { useState } from "react";
 import { logger } from "../../lib/logger";
+import ArrayCanvas from "../../components/visualization/ArrayCanvas";
 
 export default function Home() {
   const [isVisualizing, setIsVisualizing] = useState(false);
 
   const handleStartVisualization = () => {
-    // Step 2: Client-side log to track user interaction and state changes
-    logger.info("State Change: User initialized the Array Canvas.");
+    // Client-side log to track when the full interactive canvas is mounted
+    logger.info("State Change: User mounted the interactive ArrayCanvas.");
     setIsVisualizing(true);
   };
 
@@ -19,12 +20,12 @@ export default function Home() {
           Array Operations
         </h1>
         <p className="text-slate-500 max-w-lg mx-auto text-lg">
-          Select an algorithm from the sidebar to begin, or click below to initialize a sample data structure in the canvas.
+          Select an algorithm from the sidebar to begin, or click below to initialize the interactive data structure.
         </p>
       </div>
 
       {/* Main Canvas Area */}
-      <div className="w-full max-w-3xl bg-white border border-slate-200 rounded-2xl shadow-sm p-10 flex flex-col items-center justify-center min-h-[350px]">
+      <div className="w-full max-w-3xl bg-white border border-slate-200 rounded-2xl shadow-sm p-10 flex flex-col items-center justify-center min-h-[450px]">
         {!isVisualizing ? (
           <button
             onClick={handleStartVisualization}
@@ -33,20 +34,12 @@ export default function Home() {
             Initialize Canvas
           </button>
         ) : (
-          <div className="flex flex-col items-center space-y-8">
-            <div className="flex space-x-4">
-              {/* Graphic Representation of an Array */}
-              {[10, 24, 45, 7, 92].map((num, idx) => (
-                <div 
-                  key={idx} 
-                  className="w-16 h-16 bg-blue-50 border-2 border-blue-400 rounded-xl flex items-center justify-center text-2xl font-bold text-blue-700 shadow-sm transition-all hover:-translate-y-1 hover:shadow-md cursor-pointer"
-                >
-                  {num}
-                </div>
-              ))}
-            </div>
-            <p className="text-sm text-emerald-600 font-medium bg-emerald-50 px-4 py-2 rounded-full border border-emerald-200">
-              ✓ Canvas active. Right-click &gt; Inspect &gt; Console to view your frontend log!
+          <div className="flex flex-col items-center w-full">
+            {/* The imported Visualization Engine */}
+            <ArrayCanvas />
+            
+            <p className="text-sm text-emerald-600 font-medium bg-emerald-50 px-4 py-2 rounded-full border border-emerald-200 mt-8">
+              ✓ Interactive Canvas active. Open your console (F12) to see every interaction log!
             </p>
           </div>
         )}
