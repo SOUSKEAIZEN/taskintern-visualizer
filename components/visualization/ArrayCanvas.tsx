@@ -3,17 +3,24 @@
 import { useState, useEffect, useRef } from "react";
 import { logger } from "../../lib/logger";
 import { ArrayElement, AlgorithmStep } from "../../types/dsa";
-import { generateBubbleSortSteps } from "../../lib/algorithms/sorting";
+import { 
+  generateBubbleSortSteps, 
+  generateSelectionSortSteps, 
+  generateInsertionSortSteps 
+} from "../../lib/algorithms/sorting";
 
 interface ArrayCanvasProps {
   initialData?: number[];
 }
+
+type AlgorithmType = "bubble" | "selection" | "insertion";
 
 export default function ArrayCanvas({ initialData = [45, 10, 24, 92, 7] }: ArrayCanvasProps) {
   // --- States ---
   // Manual Interaction State
   const [baseArray, setBaseArray] = useState<number[]>(initialData);
   const [customInput, setCustomInput] = useState<string>("");
+  const [activeAlgorithm, setActiveAlgorithm] = useState<AlgorithmType>("bubble");
 
   // Video Playback Engine State
   const [isPlaybackMode, setIsPlaybackMode] = useState(false);
@@ -46,7 +53,6 @@ export default function ArrayCanvas({ initialData = [45, 10, 24, 92, 7] }: Array
   const handleApplyCustomInput = () => {
     if (!customInput.trim()) return;
     
-    // Parse input: split by comma, trim spaces, convert to numbers, filter out NaNs
     const parsedArray = customInput
       .split(",")
       .map((str) => parseInt(str.trim(), 10))
@@ -58,7 +64,6 @@ export default function ArrayCanvas({ initialData = [45, 10, 24, 92, 7] }: Array
       return;
     }
 
-    // Constraint: Limit to 10 elements to prevent UI overflow
     if (parsedArray.length > 10) {
       logger.warn(`Custom Input Trimmed: User entered ${parsedArray.length} items. Trimmed to 10.`);
       parsedArray.length = 10;
@@ -69,10 +74,31 @@ export default function ArrayCanvas({ initialData = [45, 10, 24, 92, 7] }: Array
     setCustomInput("");
   };
 
+  const handleAlgorithmChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
+    const selected = e.target.value as AlgorithmType;
+    logger.info(`UI Interaction: User changed active algorithm to ${selected.toUpperCase()} Sort.`);
+    setActiveAlgorithm(selected);
+  };
+
   // --- 2. Playback Engine Initialization ---
   const handleStartSorting = () => {
-    logger.info(`Playback Engine: Initializing Bubble Sort for ${baseArray.length} elements.`);
-    const steps = generateBubbleSortSteps(baseArray);
+    logger.info(`Playback Engine: Initializing ${activeAlgorithm.toUpperCase()} Sort for ${baseArray.length} elements.`);
+    
+    let steps: AlgorithmStep<ArrayElement[]>[] = [];
+    
+    // Route to the correct mathematical generator
+    switch (activeAlgorithm) {
+      case "bubble":
+        steps = generateBubbleSortSteps(baseArray);
+        break;
+      case "selection":
+        steps = generateSelectionSortSteps(baseArray);
+        break;
+      case "insertion":
+        steps = generateInsertionSortSteps(baseArray);
+        break;
+    }
+
     setHistory(steps);
     setCurrentFrame(0);
     setIsPlaybackMode(true);
@@ -117,7 +143,6 @@ export default function ArrayCanvas({ initialData = [45, 10, 24, 92, 7] }: Array
 
   // --- 4. The Animation Loop ---
   useEffect(() => {
-    // Map speed level (1-10) to milliseconds (1000ms down to 100ms)
     const currentDelayMs = 1100 - (speedLevel * 100);
 
     if (isPlaying && currentFrame < history.length - 1) {
@@ -142,6 +167,8 @@ export default function ArrayCanvas({ initialData = [45, 10, 24, 92, 7] }: Array
         return "bg-amber-400 text-amber-900 border-amber-500 shadow-amber-200 scale-110 z-10";
       case "swapping":
         return "bg-rose-500 text-white border-rose-600 shadow-rose-200 scale-110 -rotate-6 z-10";
+      case "active":
+        return "bg-purple-500 text-white border-purple-600 shadow-purple-200 scale-110 z-10 ring-4 ring-purple-100";
       case "sorted":
         return "bg-emerald-500 text-white border-emerald-600 shadow-emerald-200";
       default: 
@@ -200,12 +227,28 @@ export default function ArrayCanvas({ initialData = [45, 10, 24, 92, 7] }: Array
             </button>
           </div>
 
-          <div className="flex space-x-4">
+          <div className="flex flex-wrap justify-center gap-4 w-full">
             <button onClick={handleAddElement} className="px-6 py-2 bg-slate-200 text-slate-700 font-semibold rounded-xl hover:bg-slate-300 transition-colors">Add Random</button>
             <button onClick={handleRemoveElement} className="px-6 py-2 bg-slate-200 text-slate-700 font-semibold rounded-xl hover:bg-slate-300 transition-colors">Remove</button>
-            <button onClick={handleStartSorting} className="px-8 py-2 bg-indigo-600 text-white font-bold rounded-xl shadow-md hover:bg-indigo-700 transition-colors shadow-indigo-200">
-              ▶ Visualize Bubble Sort
-            </button>
+            
+            {/* Algorithm Selector & Visualize Button */}
+            <div className="flex bg-indigo-50 p-1 rounded-xl border border-indigo-100 shadow-sm">
+              <select
+                value={activeAlgorithm}
+                onChange={handleAlgorithmChange}
+                className="bg-transparent px-4 py-2 text-indigo-800 font-bold outline-none cursor-pointer"
+              >
+                <option value="bubble">Bubble Sort</option>
+                <option value="selection">Selection Sort</option>
+                <option value="insertion">Insertion Sort</option>
+              </select>
+              <button 
+                onClick={handleStartSorting} 
+                className="px-6 py-2 bg-indigo-600 text-white font-bold rounded-lg shadow hover:bg-indigo-700 transition-colors"
+              >
+                ▶ Visualize
+              </button>
+            </div>
           </div>
         </div>
       ) : (
