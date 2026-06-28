@@ -1,11 +1,10 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { logger } from "../../lib/logger";
 import { submitQuizScore, updateModuleProgress } from "../../lib/actions/progress";
 
-// In a full production build, these would be fetched from the database or a JSON file.
-// We are using a localized constant to demonstrate the UI and Backend wiring.
+// --- Question Banks ---
 const ARRAY_QUESTIONS = [
   {
     question: "What is the time complexity of accessing an element in an array by its index?",
@@ -24,6 +23,29 @@ const ARRAY_QUESTIONS = [
   }
 ];
 
+const LINKED_LIST_QUESTIONS = [
+  {
+    question: "What is the main advantage of a Linked List over an Array?",
+    options: ["Instant access by index", "Contiguous memory allocation", "Dynamic memory allocation", "Built-in sorting"],
+    correctIndex: 2,
+  },
+  {
+    question: "What does the final node in a Singly Linked List point to?",
+    options: ["The first node (Head)", "A random memory address", "null", "Itself"],
+    correctIndex: 2,
+  },
+  {
+    question: "What is the time complexity of searching for a specific value in a Singly Linked List?",
+    options: ["O(1)", "O(n)", "O(log n)", "O(n^2)"],
+    correctIndex: 1,
+  }
+];
+
+const QUESTIONS_MAP: Record<string, typeof ARRAY_QUESTIONS> = {
+  "arrays": ARRAY_QUESTIONS,
+  "linked-lists": LINKED_LIST_QUESTIONS,
+};
+
 interface InteractiveQuizProps {
   topicId: string;
   userId: string; // Passed down from the user session in a real app
@@ -35,6 +57,17 @@ export default function InteractiveQuiz({ topicId, userId }: InteractiveQuizProp
   const [isFinished, setIsFinished] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
 
+  const activeQuestions = QUESTIONS_MAP[topicId] || ARRAY_QUESTIONS;
+
+  // Reset the quiz state if the user switches modules
+  useEffect(() => {
+    setCurrentQuestion(0);
+    setScore(0);
+    setIsFinished(false);
+    setIsSubmitting(false);
+    logger.info(`Quiz State: Reset quiz engine for new module -> ${topicId}`);
+  }, [topicId]);
+
   const handleAnswerClick = (selectedIndex: number, isCorrect: boolean) => {
     logger.info(`Quiz Interaction: User selected option ${selectedIndex} on question ${currentQuestion}. Correct: ${isCorrect}`);
     
@@ -43,10 +76,10 @@ export default function InteractiveQuiz({ topicId, userId }: InteractiveQuizProp
     }
 
     const nextQuestion = currentQuestion + 1;
-    if (nextQuestion < ARRAY_QUESTIONS.length) {
+    if (nextQuestion < activeQuestions.length) {
       setCurrentQuestion(nextQuestion);
     } else {
-      logger.info(`Quiz State: User finished the quiz. Final local score: ${score + (isCorrect ? 1 : 0)}/${ARRAY_QUESTIONS.length}`);
+      logger.info(`Quiz State: User finished the quiz. Final local score: ${score + (isCorrect ? 1 : 0)}/${activeQuestions.length}`);
       setIsFinished(true);
     }
   };
@@ -57,7 +90,7 @@ export default function InteractiveQuiz({ topicId, userId }: InteractiveQuizProp
 
     try {
       // 1. Save the numerical quiz score
-      const scoreResult = await submitQuizScore(userId, topicId, score, ARRAY_QUESTIONS.length);
+      const scoreResult = await submitQuizScore(userId, topicId, score, activeQuestions.length);
       if (!scoreResult.success) throw new Error(scoreResult.error);
 
       // 2. Mark the overall module as completed
@@ -79,7 +112,7 @@ export default function InteractiveQuiz({ topicId, userId }: InteractiveQuizProp
       <div className="w-full max-w-2xl mx-auto bg-white p-8 rounded-2xl shadow-sm border border-slate-200 text-center animate-in zoom-in-95 duration-500">
         <h2 className="text-3xl font-extrabold text-slate-800 mb-4">Module Complete!</h2>
         <div className="text-6xl font-black text-indigo-600 mb-6">
-          {score} / {ARRAY_QUESTIONS.length}
+          {score} / {activeQuestions.length}
         </div>
         <p className="text-slate-500 mb-8">You have successfully completed the {topicId} quiz.</p>
         
@@ -94,16 +127,18 @@ export default function InteractiveQuiz({ topicId, userId }: InteractiveQuizProp
     );
   }
 
-  const activeQ = ARRAY_QUESTIONS[currentQuestion];
+  const activeQ = activeQuestions[currentQuestion];
 
   return (
     <div className="w-full max-w-2xl mx-auto bg-white p-8 rounded-2xl shadow-sm border border-slate-200">
       <div className="flex justify-between items-center mb-8">
         <h3 className="text-xl font-bold text-slate-800 flex items-center gap-2">
-          <span className="bg-indigo-100 text-indigo-700 px-3 py-1 rounded-lg text-sm">Knowledge Check</span>
+          <span className="bg-indigo-100 text-indigo-700 px-3 py-1 rounded-lg text-sm uppercase tracking-wider font-bold">
+            {topicId.replace("-", " ")} Knowledge Check
+          </span>
         </h3>
         <span className="text-sm font-semibold text-slate-400">
-          Question {currentQuestion + 1} of {ARRAY_QUESTIONS.length}
+          Question {currentQuestion + 1} of {activeQuestions.length}
         </span>
       </div>
 

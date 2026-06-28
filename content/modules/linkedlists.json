@@ -1,0 +1,30 @@
+{
+  "moduleId": "linked-lists",
+  "title": "Linked Lists",
+  "difficulty": "Intermediate",
+  "description": "A linear data structure where elements are not stored at contiguous memory locations. Instead, elements (nodes) are linked using pointers.",
+  "sections": [
+    {
+      "id": "concept",
+      "title": "Nodes and Pointers",
+      "content": "Unlike an array, a linked list does not provide instant access by index. Each element is an independent object called a 'Node'. A Node contains two pieces of information: the actual data, and a 'Pointer' (a reference or memory address) to the next Node in the sequence. The list ends when a pointer points to 'null'."
+    },
+    {
+      "id": "memory",
+      "title": "Dynamic Memory Allocation",
+      "content": "Because nodes are linked by pointers, they can be scattered anywhere in the computer's memory. This means a Linked List can easily grow or shrink in size during execution without needing to pre-allocate massive blocks of memory, making insertions and deletions highly efficient."
+    },
+    {
+      "id": "use_case",
+      "title": "Real-World Application",
+      "content": "Linked Lists are heavily used in operating systems and software architecture. Common examples include implementing 'Undo/Redo' functionality in text editors, managing browser history (Previous/Next pages), and building foundational structures like Stacks and Queues."
+    }
+  ],
+  "complexities": {
+    "access": { "best": "O(1)", "average": "O(n)", "worst": "O(n)" },
+    "search": { "best": "O(1)", "average": "O(n)", "worst": "O(n)" },
+    "insertion": { "best": "O(1)", "average": "O(n)", "worst": "O(n)" },
+    "deletion": { "best": "O(1)", "average": "O(n)", "worst": "O(n)" },
+    "space": "O(n)"
+  }
+}
