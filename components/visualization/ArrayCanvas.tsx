@@ -32,11 +32,13 @@ export default function ArrayCanvas({ initialData = [45, 10, 24, 92, 7] }: Array
   const [speedLevel, setSpeedLevel] = useState<number>(3); 
 
   const timerRef = useRef<NodeJS.Timeout | null>(null);
+  
+  const MAX_ELEMENTS = 20;
 
   // --- 1. Manual Controls & Custom Input ---
   const handleAddElement = () => {
-    if (baseArray.length >= 10) {
-      logger.warn("Constraint Hit: Prevented adding element. Array reached maximum size (10).");
+    if (baseArray.length >= MAX_ELEMENTS) {
+      logger.warn(`Constraint Hit: Prevented adding element. Array reached maximum size (${MAX_ELEMENTS}).`);
       return;
     }
     const newValue = Math.floor(Math.random() * 100);
@@ -64,9 +66,9 @@ export default function ArrayCanvas({ initialData = [45, 10, 24, 92, 7] }: Array
       return;
     }
 
-    if (parsedArray.length > 10) {
-      logger.warn(`Custom Input Trimmed: User entered ${parsedArray.length} items. Trimmed to 10.`);
-      parsedArray.length = 10;
+    if (parsedArray.length > MAX_ELEMENTS) {
+      logger.warn(`Custom Input Trimmed: User entered ${parsedArray.length} items. Trimmed to ${MAX_ELEMENTS}.`);
+      parsedArray.length = MAX_ELEMENTS;
     }
 
     logger.info(`Custom Input Applied: Set base array to [${parsedArray.join(", ")}]`);
@@ -189,7 +191,7 @@ export default function ArrayCanvas({ initialData = [45, 10, 24, 92, 7] }: Array
       </div>
 
       {/* The Visual Canvas */}
-      <div className="flex flex-wrap justify-center gap-4 p-8 bg-slate-50 border-2 border-dashed border-slate-200 rounded-3xl min-h-[180px] w-full max-w-2xl shadow-inner relative">
+      <div className="flex flex-wrap justify-center gap-4 p-8 bg-slate-50 border-2 border-dashed border-slate-200 rounded-3xl min-h-[180px] w-full max-w-4xl shadow-inner relative transition-all duration-300">
         {!isPlaybackMode ? (
           baseArray.map((num, idx) => (
             <div key={`manual-${idx}`} className={`w-16 h-16 border-2 rounded-xl flex items-center justify-center text-2xl font-bold transition-all duration-300 ${getStyleForState("default")}`}>
@@ -213,7 +215,7 @@ export default function ArrayCanvas({ initialData = [45, 10, 24, 92, 7] }: Array
           <div className="flex items-center space-x-2 bg-white p-2 rounded-xl border border-slate-200 shadow-sm w-full">
             <input 
               type="text" 
-              placeholder="e.g. 5, 24, 8, 99 (Max 10 elements)"
+              placeholder={`e.g. 5, 24, 8, 99 (Max ${MAX_ELEMENTS} elements)`}
               value={customInput}
               onChange={(e) => setCustomInput(e.target.value)}
               className="flex-1 px-4 py-2 outline-none text-slate-700 font-medium bg-transparent"
@@ -221,15 +223,15 @@ export default function ArrayCanvas({ initialData = [45, 10, 24, 92, 7] }: Array
             />
             <button 
               onClick={handleApplyCustomInput}
-              className="px-6 py-2 bg-blue-100 text-blue-700 font-semibold rounded-lg hover:bg-blue-200 transition-colors"
+              className="px-6 py-2 bg-blue-100 text-blue-700 font-semibold rounded-lg hover:bg-blue-200 transition-colors whitespace-nowrap"
             >
               Apply Array
             </button>
           </div>
 
           <div className="flex flex-wrap justify-center gap-4 w-full">
-            <button onClick={handleAddElement} className="px-6 py-2 bg-slate-200 text-slate-700 font-semibold rounded-xl hover:bg-slate-300 transition-colors">Add Random</button>
-            <button onClick={handleRemoveElement} className="px-6 py-2 bg-slate-200 text-slate-700 font-semibold rounded-xl hover:bg-slate-300 transition-colors">Remove</button>
+            <button onClick={handleAddElement} className="px-6 py-2 bg-slate-200 text-slate-700 font-semibold rounded-xl hover:bg-slate-300 transition-colors whitespace-nowrap">Add Random</button>
+            <button onClick={handleRemoveElement} className="px-6 py-2 bg-slate-200 text-slate-700 font-semibold rounded-xl hover:bg-slate-300 transition-colors whitespace-nowrap">Remove</button>
             
             {/* Algorithm Selector & Visualize Button */}
             <div className="flex bg-indigo-50 p-1 rounded-xl border border-indigo-100 shadow-sm">
@@ -244,7 +246,7 @@ export default function ArrayCanvas({ initialData = [45, 10, 24, 92, 7] }: Array
               </select>
               <button 
                 onClick={handleStartSorting} 
-                className="px-6 py-2 bg-indigo-600 text-white font-bold rounded-lg shadow hover:bg-indigo-700 transition-colors"
+                className="px-6 py-2 bg-indigo-600 text-white font-bold rounded-lg shadow hover:bg-indigo-700 transition-colors whitespace-nowrap"
               >
                 ▶ Visualize
               </button>

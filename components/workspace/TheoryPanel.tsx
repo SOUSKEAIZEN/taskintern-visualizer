@@ -3,6 +3,7 @@
 import { useEffect, useState } from "react";
 import { logger } from "../../lib/logger";
 import arrayData from "../../content/modules/arrays.json";
+import linkedListData from "../../content/modules/linkedlists.json";
 
 interface TheorySection {
   id: string;
@@ -33,12 +34,14 @@ export default function TheoryPanel({ topicId = "arrays" }: { topicId?: string }
   useEffect(() => {
     logger.info(`UI Mount: Initializing TheoryPanel for topic: ${topicId}`);
     
-    // In a production environment with multiple modules, this would be a dynamic fetch.
-    // We are hard-routing to the imported array data for this specific module.
+    // Route to the correct imported JSON data based on the active module
     if (topicId === "arrays") {
       setData(arrayData as ModuleData);
+    } else if (topicId === "linked-lists") {
+      setData(linkedListData as ModuleData);
     } else {
       logger.warn(`Data Warning: Attempted to load unknown topic ID: ${topicId}`);
+      setData(null);
     }
   }, [topicId]);
 
