@@ -1,0 +1,30 @@
+{
+  "moduleId": "arrays",
+  "title": "Array Operations",
+  "difficulty": "Beginner",
+  "description": "A fundamental linear data structure that stores elements in contiguous memory locations, allowing for instant access via indices.",
+  "sections": [
+    {
+      "id": "concept",
+      "title": "What is an Array?",
+      "content": "An array is a collection of items stored at contiguous memory locations. The primary advantage is the ability to store multiple items of the same data type together, making it easier to calculate the position of each element by simply adding an offset to a base value."
+    },
+    {
+      "id": "memory",
+      "title": "Contiguous Memory Allocation",
+      "content": "Because arrays allocate memory in a single sequential block, the CPU can cache this data highly efficiently. This makes sequential reading lightning fast compared to node-based structures like Linked Lists."
+    },
+    {
+      "id": "use_case",
+      "title": "Real-World Application",
+      "content": "In Data Analysis and machine learning, arrays (often represented as vectors or matrices) are the absolute foundational structure. They allow for rapid matrix operations, data transformations, and sequential processing required for heavy computational workloads."
+    }
+  ],
+  "complexities": {
+    "access": { "best": "O(1)", "average": "O(1)", "worst": "O(1)" },
+    "search": { "best": "O(1)", "average": "O(n)", "worst": "O(n)" },
+    "insertion": { "best": "O(1)", "average": "O(n)", "worst": "O(n)" },
+    "deletion": { "best": "O(1)", "average": "O(n)", "worst": "O(n)" },
+    "space": "O(n)"
+  }
+}
