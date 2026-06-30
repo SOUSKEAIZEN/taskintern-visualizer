@@ -1,0 +1,30 @@
+{
+  "moduleId": "stacks",
+  "title": "Stack Data Structure",
+  "difficulty": "Beginner",
+  "description": "A Stack is a linear data structure that follows a particular order in which operations are performed. The order is LIFO (Last In, First Out).",
+  "sections": [
+    {
+      "id": "concept",
+      "title": "The LIFO Principle",
+      "content": "Think of a Stack like a stack of plates in a cafeteria. You can only add a plate to the top of the stack, and you can only remove a plate from the top of the stack. The last plate placed on the stack is the first one to be removed."
+    },
+    {
+      "id": "operations",
+      "title": "Core Operations",
+      "content": "The primary operations are 'Push' (inserting an element at the top) and 'Pop' (removing the top element). A 'Peek' operation allows you to look at the top element without removing it. If you try to pop from an empty stack, it results in a 'Stack Underflow'."
+    },
+    {
+      "id": "use_case",
+      "title": "Real-World Application",
+      "content": "Stacks are heavily used in system memory (the Call Stack for function calls and recursion), implementing Undo/Redo features in text editors, and evaluating mathematical expressions (parsing brackets and syntax)."
+    }
+  ],
+  "complexities": {
+    "access": { "best": "O(n)", "average": "O(n)", "worst": "O(n)" },
+    "search": { "best": "O(n)", "average": "O(n)", "worst": "O(n)" },
+    "insertion": { "best": "O(1)", "average": "O(1)", "worst": "O(1)" },
+    "deletion": { "best": "O(1)", "average": "O(1)", "worst": "O(1)" },
+    "space": "O(n)"
+  }
+}

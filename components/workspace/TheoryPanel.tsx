@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 import { logger } from "../../lib/logger";
 import arrayData from "../../content/modules/arrays.json";
 import linkedListData from "../../content/modules/linkedlists.json";
+import stackData from "../../content/modules/stacks.json";
 
 interface TheorySection {
   id: string;
@@ -39,6 +40,8 @@ export default function TheoryPanel({ topicId = "arrays" }: { topicId?: string }
       setData(arrayData as ModuleData);
     } else if (topicId === "linked-lists") {
       setData(linkedListData as ModuleData);
+    } else if (topicId === "stacks") {
+      setData(stackData as ModuleData);
     } else {
       logger.warn(`Data Warning: Attempted to load unknown topic ID: ${topicId}`);
       setData(null);

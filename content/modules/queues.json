@@ -1,0 +1,30 @@
+{
+  "moduleId": "queues",
+  "title": "Queue Data Structure",
+  "difficulty": "Beginner",
+  "description": "A Queue is a linear data structure that follows the First In, First Out (FIFO) principle. The element that is inserted first is the first one to be removed, much like a line of people waiting for a ticket.",
+  "sections": [
+    {
+      "id": "concept",
+      "title": "The FIFO Principle",
+      "content": "Imagine a line of people waiting at a counter. The first person to join the line is the first person to be served and leave. In a Queue, elements are always added at one end (the 'Rear' or 'Tail') and removed from the opposite end (the 'Front' or 'Head')."
+    },
+    {
+      "id": "operations",
+      "title": "Core Operations",
+      "content": "The fundamental operations of a Queue are 'Enqueue' (inserting an element at the rear) and 'Dequeue' (removing an element from the front). A 'Peek' or 'Front' operation allows you to view the front element without removing it. Attempting to dequeue from an empty queue causes an 'Underflow' error."
+    },
+    {
+      "id": "use_case",
+      "title": "Real-World Application",
+      "content": "Queues are extensively used in computer science for scheduling processes in operating systems (CPU task scheduling), managing data packets in network routers, handling asynchronous requests (like message queues in web servers), and as the foundational data structure for the Breadth-First Search (BFS) algorithm."
+    }
+  ],
+  "complexities": {
+    "access": { "best": "O(n)", "average": "O(n)", "worst": "O(n)" },
+    "search": { "best": "O(n)", "average": "O(n)", "worst": "O(n)" },
+    "insertion": { "best": "O(1)", "average": "O(1)", "worst": "O(1)" },
+    "deletion": { "best": "O(1)", "average": "O(1)", "worst": "O(1)" },
+    "space": "O(n)"
+  }
+}

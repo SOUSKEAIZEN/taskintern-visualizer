@@ -1,23 +1,23 @@
 {
   "moduleId": "arrays",
-  "title": "Array Operations",
+  "title": "Array Data Structure",
   "difficulty": "Beginner",
-  "description": "A fundamental linear data structure that stores elements in contiguous memory locations, allowing for instant access via indices.",
+  "description": "An array is a collection of items stored at contiguous memory locations. The idea is to store multiple items of the same type together, making it easy to calculate the position of each element by simply adding an offset to a base value.",
   "sections": [
     {
       "id": "concept",
-      "title": "What is an Array?",
-      "content": "An array is a collection of items stored at contiguous memory locations. The primary advantage is the ability to store multiple items of the same data type together, making it easier to calculate the position of each element by simply adding an offset to a base value."
+      "title": "Basic Concept",
+      "content": "Arrays are fundamental linear data structures. Because the memory is contiguous, the computer knows exactly where every element is located if it knows the memory address of the first element (the base address). This allows for instant random access."
     },
     {
       "id": "memory",
-      "title": "Contiguous Memory Allocation",
-      "content": "Because arrays allocate memory in a single sequential block, the CPU can cache this data highly efficiently. This makes sequential reading lightning fast compared to node-based structures like Linked Lists."
+      "title": "Memory Allocation & Shifting",
+      "content": "While accessing elements is instant, inserting or deleting elements (except at the very end of the array) is costly. If you want to insert a new element at the beginning or middle, you must shift all subsequent elements forward by one memory space to make room. This shifting gives insertion and deletion a linear time complexity."
     },
     {
       "id": "use_case",
       "title": "Real-World Application",
-      "content": "In Data Analysis and machine learning, arrays (often represented as vectors or matrices) are the absolute foundational structure. They allow for rapid matrix operations, data transformations, and sequential processing required for heavy computational workloads."
+      "content": "Arrays are used as the building blocks for more complex data structures like Heaps, Hash Tables, and Strings. They are heavily utilized in CPU scheduling, matrix operations in Machine Learning, and lookup tables."
     }
   ],
   "complexities": {

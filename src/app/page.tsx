@@ -5,6 +5,7 @@ import { useSearchParams } from "next/navigation";
 import { logger } from "../../lib/logger";
 import ArrayCanvas from "../../components/visualization/ArrayCanvas";
 import LinkedListCanvas from "../../components/visualization/LinkedListCanvas";
+import StackCanvas from "../../components/visualization/StackCanvas";
 import TheoryPanel from "../../components/workspace/TheoryPanel";
 import InteractiveQuiz from "../../components/workspace/InteractiveQuiz";
 
@@ -119,7 +120,11 @@ function WorkspaceContent() {
             {!isVisualizing ? (
               <div className="text-center space-y-6 animate-in fade-in zoom-in-95 duration-500 z-10">
                 <div className="w-24 h-24 bg-indigo-100 rounded-3xl flex items-center justify-center mx-auto mb-4 border-4 border-white shadow-md transition-all">
-                  <span className="text-5xl">{activeModule === "arrays" ? "🚀" : activeModule === "linked-lists" ? "🔗" : "⚙️"}</span>
+                  <span className="text-5xl">
+                    {activeModule === "arrays" ? "🚀" : 
+                     activeModule === "linked-lists" ? "🔗" : 
+                     activeModule === "stacks" ? "🥞" : "⚙️"}
+                  </span>
                 </div>
                 <h2 className="text-3xl font-extrabold text-slate-800 tracking-tight">Ready to Visualize?</h2>
                 <p className="text-slate-500 max-w-sm mx-auto text-lg leading-relaxed capitalize">
@@ -138,6 +143,7 @@ function WorkspaceContent() {
                 {/* Dynamically render the correct visualization engine */}
                 {activeModule === "arrays" ? <ArrayCanvas /> : 
                  activeModule === "linked-lists" ? <LinkedListCanvas /> : 
+                 activeModule === "stacks" ? <StackCanvas /> :
                  <div className="text-slate-500 font-bold p-8">Module Engine in Development</div>}
                 
                 <p className="text-sm text-emerald-600 font-bold bg-emerald-50 px-5 py-2.5 rounded-full border border-emerald-200 mt-10 shadow-sm flex items-center gap-2">

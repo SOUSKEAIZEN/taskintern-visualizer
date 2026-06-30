@@ -1,0 +1,210 @@
+"use client";
+
+import { useState } from "react";
+import { logger } from "../../lib/logger";
+
+interface QueueElement {
+  id: string;
+  value: number;
+  state: "default" | "active" | "new" | "peeking";
+}
+
+export default function QueueCanvas() {
+  // --- States ---
+  // Initializing with elements to demonstrate the FIFO flow
+  const [queue, setQueue] = useState<QueueElement[]>([
+    { id: "elem-1", value: 12, state: "default" }, // Front
+    { id: "elem-2", value: 45, state: "default" },
+    { id: "elem-3", value: 88, state: "default" }, // Rear
+  ]);
+  const [customValue, setCustomValue] = useState<string>("");
+  const [isAnimating, setIsAnimating] = useState(false);
+
+  // --- Helpers ---
+  const generateId = () => Math.random().toString(36).substring(2, 9);
+  const MAX_QUEUE_SIZE = 10; // Constraint to prevent UI overflow horizontally
+
+  // --- FIFO Operations ---
+  const handleEnqueue = () => {
+    if (queue.length >= MAX_QUEUE_SIZE) {
+      logger.warn(`Constraint Hit: Queue Overflow prevented. Reached max capacity of ${MAX_QUEUE_SIZE}.`);
+      alert("Queue Overflow! The queue is at maximum capacity.");
+      return;
+    }
+    
+    const val = customValue ? parseInt(customValue) : Math.floor(Math.random() * 100);
+    if (isNaN(val)) return;
+
+    logger.info(`Memory Operation: ENQUEUE - Adding value ${val} to the Rear of the queue.`);
+    const newElement: QueueElement = { id: generateId(), value: val, state: "new" };
+    
+    // Enqueue adds to the end of the array (Rear)
+    setQueue((prev) => [...prev, newElement]);
+    setCustomValue("");
+    
+    // Reset the "new" animation highlight
+    setTimeout(() => {
+      setQueue((prev) => prev.map(el => el.id === newElement.id ? { ...el, state: "default" } : el));
+    }, 800);
+  };
+
+  const handleDequeue = () => {
+    if (queue.length === 0) {
+      logger.error("Memory Error: Queue Underflow. Attempted to DEQUEUE from an empty queue.");
+      alert("Queue Underflow! Cannot dequeue from an empty queue.");
+      return;
+    }
+
+    const frontElement = queue[0];
+    logger.info(`Memory Operation: DEQUEUE - Removing value ${frontElement.value} from the Front of the queue.`);
+    
+    setIsAnimating(true);
+    // Highlight the Front element before removing it
+    setQueue((prev) => prev.map((el, idx) => idx === 0 ? { ...el, state: "active" } : el));
+
+    setTimeout(() => {
+      setQueue((prev) => prev.slice(1)); // Remove the first element (Front)
+      setIsAnimating(false);
+    }, 600);
+  };
+
+  const handlePeek = () => {
+    if (queue.length === 0) {
+      logger.warn("Memory Warning: Attempted to PEEK into an empty queue.");
+      return;
+    }
+
+    const frontElement = queue[0];
+    logger.info(`Memory Operation: PEEK - Inspecting the Front value (${frontElement.value}) without removing it.`);
+    
+    setIsAnimating(true);
+    setQueue((prev) => prev.map((el, idx) => idx === 0 ? { ...el, state: "peeking" } : el));
+
+    setTimeout(() => {
+      setQueue((prev) => prev.map((el, idx) => idx === 0 ? { ...el, state: "default" } : el));
+      setIsAnimating(false);
+    }, 1200);
+  };
+
+  const handleClear = () => {
+    logger.info("UI State: User cleared the entire queue.");
+    setQueue([]);
+  };
+
+  // --- Graphic Design State Mapping ---
+  const getElementStyles = (state: string) => {
+    switch (state) {
+      case "active":
+        return "bg-rose-500 text-white border-rose-600 shadow-rose-200 scale-105 z-10 -translate-x-4 opacity-50"; // Slides left and fades
+      case "peeking":
+        return "bg-emerald-400 text-emerald-950 border-emerald-500 shadow-emerald-200 scale-110 z-10 ring-4 ring-emerald-100";
+      case "new":
+        return "bg-indigo-500 text-white border-indigo-600 shadow-indigo-200 animate-in slide-in-from-right-8 duration-300";
+      default:
+        return "bg-white text-slate-700 border-slate-300 shadow-sm hover:border-indigo-400 hover:text-indigo-700 hover:shadow-md";
+    }
+  };
+
+  return (
+    <div className="flex flex-col items-center w-full space-y-10">
+      
+      {/* Educational Header */}
+      <div className="text-center">
+        <h3 className="text-xl font-bold text-slate-800">FIFO Memory Queue</h3>
+        <p className="text-sm text-slate-500">First-In, First-Out. Elements enqueue at the rear and dequeue from the front.</p>
+      </div>
+
+      {/* The Visual Canvas */}
+      <div className="flex items-center justify-center p-8 bg-slate-50 border-2 border-dashed border-slate-200 rounded-3xl w-full min-h-[350px] shadow-inner overflow-hidden">
+        
+        {/* The Queue "Tube" Container */}
+        <div className="relative w-full max-w-2xl h-36 border-y-8 border-slate-300 bg-slate-100 flex items-center px-4 shadow-inner overflow-visible">
+          
+          {/* Front Indicator (Left) */}
+          <div className="absolute -left-12 flex flex-col items-center text-rose-500 font-bold tracking-widest text-xs uppercase z-20 bg-slate-50/80 p-2 rounded-lg backdrop-blur-sm">
+            <span>Front</span>
+            <span>(Dequeue)</span>
+            <svg className="w-5 h-5 mt-1 animate-pulse" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="3" d="M10 19l-7-7m0 0l7-7m-7 7h18"></path>
+            </svg>
+          </div>
+
+          {/* Rear Indicator (Right) */}
+          <div className="absolute -right-12 flex flex-col items-center text-indigo-500 font-bold tracking-widest text-xs uppercase z-20 bg-slate-50/80 p-2 rounded-lg backdrop-blur-sm">
+            <span>Rear</span>
+            <span>(Enqueue)</span>
+            <svg className="w-5 h-5 mt-1 animate-pulse" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="3" d="M14 5l7 7m0 0l-7 7m7-7H3"></path>
+            </svg>
+          </div>
+
+          {queue.length === 0 ? (
+            <div className="w-full flex items-center justify-center text-slate-400 font-bold uppercase tracking-widest text-sm">
+              Queue is Empty
+            </div>
+          ) : (
+            <div className="flex items-center space-x-3 w-full transition-all duration-500">
+              {queue.map((element) => (
+                <div 
+                  key={element.id} 
+                  className={`w-16 h-16 shrink-0 flex items-center justify-center border-2 rounded-xl text-2xl font-black transition-all duration-300 ${getElementStyles(element.state)}`}
+                >
+                  {element.value}
+                </div>
+              ))}
+            </div>
+          )}
+        </div>
+      </div>
+
+      {/* Control Panel */}
+      <div className="flex flex-col items-center space-y-6 w-full max-w-2xl">
+        
+        {/* Data Input & Primary Operations */}
+        <div className="flex flex-wrap items-center justify-center gap-4 bg-white p-4 rounded-2xl border border-slate-200 shadow-sm w-full">
+          <input 
+            type="number" 
+            placeholder={`Value (Max ${MAX_QUEUE_SIZE})`}
+            value={customValue}
+            onChange={(e) => setCustomValue(e.target.value)}
+            disabled={isAnimating}
+            className="w-40 px-4 py-2 border-2 border-slate-200 rounded-xl outline-none focus:border-indigo-400 text-slate-700 font-medium transition-colors"
+          />
+          <button 
+            onClick={handleEnqueue} 
+            disabled={isAnimating}
+            className="px-8 py-2 bg-indigo-600 text-white font-bold rounded-xl shadow-md hover:bg-indigo-700 transition-colors disabled:opacity-50"
+          >
+            Enqueue (Rear)
+          </button>
+          <button 
+            onClick={handleDequeue} 
+            disabled={isAnimating || queue.length === 0}
+            className="px-8 py-2 bg-rose-50 text-rose-600 font-bold rounded-xl hover:bg-rose-100 transition-colors disabled:opacity-50"
+          >
+            Dequeue (Front)
+          </button>
+        </div>
+
+        {/* Secondary Operations */}
+        <div className="flex flex-wrap items-center justify-center gap-4 w-full">
+          <button 
+            onClick={handlePeek} 
+            disabled={isAnimating || queue.length === 0}
+            className="px-8 py-2 bg-emerald-50 text-emerald-700 font-bold rounded-xl hover:bg-emerald-100 transition-colors disabled:opacity-50 shadow-sm"
+          >
+            👀 Peek at Front
+          </button>
+          <button 
+            onClick={handleClear} 
+            disabled={isAnimating || queue.length === 0}
+            className="px-6 py-2 text-slate-500 font-medium hover:text-slate-800 transition-colors"
+          >
+            Clear Queue
+          </button>
+        </div>
+
+      </div>
+    </div>
+  );
+}
