@@ -334,3 +334,4 @@ export default function HeapCanvas() {
       </div>
     </div>
   );
+}
