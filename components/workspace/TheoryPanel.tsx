@@ -5,6 +5,8 @@ import { logger } from "../../lib/logger";
 import arrayData from "../../content/modules/arrays.json";
 import linkedListData from "../../content/modules/linkedlists.json";
 import stackData from "../../content/modules/stacks.json";
+import queueData from "../../content/modules/queues.json";
+import treeData from "../../content/modules/trees.json";
 
 interface TheorySection {
   id: string;
@@ -42,6 +44,10 @@ export default function TheoryPanel({ topicId = "arrays" }: { topicId?: string }
       setData(linkedListData as ModuleData);
     } else if (topicId === "stacks") {
       setData(stackData as ModuleData);
+    } else if (topicId === "queues") {
+      setData(queueData as ModuleData);
+    } else if (topicId === "trees") {
+      setData(treeData as ModuleData);
     } else {
       logger.warn(`Data Warning: Attempted to load unknown topic ID: ${topicId}`);
       setData(null);

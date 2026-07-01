@@ -1,0 +1,30 @@
+{
+  "moduleId": "trees",
+  "title": "Binary Search Tree (BST)",
+  "difficulty": "Intermediate",
+  "description": "A Binary Search Tree (BST) is a non-linear, hierarchical data structure. It is a node-based binary tree where the left child contains a value less than its parent, and the right child contains a value greater than its parent.",
+  "sections": [
+    {
+      "id": "concept",
+      "title": "Hierarchical Structure",
+      "content": "Unlike arrays and linked lists, which are linear, trees are hierarchical. A BST starts at a 'Root' node. Every node can have up to two children. This strict left-less, right-greater organization allows us to discard half of the remaining tree at each step of a search, acting like a dynamic binary search."
+    },
+    {
+      "id": "operations",
+      "title": "Logarithmic Efficiency",
+      "content": "Because we eliminate half the tree with every comparison, operations like Search, Insertion, and Deletion are incredibly fast, running in O(log n) average time. However, if you insert already sorted data (e.g., 1, 2, 3, 4, 5), the tree becomes 'skewed' into a straight line, degrading its performance to O(n)."
+    },
+    {
+      "id": "use_case",
+      "title": "Real-World Application",
+      "content": "BSTs (and their self-balancing variants like AVL or Red-Black trees) are the backbone of modern computer science. They are used in database indexing, dynamic sorting, syntax tree generation in compilers, and managing virtual memory sets in operating systems."
+    }
+  ],
+  "complexities": {
+    "access": { "best": "O(log n)", "average": "O(log n)", "worst": "O(n)" },
+    "search": { "best": "O(log n)", "average": "O(log n)", "worst": "O(n)" },
+    "insertion": { "best": "O(log n)", "average": "O(log n)", "worst": "O(n)" },
+    "deletion": { "best": "O(log n)", "average": "O(log n)", "worst": "O(n)" },
+    "space": "O(n)"
+  }
+}
