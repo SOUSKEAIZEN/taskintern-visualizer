@@ -7,6 +7,8 @@ import ArrayCanvas from "../../components/visualization/ArrayCanvas";
 import LinkedListCanvas from "../../components/visualization/LinkedListCanvas";
 import StackCanvas from "../../components/visualization/StackCanvas";
 import QueueCanvas from "../../components/visualization/QueueCanvas";
+import TreeCanvas from "../../components/visualization/TreeCanvas";
+import HeapCanvas from "../../components/visualization/HeapCanvas";
 import TheoryPanel from "../../components/workspace/TheoryPanel";
 import InteractiveQuiz from "../../components/workspace/InteractiveQuiz";
 
@@ -125,7 +127,9 @@ function WorkspaceContent() {
                     {activeModule === "arrays" ? "🚀" : 
                      activeModule === "linked-lists" ? "🔗" : 
                      activeModule === "stacks" ? "🥞" : 
-                     activeModule === "queues" ? "🚶" : "⚙️"}
+                     activeModule === "queues" ? "🚶" : 
+                     activeModule === "trees" ? "🌳" : 
+                     activeModule === "heaps" ? "💎" : "⚙️"}
                   </span>
                 </div>
                 <h2 className="text-3xl font-extrabold text-slate-800 tracking-tight">Ready to Visualize?</h2>
@@ -147,6 +151,8 @@ function WorkspaceContent() {
                  activeModule === "linked-lists" ? <LinkedListCanvas /> : 
                  activeModule === "stacks" ? <StackCanvas /> :
                  activeModule === "queues" ? <QueueCanvas /> :
+                 activeModule === "trees" ? <TreeCanvas /> :
+                 activeModule === "heaps" ? <HeapCanvas /> :
                  <div className="text-slate-500 font-bold p-8">Module Engine in Development</div>}
                 
                 <p className="text-sm text-emerald-600 font-bold bg-emerald-50 px-5 py-2.5 rounded-full border border-emerald-200 mt-10 shadow-sm flex items-center gap-2">

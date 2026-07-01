@@ -1,0 +1,30 @@
+{
+  "moduleId": "graphs",
+  "title": "Graphs: BFS & DFS",
+  "difficulty": "Advanced",
+  "description": "A Graph is a non-linear data structure consisting of Vertices (nodes) and Edges (connections). Graphs are used to represent networks of communication, data organization, and computational flow.",
+  "sections": [
+    {
+      "id": "concept",
+      "title": "Vertices and Edges",
+      "content": "Unlike Trees, Graphs can contain cycles (loops) and disconnected components. An edge connecting two vertices can be directed (one-way) or undirected (two-way). Because of cycles, graph traversal algorithms must keep track of 'visited' nodes to avoid infinite loops."
+    },
+    {
+      "id": "bfs",
+      "title": "Breadth-First Search (BFS)",
+      "content": "BFS explores the graph level by level, radiating outward from the starting vertex. It visits all immediate neighbors before moving to the next level. BFS uses a Queue (FIFO) data structure and is ideal for finding the shortest path in unweighted networks."
+    },
+    {
+      "id": "dfs",
+      "title": "Depth-First Search (DFS)",
+      "content": "DFS explores as far as possible along each branch before backtracking. It plunges deep into the graph using a Stack (LIFO) or recursion. DFS is heavily used for topological sorting, solving mazes, and detecting cycles in a network."
+    }
+  ],
+  "complexities": {
+    "access": { "best": "O(1)", "average": "O(V+E)", "worst": "O(V+E)" },
+    "search": { "best": "O(1)", "average": "O(V+E)", "worst": "O(V+E)" },
+    "insertion": { "best": "O(1)", "average": "O(1)", "worst": "O(1)" },
+    "deletion": { "best": "O(1)", "average": "O(V+E)", "worst": "O(V+E)" },
+    "space": "O(V)"
+  }
+}

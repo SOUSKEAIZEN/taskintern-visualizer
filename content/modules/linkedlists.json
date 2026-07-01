@@ -1,23 +1,28 @@
 {
   "moduleId": "linked-lists",
-  "title": "Singly Linked Lists",
+  "title": "Linked List Data Structures",
   "difficulty": "Intermediate",
-  "description": "A linked list is a linear data structure, in which the elements are not stored at contiguous memory locations. Instead, the elements are linked using pointers.",
+  "description": "A linked list is a linear data structure where elements are not stored at contiguous memory locations. We will explore Singly, Doubly, and Circular Linked Lists, where elements are linked using forward and sometimes backward pointers.",
   "sections": [
     {
-      "id": "concept",
-      "title": "Nodes and Pointers",
-      "content": "In a linked list, each element is an independent object called a 'Node'. A Node contains two items: the data itself, and a reference (or pointer) to the next node in the sequence. The first node is called the Head. If the list is empty, the Head points to null."
+      "id": "singly",
+      "title": "1. Singly Linked List",
+      "content": "In a Singly Linked List, each 'Node' contains the data and a single pointer to the 'Next' node in the sequence. Traversal is strictly one-way (from Head to Tail). The final node points to null."
     },
     {
-      "id": "memory",
-      "title": "Dynamic Size & Traversal",
-      "content": "Because memory does not need to be contiguous, Linked Lists can easily grow or shrink dynamically. You do not need to shift elements when inserting or deleting. However, because memory is scattered, you lose 'Random Access'. To find the 5th element, you must traverse through the 1st, 2nd, 3rd, and 4th elements sequentially."
+      "id": "doubly",
+      "title": "2. Doubly Linked List",
+      "content": "A Doubly Linked List adds a 'Prev' pointer to each node, linking it to the previous node. This allows for two-way bidirectional traversal, making operations like reversing the list or deleting a specific node much more efficient, at the cost of extra memory for the second pointer."
     },
     {
-      "id": "use_case",
-      "title": "Real-World Application",
-      "content": "Linked Lists are crucial when you need constant-time insertions/deletions from a known position. They are used to implement Stacks and Queues, manage browser history (Previous/Next), and handle collision resolution in Hash Maps (Chaining)."
+      "id": "circular",
+      "title": "3. Circular Linked List",
+      "content": "In a Circular Linked List, the Tail node does not point to null. Instead, its 'Next' pointer loops back and points directly to the Head node, forming a closed circle. This can be implemented as a singly or doubly circular list and is excellent for continuous looping."
+    },
+    {
+      "id": "use_cases",
+      "title": "Real-World Applications",
+      "content": "Singly lists handle hash map collisions. Doubly lists are perfect for Browser History (Forward/Back) and Undo/Redo operations. Circular lists are crucial for Operating System CPU scheduling (Round Robin algorithms) and multiplayer board game turn management."
     }
   ],
   "complexities": {

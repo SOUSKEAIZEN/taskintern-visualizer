@@ -9,8 +9,11 @@ interface LinkedListNode {
   state: "default" | "active" | "found" | "new";
 }
 
+type ListType = "singly" | "doubly" | "circular";
+
 export default function LinkedListCanvas() {
   // --- States ---
+  const [listType, setListType] = useState<ListType>("singly");
   const [nodes, setNodes] = useState<LinkedListNode[]>([
     { id: "node-1", value: 14, state: "default" },
     { id: "node-2", value: 85, state: "default" },
@@ -22,25 +25,29 @@ export default function LinkedListCanvas() {
 
   // --- Helpers ---
   const generateId = () => Math.random().toString(36).substring(2, 9);
-  const MAX_NODES = 20; // Updated Constraint to allow 20 elements
+  const MAX_NODES = 20; // Constraint to prevent UI overflow
+
+  const handleTypeChange = (type: ListType) => {
+    logger.info(`UI State: User toggled Linked List architecture to ${type.toUpperCase()}`);
+    setListType(type);
+  };
 
   // --- Operations ---
   const handleAppend = () => {
     if (nodes.length >= MAX_NODES) {
-      logger.warn(`Constraint Hit: Cannot append. Linked List reached max size of ${MAX_NODES}.`);
+      logger.warn(`Constraint Hit: Cannot append. ${listType.toUpperCase()} List reached max size of ${MAX_NODES}.`);
       return;
     }
     
     const val = customValue ? parseInt(customValue) : Math.floor(Math.random() * 100);
     if (isNaN(val)) return;
 
-    logger.info(`Memory Operation: Appending new node with value ${val} to the tail.`);
+    logger.info(`Memory Operation: Appending new node with value ${val} to the tail of the ${listType} list.`);
     const newNode: LinkedListNode = { id: generateId(), value: val, state: "new" };
     
     setNodes((prev) => [...prev, newNode]);
     setCustomValue("");
     
-    // Clear the "new" highlight after a short delay
     setTimeout(() => {
       setNodes((prev) => prev.map(n => n.id === newNode.id ? { ...n, state: "default" } : n));
     }, 1000);
@@ -48,14 +55,14 @@ export default function LinkedListCanvas() {
 
   const handlePrepend = () => {
     if (nodes.length >= MAX_NODES) {
-      logger.warn(`Constraint Hit: Cannot prepend. Linked List reached max size of ${MAX_NODES}.`);
+      logger.warn(`Constraint Hit: Cannot prepend. ${listType.toUpperCase()} List reached max size of ${MAX_NODES}.`);
       return;
     }
 
     const val = customValue ? parseInt(customValue) : Math.floor(Math.random() * 100);
     if (isNaN(val)) return;
 
-    logger.info(`Memory Operation: Prepending new node with value ${val} to the head. Reassigning head pointer.`);
+    logger.info(`Memory Operation: Prepending new node with value ${val} to the head of the ${listType} list.`);
     const newNode: LinkedListNode = { id: generateId(), value: val, state: "new" };
     
     setNodes((prev) => [newNode, ...prev]);
@@ -68,10 +75,10 @@ export default function LinkedListCanvas() {
 
   const handlePop = () => {
     if (nodes.length === 0) {
-      logger.error("Memory Error: Attempted to pop from an empty Linked List.");
+      logger.error(`Memory Error: Attempted to pop from an empty ${listType} Linked List.`);
       return;
     }
-    logger.info(`Memory Operation: Removing the tail node.`);
+    logger.info(`Memory Operation: Removing the tail node from the ${listType} list.`);
     setNodes((prev) => prev.slice(0, -1));
   };
 
@@ -80,7 +87,7 @@ export default function LinkedListCanvas() {
     const target = parseInt(searchValue);
     if (isNaN(target) || nodes.length === 0 || isAnimating) return;
 
-    logger.info(`Traversal Engine: Starting linear search for value ${target}.`);
+    logger.info(`Traversal Engine: Starting linear search in ${listType} list for value ${target}.`);
     setIsAnimating(true);
     let currentIndex = 0;
 
@@ -99,7 +106,7 @@ export default function LinkedListCanvas() {
         clearInterval(interval);
         setIsAnimating(false);
       } else if (currentIndex === nodes.length - 1) {
-        logger.info(`Traversal Engine: Reached null terminator. Target ${target} not found in the list.`);
+        logger.info(`Traversal Engine: Reached tail pointer. Target ${target} not found.`);
         clearInterval(interval);
         setTimeout(() => {
           setNodes((prev) => prev.map(n => n.state === "active" ? { ...n, state: "default" } : n));
@@ -133,16 +140,37 @@ export default function LinkedListCanvas() {
   };
 
   return (
-    <div className="flex flex-col items-center w-full space-y-10">
+    <div className="flex flex-col items-center w-full space-y-8">
       
       {/* Educational Header */}
-      <div className="text-center">
-        <h3 className="text-xl font-bold text-slate-800">Singly Linked List</h3>
-        <p className="text-sm text-slate-500">Notice how each node points to the next memory address.</p>
+      <div className="text-center space-y-2">
+        <h3 className="text-xl font-bold text-slate-800 capitalize">{listType} Linked List</h3>
+        <p className="text-sm text-slate-500 max-w-md mx-auto">
+          {listType === "singly" && "Each node points only to the next memory address in sequence."}
+          {listType === "doubly" && "Nodes contain pointers to both the Next and Previous memory addresses."}
+          {listType === "circular" && "The Tail node's Next pointer loops directly back to the Head node."}
+        </p>
+      </div>
+
+      {/* Mode Selector */}
+      <div className="flex bg-slate-200/50 p-1 rounded-xl w-full max-w-md mx-auto relative z-10 border border-slate-200 shadow-inner">
+        {(["singly", "doubly", "circular"] as const).map((type) => (
+          <button
+            key={type}
+            onClick={() => handleTypeChange(type)}
+            disabled={isAnimating}
+            className={`flex-1 py-2 text-sm font-bold capitalize rounded-lg transition-all duration-300 ${
+              listType === type 
+                ? "bg-white text-indigo-700 shadow border border-slate-200/50" 
+                : "text-slate-500 hover:text-slate-700 hover:bg-slate-200/80 disabled:opacity-50"
+            }`}
+          >
+            {type}
+          </button>
+        ))}
       </div>
 
       {/* The Visual Canvas */}
-      {/* min-w-max and justify-start ensure that overflow triggers a clean scroll instead of squishing elements */}
       <div className="flex items-start justify-start p-8 bg-slate-50 border-2 border-dashed border-slate-200 rounded-3xl min-h-[260px] w-full shadow-inner overflow-x-auto custom-scrollbar">
         
         {nodes.length === 0 ? (
@@ -156,7 +184,6 @@ export default function LinkedListCanvas() {
               <div key={node.id} className="flex flex-col items-center transition-all duration-500">
                 
                 {/* Structural Spacer for Head Pointer */}
-                {/* We reserve space for all nodes so they align, but only draw the arrow on index 0 */}
                 <div className="h-14 flex flex-col items-center justify-end pb-2">
                   {index === 0 && (
                     <div className="flex flex-col items-center text-indigo-500 animate-in fade-in slide-in-from-top-2">
@@ -169,37 +196,66 @@ export default function LinkedListCanvas() {
                 </div>
 
                 <div className="flex items-center">
-                  {/* Node Box (Data | Next) */}
+                  {/* Node Box */}
                   <div className={`flex border-2 rounded-xl h-20 transition-all duration-300 ${getNodeStyles(node.state)}`}>
                     
+                    {/* Prev Field (Doubly Only) */}
+                    {listType === "doubly" && (
+                      <div className="w-10 h-full flex flex-col items-center justify-center bg-slate-100/50 rounded-l-lg border-r-2 border-inherit relative">
+                        <span className="text-[10px] font-bold text-slate-400 mb-1">Prev</span>
+                        <div className="w-3 h-3 rounded-full bg-slate-400 mt-1"></div>
+                      </div>
+                    )}
+
                     {/* Data Field */}
-                    <div className="w-16 h-full flex flex-col items-center justify-center border-r-2 border-inherit bg-white/50 rounded-l-lg">
+                    <div className={`w-16 h-full flex flex-col items-center justify-center border-r-2 border-inherit bg-white/50 ${listType !== 'doubly' ? 'rounded-l-lg' : ''}`}>
                       <span className="text-xs font-semibold text-slate-400 mb-1">Data</span>
                       <span className="text-2xl font-black text-slate-700">{node.value}</span>
                     </div>
                     
-                    {/* Pointer Field */}
+                    {/* Next Pointer Field */}
                     <div className="w-10 h-full flex flex-col items-center justify-center bg-slate-100/50 rounded-r-lg relative">
                       <span className="text-[10px] font-bold text-slate-400 mb-1">Next</span>
                       <div className="w-3 h-3 rounded-full bg-slate-400 mt-1"></div>
                     </div>
                   </div>
 
-                  {/* The Arrow (Pointer) connecting to the next node */}
+                  {/* Connecting Arrow */}
                   <div className="flex items-center px-2">
-                    <div className="w-8 h-1 bg-slate-400 rounded-full"></div>
-                    <svg className="w-4 h-4 text-slate-400 -ml-2" fill="currentColor" viewBox="0 0 20 20">
-                      <path fillRule="evenodd" d="M7.293 14.707a1 1 0 010-1.414L10.586 10 7.293 6.707a1 1 0 011.414-1.414l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0z" clipRule="evenodd" />
-                    </svg>
+                    {listType === "doubly" ? (
+                      // Bidirectional Arrow
+                      <div className="flex items-center text-slate-400">
+                        <svg className="w-4 h-4 -mr-1" fill="currentColor" viewBox="0 0 20 20"><path fillRule="evenodd" d="M12.707 5.293a1 1 0 010 1.414L9.414 10l3.293 3.293a1 1 0 01-1.414 1.414l-4-4a1 1 0 010-1.414l4-4a1 1 0 011.414 0z" clipRule="evenodd" /></svg>
+                        <div className="w-6 h-1 bg-slate-400"></div>
+                        <svg className="w-4 h-4 -ml-1" fill="currentColor" viewBox="0 0 20 20"><path fillRule="evenodd" d="M7.293 14.707a1 1 0 010-1.414L10.586 10 7.293 6.707a1 1 0 011.414-1.414l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0z" clipRule="evenodd" /></svg>
+                      </div>
+                    ) : (
+                      // Unidirectional Arrow
+                      <div className="flex items-center text-slate-400">
+                        <div className="w-8 h-1 bg-slate-400 rounded-full"></div>
+                        <svg className="w-4 h-4 -ml-2" fill="currentColor" viewBox="0 0 20 20">
+                          <path fillRule="evenodd" d="M7.293 14.707a1 1 0 010-1.414L10.586 10 7.293 6.707a1 1 0 011.414-1.414l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0z" clipRule="evenodd" />
+                        </svg>
+                      </div>
+                    )}
                   </div>
                 </div>
               </div>
             ))}
 
-            {/* Null Terminator */}
-            <div className="flex flex-col items-center mt-14 h-20 px-4 border-2 border-dashed border-rose-300 bg-rose-50 rounded-xl justify-center">
-              <span className="text-rose-500 font-bold font-mono">null</span>
-            </div>
+            {/* Terminator Block */}
+            {listType === "circular" ? (
+              <div className="flex flex-col items-center justify-center h-20 px-4 border-2 border-dashed border-indigo-400 bg-indigo-50 rounded-xl mt-14 shadow-sm animate-in fade-in">
+                <span className="text-indigo-600 font-bold text-xs uppercase tracking-wider flex flex-col items-center space-y-1">
+                  <svg className="w-6 h-6 animate-spin-slow" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" /></svg>
+                  <span>Loops to Head</span>
+                </span>
+              </div>
+            ) : (
+              <div className="flex flex-col items-center justify-center h-20 px-4 border-2 border-dashed border-rose-300 bg-rose-50 rounded-xl mt-14 animate-in fade-in">
+                <span className="text-rose-500 font-bold font-mono">null</span>
+              </div>
+            )}
 
           </div>
         )}

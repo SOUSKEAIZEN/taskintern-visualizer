@@ -1,0 +1,30 @@
+{
+  "moduleId": "heaps",
+  "title": "Heap Data Structure",
+  "difficulty": "Advanced",
+  "description": "A Heap is a special Tree-based data structure that satisfies the Heap Property. It is typically implemented as a Complete Binary Tree and is widely used to implement Priority Queues.",
+  "sections": [
+    {
+      "id": "concept",
+      "title": "The Heap Property",
+      "content": "In a Max-Heap, the key present at any node is always greater than or equal to the keys of its children, making the Root the maximum value. In a Min-Heap, the Root is the minimum value. Because it is a 'Complete' binary tree, heaps are extremely memory-efficient and are usually stored flat in an Array rather than using pointers."
+    },
+    {
+      "id": "operations",
+      "title": "Insertion and Heapify",
+      "content": "When a new element is inserted, it is placed at the end of the tree (bottom right). The tree then 'heapifies up' (or bubbles up), swapping the new element with its parent until the Heap Property is restored. Extracting the root involves moving the last element to the root and 'heapifying down'."
+    },
+    {
+      "id": "use_case",
+      "title": "Real-World Application",
+      "content": "Heaps are the underlying structure for Priority Queues (e.g., routing emergency room patients or CPU task scheduling). They are also the basis for the Heap Sort algorithm and are used in graph algorithms like Dijkstra's Shortest Path."
+    }
+  ],
+  "complexities": {
+    "access": { "best": "O(1)", "average": "O(1)", "worst": "O(1)" },
+    "search": { "best": "O(n)", "average": "O(n)", "worst": "O(n)" },
+    "insertion": { "best": "O(log n)", "average": "O(log n)", "worst": "O(log n)" },
+    "deletion": { "best": "O(log n)", "average": "O(log n)", "worst": "O(log n)" },
+    "space": "O(n)"
+  }
+}
