@@ -9,6 +9,7 @@ import StackCanvas from "../../components/visualization/StackCanvas";
 import QueueCanvas from "../../components/visualization/QueueCanvas";
 import TreeCanvas from "../../components/visualization/TreeCanvas";
 import HeapCanvas from "../../components/visualization/HeapCanvas";
+import GraphCanvas from "../../components/visualization/GraphCanvas";
 import TheoryPanel from "../../components/workspace/TheoryPanel";
 import InteractiveQuiz from "../../components/workspace/InteractiveQuiz";
 
@@ -129,7 +130,8 @@ function WorkspaceContent() {
                      activeModule === "stacks" ? "🥞" : 
                      activeModule === "queues" ? "🚶" : 
                      activeModule === "trees" ? "🌳" : 
-                     activeModule === "heaps" ? "💎" : "⚙️"}
+                     activeModule === "heaps" ? "💎" : 
+                     activeModule === "graphs" ? "🕸️" : "⚙️"}
                   </span>
                 </div>
                 <h2 className="text-3xl font-extrabold text-slate-800 tracking-tight">Ready to Visualize?</h2>
@@ -153,6 +155,7 @@ function WorkspaceContent() {
                  activeModule === "queues" ? <QueueCanvas /> :
                  activeModule === "trees" ? <TreeCanvas /> :
                  activeModule === "heaps" ? <HeapCanvas /> :
+                 activeModule === "graphs" ? <GraphCanvas /> :
                  <div className="text-slate-500 font-bold p-8">Module Engine in Development</div>}
                 
                 <p className="text-sm text-emerald-600 font-bold bg-emerald-50 px-5 py-2.5 rounded-full border border-emerald-200 mt-10 shadow-sm flex items-center gap-2">
