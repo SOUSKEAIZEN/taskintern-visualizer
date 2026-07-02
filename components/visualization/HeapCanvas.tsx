@@ -73,7 +73,7 @@ export default function HeapCanvas() {
     setCustomValue("");
 
     const frames: HeapElement[][] = [];
-    const workingHeap = [...heap.map(el => ({ ...el, state: "default" as const }))];
+    const workingHeap: HeapElement[] = heap.map(el => ({ ...el, state: "default" }));
     
     // Step 1: Add to end
     const newNode: HeapElement = { id: generateId(), value: val, state: "new" };
@@ -131,7 +131,7 @@ export default function HeapCanvas() {
     setIsAnimating(true);
     
     const frames: HeapElement[][] = [];
-    const workingHeap = [...heap.map(el => ({ ...el, state: "default" as const }))];
+    const workingHeap: HeapElement[] = heap.map(el => ({ ...el, state: "default" }));
     
     // Highlight Root
     workingHeap[0].state = "swapping";
