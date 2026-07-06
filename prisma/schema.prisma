@@ -30,6 +30,10 @@ model ModuleProgress {
   userId       String
   topicId      String   // e.g., "arrays", "linked-lists"
   isCompleted  Boolean  @default(false)
+  
+  // Added fields to support deeper data analysis of performance
+  timeSpent    Int      @default(0) // Time spent in seconds
+  completedAt  DateTime?            // Exact timestamp of completion
   lastAccessed DateTime @default(now())
   
   // Relational link to the User

@@ -48,7 +48,11 @@ export default function Sidebar() {
 
         {MODULES.map((mod) => (
           // We use URL query parameters (?module=...) so the main page knows what to load without complex global state
-          <Link key={mod.id} href={`/?module=${mod.id}`}>
+          <Link 
+            key={mod.id} 
+            href={`/?module=${mod.id}`}
+            onClick={() => logger.info(`UI Interaction: User navigated to module [${mod.id}]`)}
+          >
             <div 
               className={`flex items-center rounded-xl cursor-pointer transition-all duration-200 group ${
                 isCollapsed ? "justify-center p-3 mb-2" : "p-3 mb-1 space-x-3"
@@ -62,14 +66,17 @@ export default function Sidebar() {
         ))}
       </nav>
 
-      {/* Bottom Analytics Link */}
+      {/* Bottom Dashboard Link */}
       <div className={`pt-4 pb-6 mt-2 border-t border-slate-100 flex ${isCollapsed ? 'justify-center' : ''}`}>
-        <Link href="/dashboard">
+        <Link 
+          href="/dashboard"
+          onClick={() => logger.info("UI Interaction: User navigated to Dashboard")}
+        >
           <div className={`p-3 bg-slate-50 text-slate-600 rounded-xl cursor-pointer font-bold hover:bg-indigo-600 hover:text-white hover:shadow-md transition-all flex items-center ${
             isCollapsed ? "justify-center" : "justify-between w-full space-x-2"
           }`}>
             <span className="text-lg">📊</span>
-            {!isCollapsed && <span className="whitespace-nowrap flex-1">Analytics</span>}
+            {!isCollapsed && <span className="whitespace-nowrap flex-1">Dashboard</span>}
           </div>
         </Link>
       </div>

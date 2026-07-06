@@ -27,9 +27,10 @@ if (process.env.NODE_ENV !== "production") globalThis.prismaGlobal = prisma;
  * Server Action: Marks a specific educational module as complete or incomplete.
  */
 export async function updateModuleProgress(userId: string, topicId: string, isCompleted: boolean = true) {
-  logger.info(`DB Action: Attempting to update progress for User ${userId} on Topic ${topicId}`);
+  logger.info(`DB Action Start [updateModuleProgress]: Initiated for User ${userId}, Topic ${topicId}`);
   
   try {
+    logger.info(`DB Step 1 [updateModuleProgress]: Executing Prisma upsert for User ${userId}`);
     const progress = await prisma.moduleProgress.upsert({
       where: {
         userId_topicId: { userId, topicId }
@@ -45,10 +46,10 @@ export async function updateModuleProgress(userId: string, topicId: string, isCo
       },
     });
 
-    logger.info(`DB Success: Progress updated for User ${userId}.`, progress.id);
+    logger.info(`DB Step 2 [updateModuleProgress]: Upsert successful. Record ID: ${progress.id}`);
     return { success: true, data: progress };
   } catch (error) {
-    logger.error(`DB Failure: Failed to update progress for User ${userId}`, error);
+    logger.error(`DB Point of Failure [updateModuleProgress]: Exception caught while updating progress for User ${userId}`, error);
     return { success: false, error: "Database operation failed." };
   }
 }
@@ -57,9 +58,10 @@ export async function updateModuleProgress(userId: string, topicId: string, isCo
  * Server Action: Saves a user's quiz score to the database.
  */
 export async function submitQuizScore(userId: string, topicId: string, score: number, totalQuestions: number) {
-  logger.info(`DB Action: Submitting Quiz Score (${score}/${totalQuestions}) for User ${userId} on Topic ${topicId}`);
+  logger.info(`DB Action Start [submitQuizScore]: Initiated for User ${userId}, Topic ${topicId} with score ${score}/${totalQuestions}`);
   
   try {
+    logger.info(`DB Step 1 [submitQuizScore]: Executing Prisma create for User ${userId}`);
     const quizRecord = await prisma.quizScore.create({
       data: {
         userId,
@@ -69,10 +71,10 @@ export async function submitQuizScore(userId: string, topicId: string, score: nu
       },
     });
 
-    logger.info(`DB Success: Quiz score saved for User ${userId}.`, quizRecord.id);
+    logger.info(`DB Step 2 [submitQuizScore]: Creation successful. Record ID: ${quizRecord.id}`);
     return { success: true, data: quizRecord };
   } catch (error) {
-    logger.error(`DB Failure: Failed to save quiz score for User ${userId}`, error);
+    logger.error(`DB Point of Failure [submitQuizScore]: Exception caught while saving score for User ${userId}`, error);
     return { success: false, error: "Database operation failed." };
   }
 }
@@ -81,9 +83,10 @@ export async function submitQuizScore(userId: string, topicId: string, score: nu
  * Server Action: Fetches all learning analytics for a specific user to display on their Dashboard.
  */
 export async function fetchUserDashboardData(userId: string) {
-  logger.info(`DB Action: Fetching full dashboard analytics for User ${userId}`);
+  logger.info(`DB Action Start [fetchUserDashboardData]: Initiated for User ${userId}`);
   
   try {
+    logger.info(`DB Step 1 [fetchUserDashboardData]: Querying Prisma for unique User ${userId} and relational data (progress, scores)`);
     const user = await prisma.user.findUnique({
       where: { id: userId },
       include: {
@@ -94,15 +97,17 @@ export async function fetchUserDashboardData(userId: string) {
       }
     });
 
+    logger.info(`DB Step 2 [fetchUserDashboardData]: Query execution complete`);
+
     if (!user) {
-      logger.warn(`DB Warning: Attempted to fetch dashboard for non-existent User ${userId}`);
+      logger.warn(`DB Point of Failure [fetchUserDashboardData]: User ${userId} not found in the database. Returning null state to client.`);
       return { success: false, error: "User not found." };
     }
 
-    logger.info(`DB Success: Successfully retrieved dashboard data for User ${userId}`);
+    logger.info(`DB Step 3 [fetchUserDashboardData]: Data validation passed. Retrieved ${user.progress.length} progress records and ${user.scores.length} score records for User ${userId}`);
     return { success: true, data: user };
   } catch (error) {
-    logger.error(`DB Failure: Failed to fetch dashboard data for User ${userId}`, error);
+    logger.error(`DB Point of Failure [fetchUserDashboardData]: Exception caught while fetching dashboard data for User ${userId}`, error);
     return { success: false, error: "Database operation failed." };
   }
 }
