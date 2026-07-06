@@ -11,7 +11,6 @@ interface QueueElement {
 
 export default function QueueCanvas() {
   // --- States ---
-  // Initializing with elements to demonstrate the FIFO flow
   const [queue, setQueue] = useState<QueueElement[]>([
     { id: "elem-1", value: 12, state: "default" }, // Front
     { id: "elem-2", value: 45, state: "default" },
@@ -22,7 +21,7 @@ export default function QueueCanvas() {
 
   // --- Helpers ---
   const generateId = () => Math.random().toString(36).substring(2, 9);
-  const MAX_QUEUE_SIZE = 10; // Constraint to prevent UI overflow horizontally
+  const MAX_QUEUE_SIZE = 10; 
 
   // --- FIFO Operations ---
   const handleEnqueue = () => {
@@ -38,11 +37,9 @@ export default function QueueCanvas() {
     logger.info(`Memory Operation: ENQUEUE - Adding value ${val} to the Rear of the queue.`);
     const newElement: QueueElement = { id: generateId(), value: val, state: "new" };
     
-    // Enqueue adds to the end of the array (Rear)
     setQueue((prev) => [...prev, newElement]);
     setCustomValue("");
     
-    // Reset the "new" animation highlight
     setTimeout(() => {
       setQueue((prev) => prev.map(el => el.id === newElement.id ? { ...el, state: "default" } : el));
     }, 800);
@@ -59,11 +56,10 @@ export default function QueueCanvas() {
     logger.info(`Memory Operation: DEQUEUE - Removing value ${frontElement.value} from the Front of the queue.`);
     
     setIsAnimating(true);
-    // Highlight the Front element before removing it
     setQueue((prev) => prev.map((el, idx) => idx === 0 ? { ...el, state: "active" } : el));
 
     setTimeout(() => {
-      setQueue((prev) => prev.slice(1)); // Remove the first element (Front)
+      setQueue((prev) => prev.slice(1)); 
       setIsAnimating(false);
     }, 600);
   };
@@ -95,7 +91,7 @@ export default function QueueCanvas() {
   const getElementStyles = (state: string) => {
     switch (state) {
       case "active":
-        return "bg-rose-500 text-white border-rose-600 shadow-rose-200 scale-105 z-10 -translate-x-4 opacity-50"; // Slides left and fades
+        return "bg-rose-500 text-white border-rose-600 shadow-rose-200 scale-105 z-10 -translate-x-4 opacity-50"; 
       case "peeking":
         return "bg-emerald-400 text-emerald-950 border-emerald-500 shadow-emerald-200 scale-110 z-10 ring-4 ring-emerald-100";
       case "new":
@@ -115,45 +111,49 @@ export default function QueueCanvas() {
       </div>
 
       {/* The Visual Canvas */}
-      <div className="flex items-center justify-center p-8 bg-slate-50 border-2 border-dashed border-slate-200 rounded-3xl w-full min-h-[350px] shadow-inner overflow-hidden">
+      <div className="flex items-center justify-center p-4 md:p-8 bg-slate-50 border-2 border-dashed border-slate-200 rounded-3xl w-full min-h-[350px] shadow-inner">
         
-        {/* The Queue "Tube" Container */}
-        <div className="relative w-full max-w-2xl h-36 border-y-8 border-slate-300 bg-slate-100 flex items-center px-4 shadow-inner overflow-visible">
+        {/* Layout Wrapper to prevent overlap */}
+        <div className="flex items-center justify-between w-full max-w-5xl space-x-2 md:space-x-4">
           
-          {/* Front Indicator (Left) */}
-          <div className="absolute -left-12 flex flex-col items-center text-rose-500 font-bold tracking-widest text-xs uppercase z-20 bg-slate-50/80 p-2 rounded-lg backdrop-blur-sm">
+          {/* Front Indicator (Left) - Using shrink-0 to prevent squishing */}
+          <div className="flex flex-col items-center text-rose-500 font-bold tracking-widest text-xs uppercase z-20 shrink-0">
             <span>Front</span>
-            <span>(Dequeue)</span>
+            <span className="hidden md:inline">(Dequeue)</span>
             <svg className="w-5 h-5 mt-1 animate-pulse" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="3" d="M10 19l-7-7m0 0l7-7m-7 7h18"></path>
             </svg>
           </div>
 
-          {/* Rear Indicator (Right) */}
-          <div className="absolute -right-12 flex flex-col items-center text-indigo-500 font-bold tracking-widest text-xs uppercase z-20 bg-slate-50/80 p-2 rounded-lg backdrop-blur-sm">
+          {/* The Queue "Tube" Container */}
+          <div className="relative flex-1 h-36 border-y-8 border-slate-300 bg-slate-100 flex items-center px-4 shadow-inner overflow-x-auto custom-scrollbar">
+            {queue.length === 0 ? (
+              <div className="w-full flex items-center justify-center text-slate-400 font-bold uppercase tracking-widest text-sm">
+                Queue is Empty
+              </div>
+            ) : (
+              <div className="flex items-center space-x-3 transition-all duration-500">
+                {queue.map((element) => (
+                  <div 
+                    key={element.id} 
+                    className={`w-16 h-16 shrink-0 flex items-center justify-center border-2 rounded-xl text-2xl font-black transition-all duration-300 ${getElementStyles(element.state)}`}
+                  >
+                    {element.value}
+                  </div>
+                ))}
+              </div>
+            )}
+          </div>
+
+          {/* Rear Indicator (Right) - Using shrink-0 to prevent squishing */}
+          <div className="flex flex-col items-center text-indigo-500 font-bold tracking-widest text-xs uppercase z-20 shrink-0">
             <span>Rear</span>
-            <span>(Enqueue)</span>
+            <span className="hidden md:inline">(Enqueue)</span>
             <svg className="w-5 h-5 mt-1 animate-pulse" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="3" d="M14 5l7 7m0 0l-7 7m7-7H3"></path>
             </svg>
           </div>
 
-          {queue.length === 0 ? (
-            <div className="w-full flex items-center justify-center text-slate-400 font-bold uppercase tracking-widest text-sm">
-              Queue is Empty
-            </div>
-          ) : (
-            <div className="flex items-center space-x-3 w-full transition-all duration-500">
-              {queue.map((element) => (
-                <div 
-                  key={element.id} 
-                  className={`w-16 h-16 shrink-0 flex items-center justify-center border-2 rounded-xl text-2xl font-black transition-all duration-300 ${getElementStyles(element.state)}`}
-                >
-                  {element.value}
-                </div>
-              ))}
-            </div>
-          )}
         </div>
       </div>
 

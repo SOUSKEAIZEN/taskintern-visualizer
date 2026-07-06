@@ -229,52 +229,54 @@ export default function HeapCanvas() {
       {/* The Visual Canvas */}
       <div className="flex flex-col items-center w-full bg-slate-50 border-2 border-dashed border-slate-200 rounded-3xl shadow-inner overflow-hidden">
         
-        {/* Top Section: The Tree Representation */}
-        <div className="relative w-full min-w-[800px] h-[360px] border-b-2 border-slate-200 bg-white/50 overflow-hidden">
-          
-          {/* Background Label */}
-          <span className="absolute top-4 left-6 text-sm font-bold text-slate-400 uppercase tracking-widest">
-            Logical Representation (Tree)
-          </span>
+        {/* Top Section: The Tree Representation (Wrapped in scrollable container) */}
+        <div className="w-full overflow-x-auto custom-scrollbar border-b-2 border-slate-200 bg-white/50">
+          <div className="relative w-[800px] mx-auto h-[360px]">
+            
+            {/* Background Label */}
+            <span className="absolute top-4 left-6 text-sm font-bold text-slate-400 uppercase tracking-widest z-10">
+              Logical Representation (Tree)
+            </span>
 
-          {heap.length > 0 && (
-            <>
-              {/* SVG Edge Layer */}
-              <svg className="absolute inset-0 w-full h-full pointer-events-none z-0">
-                {heap.map((_, i) => {
-                  if (i === 0) return null;
-                  const parentIdx = Math.floor((i - 1) / 2);
-                  const childCoords = getCoords(i);
-                  const parentCoords = getCoords(parentIdx);
+            {heap.length > 0 && (
+              <>
+                {/* SVG Edge Layer */}
+                <svg className="absolute inset-0 w-full h-full pointer-events-none z-0">
+                  {heap.map((_, i) => {
+                    if (i === 0) return null;
+                    const parentIdx = Math.floor((i - 1) / 2);
+                    const childCoords = getCoords(i);
+                    const parentCoords = getCoords(parentIdx);
+                    return (
+                      <line 
+                        key={`edge-${i}`} 
+                        x1={parentCoords.x} y1={parentCoords.y} 
+                        x2={childCoords.x} y2={childCoords.y} 
+                        stroke="#cbd5e1" // slate-300
+                        strokeWidth="3"
+                        className="transition-all duration-300"
+                      />
+                    );
+                  })}
+                </svg>
+
+                {/* HTML Node Layer */}
+                {heap.map((node, i) => {
+                  const { x, y } = getCoords(i);
                   return (
-                    <line 
-                      key={`edge-${i}`} 
-                      x1={parentCoords.x} y1={parentCoords.y} 
-                      x2={childCoords.x} y2={childCoords.y} 
-                      stroke="#cbd5e1" // slate-300
-                      strokeWidth="3"
-                      className="transition-all duration-300"
-                    />
+                    <div 
+                      key={node.id}
+                      className={`absolute w-14 h-14 rounded-full border-2 flex flex-col items-center justify-center font-black transition-all duration-500 transform -translate-x-1/2 -translate-y-1/2 cursor-default ${getNodeStyles(node.state)}`}
+                      style={{ left: `${x}px`, top: `${y}px` }}
+                    >
+                      <span className="text-lg leading-none">{node.value}</span>
+                      <span className="text-[10px] font-semibold opacity-60">[{i}]</span>
+                    </div>
                   );
                 })}
-              </svg>
-
-              {/* HTML Node Layer */}
-              {heap.map((node, i) => {
-                const { x, y } = getCoords(i);
-                return (
-                  <div 
-                    key={node.id}
-                    className={`absolute w-14 h-14 rounded-full border-2 flex flex-col items-center justify-center font-black transition-all duration-500 transform -translate-x-1/2 -translate-y-1/2 cursor-default ${getNodeStyles(node.state)}`}
-                    style={{ left: `${x}px`, top: `${y}px` }}
-                  >
-                    <span className="text-lg leading-none">{node.value}</span>
-                    <span className="text-[10px] font-semibold opacity-60">[{i}]</span>
-                  </div>
-                );
-              })}
-            </>
-          )}
+              </>
+            )}
+          </div>
         </div>
 
         {/* Bottom Section: The Array Representation */}
@@ -288,7 +290,7 @@ export default function HeapCanvas() {
               <span className="text-slate-400 font-medium">Heap is Empty</span>
             ) : (
               heap.map((node, i) => (
-                <div key={`arr-${node.id}`} className="flex flex-col items-center space-y-2">
+                <div key={`arr-${node.id}`} className="flex flex-col items-center space-y-2 shrink-0">
                   <span className="text-xs font-bold text-slate-400">[{i}]</span>
                   <div className={`w-14 h-14 border-2 rounded-lg flex items-center justify-center text-xl font-bold transition-all duration-300 ${getNodeStyles(node.state)}`}>
                     {node.value}
