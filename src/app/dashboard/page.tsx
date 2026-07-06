@@ -1,3 +1,4 @@
+// src/app/dashboard/page.tsx
 "use client";
 
 import { useEffect, useState } from "react";
@@ -17,9 +18,11 @@ interface QuizScore {
 interface ModuleProgress {
   id: string;
   topicId: string;
+  theoryCompleted: boolean; // Granular theory tracking
+  visualizationsCompleted: string[]; // Granular visualizer tracking
   isCompleted: boolean;
   lastAccessed: Date;
-  timeSpent: number; // Added from our Prisma schema update
+  timeSpent: number; 
 }
 
 interface DashboardData {
@@ -40,6 +43,18 @@ const ALL_MODULES = [
   { id: "heaps", label: "Heaps" },
   { id: "graphs", label: "Graphs (BFS/DFS)" },
 ];
+
+// Configuration for calculating independent percentages
+// Adjust the 'visCount' to match the exact number of interactive visualizations per page
+const MODULE_CONFIG: Record<string, { hasTheory: boolean, visCount: number }> = {
+  "arrays": { hasTheory: true, visCount: 4 }, 
+  "linked-lists": { hasTheory: true, visCount: 3 },
+  "stacks": { hasTheory: true, visCount: 2 },
+  "queues": { hasTheory: true, visCount: 2 },
+  "trees": { hasTheory: true, visCount: 3 },
+  "heaps": { hasTheory: true, visCount: 2 },
+  "graphs": { hasTheory: true, visCount: 2 },
+};
 
 const TOTAL_MODULES = ALL_MODULES.length; 
 
@@ -64,21 +79,21 @@ const DashboardPage = () => {
 
     const loadDashboard = async (isBackgroundSync = false) => {
       if (!isBackgroundSync) {
-        logger.info(`Dashboard UI: Initial mount. Fetching data for User ${CURRENT_USER_ID}`);
+        logger.info(`Dashboard UI Step 1: Initial mount. Fetching data for User ${CURRENT_USER_ID}`);
         setIsLoading(true);
       } else {
-        logger.info(`Dashboard UI: Running background sync for User ${CURRENT_USER_ID}...`);
+        logger.info(`Dashboard UI Step 1 [Background]: Running background sync for User ${CURRENT_USER_ID}...`);
       }
       
       try {
         const result = await fetchUserDashboardData(CURRENT_USER_ID);
         
         if (result.success && result.data) {
-          if (!isBackgroundSync) logger.info("Dashboard UI: Successfully fetched initial database records.");
+          if (!isBackgroundSync) logger.info("Dashboard UI Step 2: Successfully fetched initial database records.");
           setData(result.data as DashboardData);
           setLastSynced(new Date());
         } else if (!isBackgroundSync) {
-          logger.warn("Dashboard UI Warning: No data found, or user does not exist yet.");
+          logger.warn("Dashboard UI Point of Failure: No data found, or user does not exist yet.");
           setError("No learning history found. Complete a module to see your stats here!");
         }
       } catch (err) {
@@ -112,11 +127,41 @@ const DashboardPage = () => {
   }
 
   // --- Metric Calculations ---
-  logger.info("Dashboard UI: Calculating complex metrics (Speed, Statuses, Tiers)...");
+  logger.info("Dashboard UI Step 3: Calculating granular metrics (Percentages, Time, Tiers)...");
   
   const userProgress = data?.progress || [];
-  const completedModules = userProgress.filter(mod => mod.isCompleted);
-  const startedModules = userProgress.filter(mod => !mod.isCompleted);
+  
+  // Generate Master List with Independent Percentages
+  const moduleStatusList = ALL_MODULES.map(module => {
+    const dbRecord = userProgress.find(p => p.topicId === module.id);
+    const config = MODULE_CONFIG[module.id];
+    const totalPossibleSteps = (config?.hasTheory ? 1 : 0) + (config?.visCount || 0);
+    
+    if (!dbRecord) {
+      return { ...module, status: "Pending", timeSpent: 0, percentage: 0 };
+    }
+
+    // Granular Calculation
+    const theoryScore = dbRecord.theoryCompleted ? 1 : 0;
+    const visScore = dbRecord.visualizationsCompleted?.length || 0;
+    const currentSteps = theoryScore + visScore;
+    
+    // Guard against over-100% if visualizations change
+    const calculatedPercentage = Math.min(100, Math.round((currentSteps / totalPossibleSteps) * 100));
+    
+    // Check master completion flag or if calculated percentage is 100
+    const isActuallyComplete = dbRecord.isCompleted || calculatedPercentage === 100;
+
+    return { 
+      ...module, 
+      status: isActuallyComplete ? "Completed" : "Started", 
+      timeSpent: dbRecord.timeSpent,
+      percentage: calculatedPercentage
+    };
+  });
+
+  const completedModules = moduleStatusList.filter(mod => mod.status === "Completed");
+  const startedModules = moduleStatusList.filter(mod => mod.status === "Started");
   
   const completionPercentage = Math.round((completedModules.length / TOTAL_MODULES) * 100);
   
@@ -126,7 +171,7 @@ const DashboardPage = () => {
     ? Math.round(completedModules.reduce((acc, mod) => acc + (mod.timeSpent || 0), 0) / completedModules.length) 
     : 0;
 
-  // Codeforces-style Tiers based on completion percentage
+  // Codeforces-style Tiers
   let performanceTier = "Newbie";
   let tierColor = "text-slate-600 bg-slate-100 border-slate-200";
   
@@ -143,14 +188,6 @@ const DashboardPage = () => {
     performanceTier = "Grandmaster";
     tierColor = "text-red-600 bg-red-50 border-red-200";
   }
-
-  // Generate Master List with Statuses
-  const moduleStatusList = ALL_MODULES.map(module => {
-    const dbRecord = userProgress.find(p => p.topicId === module.id);
-    if (!dbRecord) return { ...module, status: "Pending", timeSpent: 0 };
-    if (dbRecord.isCompleted) return { ...module, status: "Completed", timeSpent: dbRecord.timeSpent };
-    return { ...module, status: "Started", timeSpent: dbRecord.timeSpent };
-  });
 
   const lastAccessedModule = [...userProgress].sort(
     (a, b) => new Date(b.lastAccessed).getTime() - new Date(a.lastAccessed).getTime()
@@ -172,7 +209,7 @@ const DashboardPage = () => {
           
           <div className="w-full max-w-md">
             <div className="flex justify-between text-sm mb-2">
-              <span className="font-semibold text-slate-700">Overall Progress</span>
+              <span className="font-semibold text-slate-700">Overall Syllabus Progress</span>
               <span className="font-bold text-indigo-600">{completionPercentage}%</span>
             </div>
             <div className="w-full bg-slate-100 rounded-full h-2.5">
@@ -203,7 +240,7 @@ const DashboardPage = () => {
       </div>
 
       {error ? (
-        <div className="bg-amber-50 border border-amber-200 text-amber-800 p-6 rounded-2xl text-center font-medium">
+        <div className="bg-amber-50 border border-amber-200 text-amber-800 p-6 rounded-2xl text-center font-medium shadow-sm">
           {error}
         </div>
       ) : (
@@ -218,19 +255,19 @@ const DashboardPage = () => {
             
             <div className="grid grid-cols-2 gap-4">
               <div className="bg-slate-50 p-4 rounded-2xl border border-slate-100">
-                <p className="text-xs text-slate-500 font-semibold uppercase tracking-wider mb-1">Total Time Spent</p>
+                <p className="text-xs text-slate-500 font-semibold uppercase tracking-wider mb-1">Total Time</p>
                 <p className="text-2xl font-black text-slate-800">{formatTime(totalTimeSeconds)}</p>
               </div>
               <div className="bg-slate-50 p-4 rounded-2xl border border-slate-100">
-                <p className="text-xs text-slate-500 font-semibold uppercase tracking-wider mb-1">Avg. Completion</p>
+                <p className="text-xs text-slate-500 font-semibold uppercase tracking-wider mb-1">Avg. Finish</p>
                 <p className="text-2xl font-black text-slate-800">{formatTime(avgTimePerCompleted)}</p>
               </div>
               <div className="bg-slate-50 p-4 rounded-2xl border border-slate-100">
-                <p className="text-xs text-slate-500 font-semibold uppercase tracking-wider mb-1">Modules Started</p>
-                <p className="text-2xl font-black text-slate-800">{startedModules.length + completedModules.length} / {TOTAL_MODULES}</p>
+                <p className="text-xs text-slate-500 font-semibold uppercase tracking-wider mb-1">Started</p>
+                <p className="text-2xl font-black text-slate-800">{startedModules.length} / {TOTAL_MODULES}</p>
               </div>
               <div className="bg-slate-50 p-4 rounded-2xl border border-slate-100">
-                <p className="text-xs text-slate-500 font-semibold uppercase tracking-wider mb-1">Modules Finished</p>
+                <p className="text-xs text-slate-500 font-semibold uppercase tracking-wider mb-1">Finished</p>
                 <p className="text-2xl font-black text-slate-800">{completedModules.length} / {TOTAL_MODULES}</p>
               </div>
             </div>
@@ -243,23 +280,33 @@ const DashboardPage = () => {
               Module Status
             </h2>
             
-            <div className="space-y-3 max-h-64 overflow-y-auto custom-scrollbar pr-2">
+            <div className="space-y-4 max-h-[340px] overflow-y-auto custom-scrollbar pr-2">
               {moduleStatusList.map((mod) => (
-                <div key={mod.id} className="flex items-center justify-between p-3 rounded-xl bg-slate-50 border border-slate-100">
-                  <div className="flex flex-col">
-                    <span className="font-semibold text-sm text-slate-700">{mod.label}</span>
-                    <span className="text-xs text-slate-400">Time: {formatTime(mod.timeSpent)}</span>
+                <div key={mod.id} className="flex flex-col p-4 rounded-xl bg-slate-50 border border-slate-100 gap-3">
+                  <div className="flex items-center justify-between">
+                    <div className="flex flex-col">
+                      <span className="font-semibold text-sm text-slate-700">{mod.label}</span>
+                      <span className="text-xs text-slate-400">Time: {formatTime(mod.timeSpent)}</span>
+                    </div>
+                    
+                    {mod.status === "Completed" && (
+                      <span className="px-3 py-1 bg-emerald-100 text-emerald-700 text-xs font-bold rounded-full">Completed</span>
+                    )}
+                    {mod.status === "Started" && (
+                      <span className="px-3 py-1 bg-amber-100 text-amber-700 text-xs font-bold rounded-full">{mod.percentage}%</span>
+                    )}
+                    {mod.status === "Pending" && (
+                      <span className="px-3 py-1 bg-slate-200 text-slate-500 text-xs font-bold rounded-full">Pending</span>
+                    )}
                   </div>
-                  
-                  {mod.status === "Completed" && (
-                    <span className="px-3 py-1 bg-emerald-100 text-emerald-700 text-xs font-bold rounded-full">Completed</span>
-                  )}
-                  {mod.status === "Started" && (
-                    <span className="px-3 py-1 bg-amber-100 text-amber-700 text-xs font-bold rounded-full">In Progress</span>
-                  )}
-                  {mod.status === "Pending" && (
-                    <span className="px-3 py-1 bg-slate-200 text-slate-500 text-xs font-bold rounded-full">Pending</span>
-                  )}
+
+                  {/* Individual Module Progress Bar */}
+                  <div className="w-full bg-slate-200 rounded-full h-1.5">
+                    <div 
+                      className={`h-1.5 rounded-full transition-all duration-700 ease-out ${mod.status === 'Completed' ? 'bg-emerald-500' : 'bg-amber-500'}`}
+                      style={{ width: `${mod.percentage}%` }}
+                    ></div>
+                  </div>
                 </div>
               ))}
             </div>

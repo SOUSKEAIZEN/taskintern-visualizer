@@ -1,7 +1,8 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useState, useRef } from "react";
 import { logger } from "../../lib/logger";
+import { markTheoryComplete } from "../../lib/actions/progress";
 import arrayData from "../../content/modules/arrays.json";
 import linkedListData from "../../content/modules/linkedlists.json";
 import stackData from "../../content/modules/stacks.json";
@@ -35,9 +36,13 @@ interface ModuleData {
 
 export default function TheoryPanel({ topicId = "arrays" }: { topicId?: string }) {
   const [data, setData] = useState<ModuleData | null>(null);
+  
+  // Ref for the bottom of the theory content
+  const bottomRef = useRef<HTMLDivElement>(null);
+  const CURRENT_USER_ID = "placeholder-student-id-123";
 
   useEffect(() => {
-    logger.info(`UI Mount: Initializing TheoryPanel for topic: ${topicId}`);
+    logger.info(`UI Mount Step 1: Initializing TheoryPanel for topic: ${topicId}`);
     
     // Route to the correct imported JSON data based on the active module
     if (topicId === "arrays") {
@@ -55,10 +60,53 @@ export default function TheoryPanel({ topicId = "arrays" }: { topicId?: string }
     } else if (topicId === "graphs") {
       setData(graphData as ModuleData);
     } else {
-      logger.warn(`Data Warning: Attempted to load unknown topic ID: ${topicId}`);
+      logger.warn(`UI Point of Failure: Attempted to load unknown topic ID: ${topicId}`);
       setData(null);
     }
   }, [topicId]);
+
+  // Intersection Observer Effect for tracking reading completion
+  useEffect(() => {
+    if (!data || !bottomRef.current) return;
+
+    logger.info(`UI Mount Step 2: Setting up IntersectionObserver for ${topicId} theory content.`);
+
+    const observer = new IntersectionObserver(
+      (entries) => {
+        const [entry] = entries;
+        if (entry.isIntersecting) {
+          logger.info(`UI Action Step 1: User reached the bottom of ${topicId} theory. Firing completion event...`);
+          
+          markTheoryComplete(CURRENT_USER_ID, topicId)
+            .then((res) => {
+              if (res.success) {
+                logger.info(`UI Action Step 2: Successfully registered theory completion for ${topicId} in database.`);
+              } else {
+                logger.error(`UI Point of Failure: Server rejected theory completion for ${topicId}. Error: ${res.error}`);
+              }
+            })
+            .catch((err) => {
+              logger.error(`UI Point of Failure: Network exception while marking theory complete.`, err);
+            });
+
+          // Disconnect immediately after firing to prevent spamming the server
+          observer.disconnect();
+          logger.info(`UI Action Step 3: IntersectionObserver disconnected for ${topicId}.`);
+        }
+      },
+      {
+        root: null, // Observe relative to the viewport
+        threshold: 0.1, // Trigger when 10% of the target is visible
+      }
+    );
+
+    observer.observe(bottomRef.current);
+
+    // Cleanup function
+    return () => {
+      observer.disconnect();
+    };
+  }, [data, topicId]);
 
   if (!data) {
     return (
@@ -107,7 +155,7 @@ export default function TheoryPanel({ topicId = "arrays" }: { topicId?: string }
       </div>
 
       {/* Graphic Design: Time Complexity Table */}
-      <div className="bg-slate-50 rounded-2xl border border-slate-200 overflow-hidden shadow-sm">
+      <div className="bg-slate-50 rounded-2xl border border-slate-200 overflow-hidden shadow-sm mb-6">
         <div className="bg-slate-900 px-6 py-4">
           <h3 className="text-lg font-bold text-white flex items-center space-x-2">
             <span>⚡</span>
@@ -150,6 +198,9 @@ export default function TheoryPanel({ topicId = "arrays" }: { topicId?: string }
           </span>
         </div>
       </div>
+
+      {/* Invisible Trigger for Intersection Observer */}
+      <div ref={bottomRef} className="h-4 w-full" aria-hidden="true" />
     </div>
   );
 }

@@ -25,18 +25,22 @@ model User {
 // Open Innovation: Learning Analytics Tracking
 // ---------------------------------------------------------
 model ModuleProgress {
-  id           String   @id @default(uuid())
-  userId       String
-  topicId      String   // e.g., "arrays", "linked-lists"
-  isCompleted  Boolean  @default(false)
+  id                      String   @id @default(uuid())
+  userId                  String
+  topicId                 String   // e.g., "arrays", "linked-lists"
+  
+  // Granular tracking fields for Dashboard
+  theoryCompleted         Boolean  @default(false)
+  visualizationsCompleted String[] @default([]) // Stores IDs/names of completed visualizations
+  isCompleted             Boolean  @default(false) // Master flag for 100% completion
   
   // Added fields to support deeper data analysis of performance
-  timeSpent    Int      @default(0) // Time spent in seconds
-  completedAt  DateTime?            // Exact timestamp of completion
-  lastAccessed DateTime @default(now())
+  timeSpent               Int      @default(0) // Time spent in seconds
+  completedAt             DateTime?            // Exact timestamp of completion
+  lastAccessed            DateTime @default(now())
   
   // Relational link to the User
-  user         User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  user                    User     @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   // Ensures a user can only have one progress record per topic
   @@unique([userId, topicId])

@@ -24,6 +24,82 @@ const prisma = globalThis.prismaGlobal ?? prismaClientSingleton();
 if (process.env.NODE_ENV !== "production") globalThis.prismaGlobal = prisma;
 
 /**
+ * Server Action: Marks the theory portion of a specific educational module as complete.
+ */
+export async function markTheoryComplete(userId: string, topicId: string) {
+  logger.info(`DB Action Start [markTheoryComplete]: Initiated for User ${userId}, Topic ${topicId}`);
+  
+  try {
+    logger.info(`DB Step 1 [markTheoryComplete]: Executing Prisma upsert to set theoryCompleted flag.`);
+    const progress = await prisma.moduleProgress.upsert({
+      where: {
+        userId_topicId: { userId, topicId }
+      },
+      update: {
+        theoryCompleted: true,
+        lastAccessed: new Date(),
+      },
+      create: {
+        userId,
+        topicId,
+        theoryCompleted: true,
+      },
+    });
+
+    logger.info(`DB Step 2 [markTheoryComplete]: Upsert successful. Record ID: ${progress.id}`);
+    return { success: true, data: progress };
+  } catch (error) {
+    logger.error(`DB Point of Failure [markTheoryComplete]: Exception caught while updating theory progress for User ${userId}`, error);
+    return { success: false, error: "Database operation failed." };
+  }
+}
+
+/**
+ * Server Action: Marks a specific visualization within a module as complete.
+ */
+export async function markVisualizationComplete(userId: string, topicId: string, visualizationId: string) {
+  logger.info(`DB Action Start [markVisualizationComplete]: Initiated for User ${userId}, Topic ${topicId}, Visualization ${visualizationId}`);
+  
+  try {
+    logger.info(`DB Step 1 [markVisualizationComplete]: Fetching existing record to check current visualizations completed.`);
+    const existingRecord = await prisma.moduleProgress.findUnique({
+      where: { userId_topicId: { userId, topicId } }
+    });
+
+    // Check if it's already in the array to avoid duplicates
+    const currentVisualizations = existingRecord?.visualizationsCompleted || [];
+    if (currentVisualizations.includes(visualizationId)) {
+      logger.info(`DB Step 2 [markVisualizationComplete]: Visualization ${visualizationId} already marked complete. Skipping update.`);
+      return { success: true, data: existingRecord };
+    }
+
+    const updatedVisualizations = [...currentVisualizations, visualizationId];
+
+    logger.info(`DB Step 3 [markVisualizationComplete]: Executing Prisma upsert to append visualization ID to array.`);
+    const progress = await prisma.moduleProgress.upsert({
+      where: {
+        userId_topicId: { userId, topicId }
+      },
+      update: {
+        visualizationsCompleted: updatedVisualizations,
+        lastAccessed: new Date(),
+      },
+      create: {
+        userId,
+        topicId,
+        visualizationsCompleted: [visualizationId],
+      },
+    });
+
+    logger.info(`DB Step 4 [markVisualizationComplete]: Upsert successful. Record ID: ${progress.id}. Total visualizations: ${updatedVisualizations.length}`);
+    return { success: true, data: progress };
+  } catch (error) {
+    logger.error(`DB Point of Failure [markVisualizationComplete]: Exception caught while updating visualization progress for User ${userId}`, error);
+    return { success: false, error: "Database operation failed." };
+  }
+}
+
+/**
  * Server Action: Marks a specific educational module as complete or incomplete, and aggregates time spent.
  */
 export async function updateModuleProgress(userId: string, topicId: string, isCompleted: boolean = false, timeSpentSeconds: number = 0) {
