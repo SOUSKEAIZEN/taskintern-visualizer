@@ -24,29 +24,42 @@ const prisma = globalThis.prismaGlobal ?? prismaClientSingleton();
 if (process.env.NODE_ENV !== "production") globalThis.prismaGlobal = prisma;
 
 /**
- * Server Action: Marks a specific educational module as complete or incomplete.
+ * Server Action: Marks a specific educational module as complete or incomplete, and aggregates time spent.
  */
-export async function updateModuleProgress(userId: string, topicId: string, isCompleted: boolean = true) {
-  logger.info(`DB Action Start [updateModuleProgress]: Initiated for User ${userId}, Topic ${topicId}`);
+export async function updateModuleProgress(userId: string, topicId: string, isCompleted: boolean = false, timeSpentSeconds: number = 0) {
+  logger.info(`DB Action Start [updateModuleProgress]: Initiated for User ${userId}, Topic ${topicId} | Payload: { isCompleted: ${isCompleted}, timeSpent: +${timeSpentSeconds}s }`);
   
   try {
-    logger.info(`DB Step 1 [updateModuleProgress]: Executing Prisma upsert for User ${userId}`);
+    logger.info(`DB Step 1 [updateModuleProgress]: Checking for existing record to prevent overwriting prior completions.`);
+    const existingRecord = await prisma.moduleProgress.findUnique({
+      where: { userId_topicId: { userId, topicId } }
+    });
+
+    // Safety checks for completion state
+    const finalIsCompleted = isCompleted || (existingRecord?.isCompleted ?? false);
+    const newlyCompleted = finalIsCompleted && !existingRecord?.isCompleted;
+
+    logger.info(`DB Step 2 [updateModuleProgress]: Executing Prisma upsert for User ${userId}. Aggregating time data...`);
     const progress = await prisma.moduleProgress.upsert({
       where: {
         userId_topicId: { userId, topicId }
       },
       update: {
-        isCompleted,
+        isCompleted: finalIsCompleted,
+        timeSpent: { increment: timeSpentSeconds },
         lastAccessed: new Date(),
+        completedAt: newlyCompleted ? new Date() : existingRecord?.completedAt,
       },
       create: {
         userId,
         topicId,
-        isCompleted,
+        isCompleted: finalIsCompleted,
+        timeSpent: timeSpentSeconds,
+        completedAt: finalIsCompleted ? new Date() : null,
       },
     });
 
-    logger.info(`DB Step 2 [updateModuleProgress]: Upsert successful. Record ID: ${progress.id}`);
+    logger.info(`DB Step 3 [updateModuleProgress]: Upsert successful. Record ID: ${progress.id} | Total Time on DB: ${progress.timeSpent}s`);
     return { success: true, data: progress };
   } catch (error) {
     logger.error(`DB Point of Failure [updateModuleProgress]: Exception caught while updating progress for User ${userId}`, error);
