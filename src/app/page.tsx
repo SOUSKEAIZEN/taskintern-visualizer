@@ -11,7 +11,6 @@ import TreeCanvas from "../../components/visualization/TreeCanvas";
 import HeapCanvas from "../../components/visualization/HeapCanvas";
 import GraphCanvas from "../../components/visualization/GraphCanvas";
 import TheoryPanel from "../../components/workspace/TheoryPanel";
-import InteractiveQuiz from "../../components/workspace/InteractiveQuiz";
 
 function WorkspaceContent() {
   const searchParams = useSearchParams();
@@ -87,7 +86,7 @@ function WorkspaceContent() {
         </div>
       )}
 
-      {/* Right Pane: Interactive Workspace & Assessment */}
+      {/* Right Pane: Interactive Workspace */}
       <div 
         style={{ width: isFullscreen ? '100%' : `${100 - leftPaneWidth}%` }}
         className="h-full overflow-y-auto p-4 md:p-8 bg-slate-50/50 space-y-8 pb-24 relative custom-scrollbar flex-grow transition-all duration-300"
@@ -166,24 +165,6 @@ function WorkspaceContent() {
             )}
           </div>
         </div>
-
-        {/* Assessment Section */}
-        {isVisualizing && (
-          <div className="w-full max-w-4xl mx-auto animate-in fade-in slide-in-from-bottom-8 duration-700">
-            <div className="flex items-center justify-center mb-12 mt-8">
-              <div className="w-full h-px bg-slate-200"></div>
-              <span className="px-6 text-sm font-bold text-slate-400 uppercase tracking-widest whitespace-nowrap">
-                Knowledge Assessment
-              </span>
-              <div className="w-full h-px bg-slate-200"></div>
-            </div>
-            
-            <InteractiveQuiz 
-              topicId={activeModule} 
-              userId="placeholder-student-id-123" 
-            />
-          </div>
-        )}
       </div>
     </div>
   );
