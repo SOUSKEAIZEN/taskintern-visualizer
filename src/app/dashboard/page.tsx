@@ -32,7 +32,7 @@ interface DashboardData {
 // Total number of visualization modules available in the app
 const TOTAL_MODULES = 6; 
 
-export default function DashboardPage() {
+const DashboardPage = () => {
   const [data, setData] = useState<DashboardData | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -45,20 +45,22 @@ export default function DashboardPage() {
       setIsLoading(true);
       
       try {
+        logger.info("Dashboard UI: Initiating fetchUserDashboardData action...");
         const result = await fetchUserDashboardData(CURRENT_USER_ID);
         
         if (result.success && result.data) {
-          logger.info("Dashboard UI: Successfully fetched database records.");
+          logger.info("Dashboard UI: Successfully fetched database records and updated state.");
           setData(result.data as DashboardData);
         } else {
           logger.warn("Dashboard UI Warning: No data found, or user does not exist yet.");
           setError("No learning history found. Complete a module to see your stats here!");
         }
       } catch (err) {
-        logger.error("Dashboard UI Error: Failed to load data.", err);
+        logger.error("Dashboard UI Point of Failure: Failed to load data.", err);
         setError("Failed to load dashboard data. Check your database connection.");
       } finally {
         setIsLoading(false);
+        logger.info("Dashboard UI: Loading state resolved.");
       }
     };
 
@@ -78,7 +80,7 @@ export default function DashboardPage() {
   }
 
   // --- Metric Calculations ---
-  logger.info("Dashboard UI: Calculating performance metrics...");
+  logger.info("Dashboard UI: Calculating performance metrics based on retrieved data...");
   
   const completedModulesCount = data?.progress.filter(mod => mod.isCompleted).length || 0;
   const completionPercentage = Math.round((completedModulesCount / TOTAL_MODULES) * 100);
@@ -100,7 +102,7 @@ export default function DashboardPage() {
   const recentActivity = sortedProgress.slice(0, 3);
   const lastAccessedModule = recentActivity.length > 0 ? recentActivity[0] : null;
 
-  logger.info(`Dashboard UI: Metrics calculated. Completion: ${completionPercentage}%, Tier: ${performanceTier}`);
+  logger.info(`Dashboard UI: Metrics calculation complete. Overall Completion: ${completionPercentage}%, Assigned Tier: ${performanceTier}`);
 
   return (
     <div className="max-w-5xl mx-auto space-y-8 animate-in fade-in duration-500">
@@ -132,9 +134,9 @@ export default function DashboardPage() {
           </div>
           {lastAccessedModule && (
             <Link 
-              href={`/modules/${lastAccessedModule.topicId}`}
+              href={`/?module=${lastAccessedModule.topicId}`}
               className="px-6 py-2 bg-slate-900 hover:bg-slate-800 text-white text-sm font-semibold rounded-xl transition-colors shadow-sm"
-              onClick={() => logger.info(`Dashboard UI: User clicked Resume Learning for ${lastAccessedModule.topicId}`)}
+              onClick={() => logger.info(`Dashboard UI: User clicked Resume Learning routing to /?module=${lastAccessedModule.topicId}`)}
             >
               Resume: {lastAccessedModule.topicId.replace('-', ' ')} &rarr;
             </Link>
@@ -208,4 +210,6 @@ export default function DashboardPage() {
       )}
     </div>
   );
-}
+};
+
+export default DashboardPage;
