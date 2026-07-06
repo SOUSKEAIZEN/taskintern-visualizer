@@ -24,12 +24,32 @@ const prisma = globalThis.prismaGlobal ?? prismaClientSingleton();
 if (process.env.NODE_ENV !== "production") globalThis.prismaGlobal = prisma;
 
 /**
+ * Helper Function: Ensures a user exists in the database to prevent Foreign Key constraint errors.
+ */
+async function ensureUserExists(userId: string) {
+  const user = await prisma.user.findUnique({ where: { id: userId } });
+  if (!user) {
+    logger.info(`DB Helper [ensureUserExists]: User ${userId} not found. Creating auto-generated profile...`);
+    await prisma.user.create({
+      data: {
+        id: userId,
+        email: `${userId}@student.taskintern.com`, // Required by schema
+        name: "Student Profile",
+      },
+    });
+    logger.info(`DB Helper [ensureUserExists]: User ${userId} successfully created.`);
+  }
+}
+
+/**
  * Server Action: Marks the theory portion of a specific educational module as complete.
  */
 export async function markTheoryComplete(userId: string, topicId: string) {
   logger.info(`DB Action Start [markTheoryComplete]: Initiated for User ${userId}, Topic ${topicId}`);
   
   try {
+    await ensureUserExists(userId); // Fixes the Foreign Key constraint!
+
     logger.info(`DB Step 1 [markTheoryComplete]: Executing Prisma upsert to set theoryCompleted flag.`);
     const progress = await prisma.moduleProgress.upsert({
       where: {
@@ -61,6 +81,8 @@ export async function markVisualizationComplete(userId: string, topicId: string,
   logger.info(`DB Action Start [markVisualizationComplete]: Initiated for User ${userId}, Topic ${topicId}, Visualization ${visualizationId}`);
   
   try {
+    await ensureUserExists(userId);
+
     logger.info(`DB Step 1 [markVisualizationComplete]: Fetching existing record to check current visualizations completed.`);
     const existingRecord = await prisma.moduleProgress.findUnique({
       where: { userId_topicId: { userId, topicId } }
@@ -106,6 +128,8 @@ export async function updateModuleProgress(userId: string, topicId: string, isCo
   logger.info(`DB Action Start [updateModuleProgress]: Initiated for User ${userId}, Topic ${topicId} | Payload: { isCompleted: ${isCompleted}, timeSpent: +${timeSpentSeconds}s }`);
   
   try {
+    await ensureUserExists(userId);
+
     logger.info(`DB Step 1 [updateModuleProgress]: Checking for existing record to prevent overwriting prior completions.`);
     const existingRecord = await prisma.moduleProgress.findUnique({
       where: { userId_topicId: { userId, topicId } }
@@ -150,6 +174,8 @@ export async function submitQuizScore(userId: string, topicId: string, score: nu
   logger.info(`DB Action Start [submitQuizScore]: Initiated for User ${userId}, Topic ${topicId} with score ${score}/${totalQuestions}`);
   
   try {
+    await ensureUserExists(userId);
+
     logger.info(`DB Step 1 [submitQuizScore]: Executing Prisma create for User ${userId}`);
     const quizRecord = await prisma.quizScore.create({
       data: {
@@ -175,6 +201,9 @@ export async function fetchUserDashboardData(userId: string) {
   logger.info(`DB Action Start [fetchUserDashboardData]: Initiated for User ${userId}`);
   
   try {
+    // If the dashboard is loaded before anything else, create the user!
+    await ensureUserExists(userId);
+
     logger.info(`DB Step 1 [fetchUserDashboardData]: Querying Prisma for unique User ${userId} and relational data (progress, scores)`);
     const user = await prisma.user.findUnique({
       where: { id: userId },

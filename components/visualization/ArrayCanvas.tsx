@@ -2,6 +2,7 @@
 
 import { useState, useEffect, useRef } from "react";
 import { logger } from "../../lib/logger";
+import { markVisualizationComplete } from "../../lib/actions/progress";
 import { ArrayElement, AlgorithmStep } from "../../types/dsa";
 import { 
   generateBubbleSortSteps, 
@@ -32,7 +33,7 @@ export default function ArrayCanvas({ initialData = [45, 10, 24, 92, 7] }: Array
   const [speedLevel, setSpeedLevel] = useState<number>(3); 
 
   const timerRef = useRef<NodeJS.Timeout | null>(null);
-  
+  const CURRENT_USER_ID = "placeholder-student-id-123";
   const MAX_ELEMENTS = 20;
 
   // --- 1. Manual Controls & Custom Input ---
@@ -159,7 +160,28 @@ export default function ArrayCanvas({ initialData = [45, 10, 24, 92, 7] }: Array
     };
   }, [isPlaying, currentFrame, history.length, speedLevel]);
 
-  // --- 5. Visual Rendering Helpers ---
+  // --- 5. Interactive Completion Tracking ---
+  useEffect(() => {
+    // Only fire if we are actively visualizing and have reached the final frame
+    if (isPlaybackMode && history.length > 0 && currentFrame === history.length - 1) {
+      const visualizationId = `array-${activeAlgorithm}`;
+      logger.info(`UI Action Step 1: Animation complete. Firing progress event for ${visualizationId}...`);
+      
+      markVisualizationComplete(CURRENT_USER_ID, "arrays", visualizationId)
+        .then((res) => {
+          if (res.success) {
+            logger.info(`UI Action Step 2: Successfully registered ${visualizationId} completion in database.`);
+          } else {
+            logger.error(`UI Point of Failure: Server rejected visualization completion. Error: ${res.error}`);
+          }
+        })
+        .catch((err) => {
+          logger.error(`UI Point of Failure: Network exception while marking visualization complete.`, err);
+        });
+    }
+  }, [currentFrame, history.length, isPlaybackMode, activeAlgorithm]);
+
+  // --- 6. Visual Rendering Helpers ---
   const activeFrame = isPlaybackMode && history.length > 0 ? history[currentFrame].snapshot : null;
   const activeDescription = isPlaybackMode && history.length > 0 ? history[currentFrame].description : "";
 
