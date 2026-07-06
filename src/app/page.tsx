@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect, Suspense } from "react";
+import { useState, useEffect, Suspense, useRef } from "react";
 import { useSearchParams } from "next/navigation";
 import { logger } from "../../lib/logger";
 import ArrayCanvas from "../../components/visualization/ArrayCanvas";
@@ -11,10 +11,11 @@ import TreeCanvas from "../../components/visualization/TreeCanvas";
 import HeapCanvas from "../../components/visualization/HeapCanvas";
 import GraphCanvas from "../../components/visualization/GraphCanvas";
 import TheoryPanel from "../../components/workspace/TheoryPanel";
+// Note: We will need to update the updateModuleProgress action to accept timeSpent in the next step
+// import { updateModuleProgress } from "../../lib/actions/progress";
 
 function WorkspaceContent() {
   const searchParams = useSearchParams();
-  // Read the module from the URL, default to arrays if none is provided
   const urlModule = searchParams.get("module") || "arrays";
 
   const [activeModule, setActiveModule] = useState(urlModule);
@@ -22,21 +23,98 @@ function WorkspaceContent() {
   
   // UI UX States
   const [isFullscreen, setIsFullscreen] = useState(false);
-  const [leftPaneWidth, setLeftPaneWidth] = useState(33.33); // Starting at 33.33% width
+  const [leftPaneWidth, setLeftPaneWidth] = useState(33.33); 
+
+  // --- Time Tracking & Analytics States ---
+  const [activeTime, setActiveTime] = useState(0); // For UI display (seconds)
+  const sessionStartTimeRef = useRef<number | null>(null);
+  const activeModuleRef = useRef<string>(activeModule);
+  
+  const CURRENT_USER_ID = "placeholder-student-id-123";
+
+  // Keeps the ref in sync with the state so event listeners can access the latest value
+  useEffect(() => {
+    activeModuleRef.current = activeModule;
+  }, [activeModule]);
 
   // Sync URL parameter to the active module state
   useEffect(() => {
     if (urlModule !== activeModule) {
       logger.info(`URL State Change: Switching active module to ${urlModule.toUpperCase()}`);
+      
+      // If they switch modules while visualizing, force a timer stop and sync
+      if (isVisualizing) {
+        logger.info(`Timer Logic: Auto-stopping session due to module switch.`);
+        handleStopVisualization();
+      }
+      
       setActiveModule(urlModule);
-      setIsVisualizing(false); // Reset canvas when switching modules
-      setIsFullscreen(false); // Exit fullscreen if active
+      setIsVisualizing(false); 
+      setIsFullscreen(false); 
     }
-  }, [urlModule, activeModule]);
+  }, [urlModule]);
+
+  // --- Real-time Timer Logic ---
+  useEffect(() => {
+    let interval: NodeJS.Timeout;
+
+    if (isVisualizing) {
+      logger.info(`Timer Logic Step 1: Starting active learning session for [${activeModule}]`);
+      sessionStartTimeRef.current = Date.now();
+      setActiveTime(0); // Reset UI timer
+      
+      interval = setInterval(() => {
+        setActiveTime((prev) => prev + 1);
+      }, 1000);
+    }
+
+    return () => {
+      if (interval) clearInterval(interval);
+    };
+  }, [isVisualizing, activeModule]);
+
+  // --- Safely Catch Page Close / Refresh ---
+  useEffect(() => {
+    const handleBeforeUnload = (e: BeforeUnloadEvent) => {
+      if (sessionStartTimeRef.current) {
+        const timeSpent = Math.floor((Date.now() - sessionStartTimeRef.current) / 1000);
+        logger.warn(`Browser Event [beforeunload]: Emergency syncing ${timeSpent}s for ${activeModuleRef.current} before tab closes.`);
+        syncProgressToDatabase(activeModuleRef.current, timeSpent);
+      }
+    };
+
+    window.addEventListener("beforeunload", handleBeforeUnload);
+    return () => window.removeEventListener("beforeunload", handleBeforeUnload);
+  }, []);
+
+  const syncProgressToDatabase = async (topicId: string, timeSpentSeconds: number) => {
+    if (timeSpentSeconds <= 0) return;
+    
+    logger.info(`DB Sync Init: Preparing to send ${timeSpentSeconds}s to backend for ${topicId}`);
+    try {
+      // NOTE: The backend action needs to be updated to handle timeSpent appending.
+      // await updateModuleProgress(CURRENT_USER_ID, topicId, false, timeSpentSeconds);
+      logger.info(`DB Sync Success: (Simulated) Saved ${timeSpentSeconds}s for ${topicId}.`);
+    } catch (err) {
+      logger.error(`DB Sync Point of Failure: Could not save time for ${topicId}`, err);
+    }
+  };
 
   const handleStartVisualization = () => {
     logger.info(`State Change: User mounted the interactive ${activeModule} Canvas.`);
     setIsVisualizing(true);
+  };
+
+  const handleStopVisualization = () => {
+    logger.info(`State Change: User unmounted the interactive ${activeModule} Canvas.`);
+    setIsVisualizing(false);
+    
+    if (sessionStartTimeRef.current) {
+      const totalTimeSpent = Math.floor((Date.now() - sessionStartTimeRef.current) / 1000);
+      logger.info(`Timer Logic Step 2: Session ended natively. Total time: ${totalTimeSpent}s`);
+      syncProgressToDatabase(activeModule, totalTimeSpent);
+      sessionStartTimeRef.current = null;
+    }
   };
 
   const toggleFullscreen = () => {
@@ -44,10 +122,17 @@ function WorkspaceContent() {
     setIsFullscreen(!isFullscreen);
   };
 
+  // Helper to format the active time for the UI
+  const formatUIClock = (totalSeconds: number) => {
+    const m = Math.floor(totalSeconds / 60).toString().padStart(2, '0');
+    const s = (totalSeconds % 60).toString().padStart(2, '0');
+    return `${m}:${s}`;
+  };
+
   return (
     <div className="flex h-full w-full relative">
       
-      {/* Left Pane: Educational Theory Content (Hidden if Fullscreen) */}
+      {/* Left Pane: Educational Theory Content */}
       {!isFullscreen && (
         <div 
           style={{ width: `${leftPaneWidth}%` }}
@@ -66,9 +151,8 @@ function WorkspaceContent() {
             const startWidth = leftPaneWidth;
             
             const onMouseMove = (moveEvent: MouseEvent) => {
-              // Calculate the change as a percentage of the total window width
               const delta = ((moveEvent.clientX - startX) / window.innerWidth) * 100;
-              const newWidth = Math.max(20, Math.min(startWidth + delta, 60)); // Constrain between 20% and 60%
+              const newWidth = Math.max(20, Math.min(startWidth + delta, 60)); 
               setLeftPaneWidth(newWidth);
             };
             
@@ -81,7 +165,6 @@ function WorkspaceContent() {
             document.addEventListener("mouseup", onMouseUp);
           }}
         >
-          {/* Visual indicator for the drag handle */}
           <div className="h-8 w-1 bg-slate-400 group-hover:bg-white rounded-full"></div>
         </div>
       )}
@@ -96,28 +179,43 @@ function WorkspaceContent() {
           {/* Main Visualization Area */}
           <div className="bg-white border border-slate-200 rounded-3xl shadow-sm p-4 md:p-8 flex flex-col items-center justify-center min-h-[500px] relative overflow-hidden transition-all duration-500">
             
-            {/* Background Accent Graphic */}
             <div className="absolute top-0 right-0 -mr-16 -mt-16 w-64 h-64 bg-indigo-50 rounded-full blur-3xl opacity-60 pointer-events-none"></div>
 
-            {/* Fullscreen Toggle Button (Only show if visualizing) */}
+            {/* Top Right Controls (Timer & Fullscreen) */}
             {isVisualizing && (
-              <button
-                onClick={toggleFullscreen}
-                className="absolute top-4 right-4 p-2 bg-white border border-slate-200 hover:bg-slate-50 text-slate-500 hover:text-indigo-600 rounded-lg shadow-sm transition-all z-20 flex items-center space-x-2"
-                title={isFullscreen ? "Exit Fullscreen" : "Enter Fullscreen"}
-              >
-                {isFullscreen ? (
-                  <>
-                    <span className="text-sm font-bold">Exit</span>
-                    <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M4 14h4v4m0-4l-5 5m11-5h4v4m-4-4l5 5M4 10h4V6m0 4l-5-5m11 5h4V6m-4 4l5-5" /></svg>
-                  </>
-                ) : (
-                  <>
-                    <span className="text-sm font-bold">Fullscreen</span>
-                    <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M4 8V4m0 0h4M4 4l5 5m11-1V4m0 0h-4m4 0l-5 5M4 16v4m0 0h4m-4 0l5-5m11 5l-5-5m5 5v-4m0 4h-4" /></svg>
-                  </>
-                )}
-              </button>
+              <div className="absolute top-4 right-4 flex items-center gap-3 z-20">
+                {/* Live Timer Display */}
+                <div className="flex items-center gap-2 px-3 py-2 bg-slate-900 text-white rounded-lg shadow-sm font-mono text-sm">
+                  <span className="w-2 h-2 rounded-full bg-red-500 animate-pulse"></span>
+                  {formatUIClock(activeTime)}
+                </div>
+
+                <button
+                  onClick={toggleFullscreen}
+                  className="p-2 bg-white border border-slate-200 hover:bg-slate-50 text-slate-500 hover:text-indigo-600 rounded-lg shadow-sm transition-all flex items-center space-x-2"
+                  title={isFullscreen ? "Exit Fullscreen" : "Enter Fullscreen"}
+                >
+                  {isFullscreen ? (
+                    <>
+                      <span className="text-sm font-bold">Exit</span>
+                      <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M4 14h4v4m0-4l-5 5m11-5h4v4m-4-4l5 5M4 10h4V6m0 4l-5-5m11 5h4V6m-4 4l5-5" /></svg>
+                    </>
+                  ) : (
+                    <>
+                      <span className="text-sm font-bold">Fullscreen</span>
+                      <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M4 8V4m0 0h4M4 4l5 5m11-1V4m0 0h-4m4 0l-5 5M4 16v4m0 0h4m-4 0l5-5m11 5l-5-5m5 5v-4m0 4h-4" /></svg>
+                    </>
+                  )}
+                </button>
+                
+                <button
+                  onClick={handleStopVisualization}
+                  className="p-2 bg-red-50 border border-red-100 hover:bg-red-100 text-red-600 rounded-lg shadow-sm transition-all"
+                  title="Stop Learning Session"
+                >
+                  <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M6 18L18 6M6 6l12 12" /></svg>
+                </button>
+              </div>
             )}
 
             {!isVisualizing ? (
@@ -129,7 +227,7 @@ function WorkspaceContent() {
                      activeModule === "stacks" ? "🥞" : 
                      activeModule === "queues" ? "🚶" : 
                      activeModule === "trees" ? "🌳" : 
-                     activeModule === "heaps" ? "💎" : 
+                     activeModule === "heaps" ? "⛰️" : 
                      activeModule === "graphs" ? "🕸️" : "⚙️"}
                   </span>
                 </div>
@@ -145,7 +243,7 @@ function WorkspaceContent() {
                 </button>
               </div>
             ) : (
-              <div className="flex flex-col items-center w-full animate-in fade-in duration-500 z-10">
+              <div className="flex flex-col items-center w-full animate-in fade-in duration-500 z-10 mt-12">
                 
                 {/* Dynamically render the correct visualization engine */}
                 {activeModule === "arrays" ? <ArrayCanvas /> : 
@@ -159,7 +257,7 @@ function WorkspaceContent() {
                 
                 <p className="text-sm text-emerald-600 font-bold bg-emerald-50 px-5 py-2.5 rounded-full border border-emerald-200 mt-10 shadow-sm flex items-center gap-2">
                   <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
-                  Interactive Canvas Active.
+                  Interactive Canvas Active. Time is being tracked.
                 </p>
               </div>
             )}

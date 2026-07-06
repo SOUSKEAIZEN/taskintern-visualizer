@@ -19,6 +19,7 @@ interface ModuleProgress {
   topicId: string;
   isCompleted: boolean;
   lastAccessed: Date;
+  timeSpent: number; // Added from our Prisma schema update
 }
 
 interface DashboardData {
@@ -29,80 +30,131 @@ interface DashboardData {
   scores: QuizScore[];
 }
 
-// Total number of visualization modules available in the app
-const TOTAL_MODULES = 6; 
+// Master list to calculate "Pending" statuses
+const ALL_MODULES = [
+  { id: "arrays", label: "Array Operations" },
+  { id: "linked-lists", label: "Linked Lists" },
+  { id: "stacks", label: "Stacks" },
+  { id: "queues", label: "Queues" },
+  { id: "trees", label: "Trees & BST" },
+  { id: "heaps", label: "Heaps" },
+  { id: "graphs", label: "Graphs (BFS/DFS)" },
+];
+
+const TOTAL_MODULES = ALL_MODULES.length; 
+
+// Helper function to format seconds into mm:ss
+const formatTime = (totalSeconds: number) => {
+  if (!totalSeconds) return "0m 0s";
+  const m = Math.floor(totalSeconds / 60);
+  const s = totalSeconds % 60;
+  return `${m}m ${s}s`;
+};
 
 const DashboardPage = () => {
   const [data, setData] = useState<DashboardData | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [lastSynced, setLastSynced] = useState<Date>(new Date());
 
   const CURRENT_USER_ID = "placeholder-student-id-123"; 
 
   useEffect(() => {
-    const loadDashboard = async () => {
-      logger.info(`Dashboard UI: Mounting and fetching data for User ${CURRENT_USER_ID}`);
-      setIsLoading(true);
+    let pollInterval: NodeJS.Timeout;
+
+    const loadDashboard = async (isBackgroundSync = false) => {
+      if (!isBackgroundSync) {
+        logger.info(`Dashboard UI: Initial mount. Fetching data for User ${CURRENT_USER_ID}`);
+        setIsLoading(true);
+      } else {
+        logger.info(`Dashboard UI: Running background sync for User ${CURRENT_USER_ID}...`);
+      }
       
       try {
-        logger.info("Dashboard UI: Initiating fetchUserDashboardData action...");
         const result = await fetchUserDashboardData(CURRENT_USER_ID);
         
         if (result.success && result.data) {
-          logger.info("Dashboard UI: Successfully fetched database records and updated state.");
+          if (!isBackgroundSync) logger.info("Dashboard UI: Successfully fetched initial database records.");
           setData(result.data as DashboardData);
-        } else {
+          setLastSynced(new Date());
+        } else if (!isBackgroundSync) {
           logger.warn("Dashboard UI Warning: No data found, or user does not exist yet.");
           setError("No learning history found. Complete a module to see your stats here!");
         }
       } catch (err) {
         logger.error("Dashboard UI Point of Failure: Failed to load data.", err);
-        setError("Failed to load dashboard data. Check your database connection.");
+        if (!isBackgroundSync) setError("Failed to load dashboard data. Check your database connection.");
       } finally {
-        setIsLoading(false);
-        logger.info("Dashboard UI: Loading state resolved.");
+        if (!isBackgroundSync) setIsLoading(false);
       }
     };
 
+    // Initial load
     loadDashboard();
+
+    // Set up polling for instant sync feel (every 10 seconds)
+    pollInterval = setInterval(() => {
+      loadDashboard(true);
+    }, 10000);
+
+    return () => clearInterval(pollInterval);
   }, []);
 
   if (isLoading) {
-    logger.info("Dashboard UI: Rendering loading state...");
     return (
       <div className="flex items-center justify-center h-full w-full">
         <div className="animate-pulse flex flex-col items-center space-y-4">
           <div className="w-12 h-12 border-4 border-indigo-200 border-t-indigo-600 rounded-full animate-spin"></div>
-          <p className="text-slate-500 font-medium">Fetching Analytics...</p>
+          <p className="text-slate-500 font-medium">Fetching Real-Time Analytics...</p>
         </div>
       </div>
     );
   }
 
   // --- Metric Calculations ---
-  logger.info("Dashboard UI: Calculating performance metrics based on retrieved data...");
+  logger.info("Dashboard UI: Calculating complex metrics (Speed, Statuses, Tiers)...");
   
-  const completedModulesCount = data?.progress.filter(mod => mod.isCompleted).length || 0;
-  const completionPercentage = Math.round((completedModulesCount / TOTAL_MODULES) * 100);
+  const userProgress = data?.progress || [];
+  const completedModules = userProgress.filter(mod => mod.isCompleted);
+  const startedModules = userProgress.filter(mod => !mod.isCompleted);
   
-  let performanceTier = "Novice";
-  let tierColor = "text-amber-600 bg-amber-50 border-amber-100";
-  if (completionPercentage > 25 && completionPercentage <= 75) {
-    performanceTier = "Intermediate";
-    tierColor = "text-indigo-600 bg-indigo-50 border-indigo-100";
-  } else if (completionPercentage > 75) {
+  const completionPercentage = Math.round((completedModules.length / TOTAL_MODULES) * 100);
+  
+  // Calculate Time & Speed
+  const totalTimeSeconds = userProgress.reduce((acc, mod) => acc + (mod.timeSpent || 0), 0);
+  const avgTimePerCompleted = completedModules.length > 0 
+    ? Math.round(completedModules.reduce((acc, mod) => acc + (mod.timeSpent || 0), 0) / completedModules.length) 
+    : 0;
+
+  // Codeforces-style Tiers based on completion percentage
+  let performanceTier = "Newbie";
+  let tierColor = "text-slate-600 bg-slate-100 border-slate-200";
+  
+  if (completionPercentage > 0 && completionPercentage <= 25) {
+    performanceTier = "Pupil";
+    tierColor = "text-green-600 bg-green-50 border-green-200";
+  } else if (completionPercentage > 25 && completionPercentage <= 75) {
+    performanceTier = "Specialist";
+    tierColor = "text-cyan-600 bg-cyan-50 border-cyan-200";
+  } else if (completionPercentage > 75 && completionPercentage < 100) {
     performanceTier = "Expert";
-    tierColor = "text-emerald-600 bg-emerald-50 border-emerald-100";
+    tierColor = "text-indigo-600 bg-indigo-50 border-indigo-200";
+  } else if (completionPercentage === 100) {
+    performanceTier = "Grandmaster";
+    tierColor = "text-red-600 bg-red-50 border-red-200";
   }
 
-  // --- Recent Activity Logic ---
-  const sortedProgress = [...(data?.progress || [])].sort(
-    (a, b) => new Date(b.lastAccessed).getTime() - new Date(a.lastAccessed).getTime()
-  );
-  const recentActivity = sortedProgress.slice(0, 3);
-  const lastAccessedModule = recentActivity.length > 0 ? recentActivity[0] : null;
+  // Generate Master List with Statuses
+  const moduleStatusList = ALL_MODULES.map(module => {
+    const dbRecord = userProgress.find(p => p.topicId === module.id);
+    if (!dbRecord) return { ...module, status: "Pending", timeSpent: 0 };
+    if (dbRecord.isCompleted) return { ...module, status: "Completed", timeSpent: dbRecord.timeSpent };
+    return { ...module, status: "Started", timeSpent: dbRecord.timeSpent };
+  });
 
-  logger.info(`Dashboard UI: Metrics calculation complete. Overall Completion: ${completionPercentage}%, Assigned Tier: ${performanceTier}`);
+  const lastAccessedModule = [...userProgress].sort(
+    (a, b) => new Date(b.lastAccessed).getTime() - new Date(a.lastAccessed).getTime()
+  )[0];
 
   return (
     <div className="max-w-5xl mx-auto space-y-8 animate-in fade-in duration-500">
@@ -110,10 +162,14 @@ const DashboardPage = () => {
       {/* Dashboard Header */}
       <div className="bg-white p-8 rounded-3xl shadow-sm border border-slate-200 flex flex-col md:flex-row justify-between items-start md:items-end gap-6">
         <div className="flex-1 w-full">
-          <h1 className="text-3xl font-extrabold text-slate-800 tracking-tight mb-2">Dashboard</h1>
-          <p className="text-slate-500 mb-6">Here is a summary of your algorithmic journey and visualizations.</p>
+          <div className="flex items-center gap-3 mb-2">
+            <h1 className="text-3xl font-extrabold text-slate-800 tracking-tight">Dashboard</h1>
+            <span className="text-xs font-medium bg-emerald-100 text-emerald-700 px-2 py-1 rounded-full animate-pulse">
+              Live Sync Active
+            </span>
+          </div>
+          <p className="text-slate-500 mb-6">Real-time overview of your algorithmic journey.</p>
           
-          {/* Progress Bar */}
           <div className="w-full max-w-md">
             <div className="flex justify-between text-sm mb-2">
               <span className="font-semibold text-slate-700">Overall Progress</span>
@@ -129,18 +185,20 @@ const DashboardPage = () => {
         </div>
 
         <div className="flex flex-col items-end gap-4">
-          <div className={`text-sm font-semibold px-4 py-2 rounded-full border ${tierColor}`}>
+          <div className={`text-sm font-bold px-5 py-2 rounded-full border shadow-sm ${tierColor}`}>
             Tier: {performanceTier}
           </div>
           {lastAccessedModule && (
             <Link 
               href={`/?module=${lastAccessedModule.topicId}`}
               className="px-6 py-2 bg-slate-900 hover:bg-slate-800 text-white text-sm font-semibold rounded-xl transition-colors shadow-sm"
-              onClick={() => logger.info(`Dashboard UI: User clicked Resume Learning routing to /?module=${lastAccessedModule.topicId}`)}
             >
-              Resume: {lastAccessedModule.topicId.replace('-', ' ')} &rarr;
+              Resume Learning &rarr;
             </Link>
           )}
+          <span className="text-xs text-slate-400">
+            Last synced: {lastSynced.toLocaleTimeString()}
+          </span>
         </div>
       </div>
 
@@ -151,58 +209,59 @@ const DashboardPage = () => {
       ) : (
         <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
           
-          {/* Recent Activity Card */}
+          {/* Speed & Analytics Card */}
           <div className="bg-white p-8 rounded-3xl shadow-sm border border-slate-200">
             <h2 className="text-xl font-bold text-slate-800 mb-6 flex items-center gap-2">
-              <span className="w-8 h-8 rounded-lg bg-emerald-100 flex items-center justify-center text-emerald-600">⚡</span>
-              Recent Activity
+              <span className="w-8 h-8 rounded-lg bg-blue-100 flex items-center justify-center text-blue-600">⏱️</span>
+              Speed Analytics
             </h2>
             
-            <div className="space-y-4">
-              {recentActivity.length === 0 ? (
-                <p className="text-slate-400 italic">No modules started yet.</p>
-              ) : (
-                recentActivity.map((mod) => (
-                  <div key={mod.id} className="flex items-center justify-between p-4 rounded-2xl bg-slate-50 border border-slate-100 transition-colors hover:border-slate-300">
-                    <div className="flex flex-col">
-                      <span className="font-semibold text-slate-700 capitalize">{mod.topicId.replace('-', ' ')}</span>
-                      <span className="text-xs text-slate-400">Accessed: {new Date(mod.lastAccessed).toLocaleDateString()}</span>
-                    </div>
-                    {mod.isCompleted ? (
-                      <span className="px-3 py-1 bg-emerald-100 text-emerald-700 text-xs font-bold rounded-full">Completed</span>
-                    ) : (
-                      <span className="px-3 py-1 bg-amber-100 text-amber-700 text-xs font-bold rounded-full">In Progress</span>
-                    )}
-                  </div>
-                ))
-              )}
+            <div className="grid grid-cols-2 gap-4">
+              <div className="bg-slate-50 p-4 rounded-2xl border border-slate-100">
+                <p className="text-xs text-slate-500 font-semibold uppercase tracking-wider mb-1">Total Time Spent</p>
+                <p className="text-2xl font-black text-slate-800">{formatTime(totalTimeSeconds)}</p>
+              </div>
+              <div className="bg-slate-50 p-4 rounded-2xl border border-slate-100">
+                <p className="text-xs text-slate-500 font-semibold uppercase tracking-wider mb-1">Avg. Completion</p>
+                <p className="text-2xl font-black text-slate-800">{formatTime(avgTimePerCompleted)}</p>
+              </div>
+              <div className="bg-slate-50 p-4 rounded-2xl border border-slate-100">
+                <p className="text-xs text-slate-500 font-semibold uppercase tracking-wider mb-1">Modules Started</p>
+                <p className="text-2xl font-black text-slate-800">{startedModules.length + completedModules.length} / {TOTAL_MODULES}</p>
+              </div>
+              <div className="bg-slate-50 p-4 rounded-2xl border border-slate-100">
+                <p className="text-xs text-slate-500 font-semibold uppercase tracking-wider mb-1">Modules Finished</p>
+                <p className="text-2xl font-black text-slate-800">{completedModules.length} / {TOTAL_MODULES}</p>
+              </div>
             </div>
           </div>
 
-          {/* Quiz History Card */}
+          {/* Module Master Status Card */}
           <div className="bg-white p-8 rounded-3xl shadow-sm border border-slate-200">
             <h2 className="text-xl font-bold text-slate-800 mb-6 flex items-center gap-2">
-              <span className="w-8 h-8 rounded-lg bg-indigo-100 flex items-center justify-center text-indigo-600">★</span>
-              Quiz History
+              <span className="w-8 h-8 rounded-lg bg-emerald-100 flex items-center justify-center text-emerald-600">📋</span>
+              Module Status
             </h2>
             
-            <div className="space-y-4">
-              {data?.scores.length === 0 ? (
-                <p className="text-slate-400 italic">No quizzes attempted yet.</p>
-              ) : (
-                data?.scores.map((quiz) => (
-                  <div key={quiz.id} className="flex items-center justify-between p-4 rounded-2xl bg-slate-50 border border-slate-100 transition-colors hover:border-slate-300">
-                    <div className="flex flex-col">
-                      <span className="font-semibold text-slate-700 capitalize">{quiz.topicId.replace('-', ' ')}</span>
-                      <span className="text-xs text-slate-400">{new Date(quiz.attemptedAt).toLocaleDateString()}</span>
-                    </div>
-                    <div className="flex items-baseline gap-1">
-                      <span className="text-2xl font-black text-indigo-600">{quiz.score}</span>
-                      <span className="text-sm font-semibold text-slate-400">/ {quiz.totalQuestions}</span>
-                    </div>
+            <div className="space-y-3 max-h-64 overflow-y-auto custom-scrollbar pr-2">
+              {moduleStatusList.map((mod) => (
+                <div key={mod.id} className="flex items-center justify-between p-3 rounded-xl bg-slate-50 border border-slate-100">
+                  <div className="flex flex-col">
+                    <span className="font-semibold text-sm text-slate-700">{mod.label}</span>
+                    <span className="text-xs text-slate-400">Time: {formatTime(mod.timeSpent)}</span>
                   </div>
-                ))
-              )}
+                  
+                  {mod.status === "Completed" && (
+                    <span className="px-3 py-1 bg-emerald-100 text-emerald-700 text-xs font-bold rounded-full">Completed</span>
+                  )}
+                  {mod.status === "Started" && (
+                    <span className="px-3 py-1 bg-amber-100 text-amber-700 text-xs font-bold rounded-full">In Progress</span>
+                  )}
+                  {mod.status === "Pending" && (
+                    <span className="px-3 py-1 bg-slate-200 text-slate-500 text-xs font-bold rounded-full">Pending</span>
+                  )}
+                </div>
+              ))}
             </div>
           </div>
           
