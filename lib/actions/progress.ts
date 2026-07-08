@@ -7,9 +7,15 @@ import { logger } from "../logger";
 
 // Prisma 7 specific Singleton using the pg adapter
 const prismaClientSingleton = () => {
-  const connectionString = process.env.DATABASE_URL;
-  // Initialize the PostgreSQL connection pool
-  const pool = new Pool({ connectionString });
+  let connectionString = process.env.DATABASE_URL || "";
+  // The pg driver treats sslmode=require as verify-full, which breaks Aiven certs. We strip it out and manually pass ssl: rejectUnauthorized: false.
+  connectionString = connectionString.replace("?sslmode=require", "");
+  
+  // Initialize the PostgreSQL connection pool with SSL configured for Aiven
+  const pool = new Pool({ 
+    connectionString,
+    ssl: { rejectUnauthorized: false }
+  });
   const adapter = new PrismaPg(pool);
   
   return new PrismaClient({ adapter });
