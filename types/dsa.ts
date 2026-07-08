@@ -7,8 +7,10 @@
  * comparing: being compared with another element
  * swapping: mid-animation for a swap operation
  * sorted: confirmed in its final correct position
+ * found: target element successfully found (Search)
+ * outOfBounds: element no longer in the search space (Binary Search)
  */
-export type VisualState = "default" | "active" | "comparing" | "swapping" | "sorted";
+export type VisualState = "default" | "active" | "comparing" | "swapping" | "sorted" | "found" | "outOfBounds";
 
 // ---------------------------------------------------------
 // Data Structure Interfaces
@@ -47,4 +49,30 @@ export interface AlgorithmStep<T> {
   snapshot: T; // The exact state of the data structure at this moment
   description: string; // Text explaining what is happening (e.g., "Comparing 24 and 45")
   activeIds: string[]; // The specific elements that are interacting right now
+  logMessage?: string; // Point of failure tracking log (e.g., "Step 4: Checking if array[mid] === target")
+}
+
+// ---------------------------------------------------------
+// Searching Specific Interfaces
+// ---------------------------------------------------------
+
+/**
+ * Tracks the index positions specific to searching algorithms 
+ * to render UI pointers beneath the array.
+ */
+export interface SearchPointers {
+  low?: number;     // Used for Binary Search
+  high?: number;    // Used for Binary Search
+  mid?: number;     // Used for Binary Search
+  current?: number; // Used for Linear Search
+}
+
+/**
+ * The absolute state of the search operation at any given step.
+ */
+export interface SearchState {
+  arraySnapshot: ArrayElement[];
+  pointers: SearchPointers;
+  target: number;
+  foundIndex: number | null;
 }

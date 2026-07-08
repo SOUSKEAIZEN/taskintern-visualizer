@@ -10,6 +10,7 @@ import queueData from "../../content/modules/queues.json";
 import treeData from "../../content/modules/trees.json";
 import heapData from "../../content/modules/heaps.json";
 import graphData from "../../content/modules/graphs.json";
+import searchingData from "../../content/modules/searching.json";
 
 interface TheorySection {
   id: string;
@@ -47,6 +48,8 @@ export default function TheoryPanel({ topicId = "arrays" }: { topicId?: string }
     // Route to the correct imported JSON data based on the active module
     if (topicId === "arrays") {
       setData(arrayData as ModuleData);
+    } else if (topicId === "searching") {
+      setData(searchingData as ModuleData);
     } else if (topicId === "linked-lists") {
       setData(linkedListData as ModuleData);
     } else if (topicId === "stacks") {

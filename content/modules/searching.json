@@ -1,0 +1,67 @@
+{
+  "id": "searching",
+  "moduleId": "2",
+  "difficulty": "Beginner",
+  "title": "Searching Algorithms",
+  "description": "Fundamental algorithms for finding a specific target element within a data structure.",
+  "complexities": {
+    "search": {
+      "best": "O(1)",
+      "average": "O(log n) / O(n)",
+      "worst": "O(n)"
+    },
+    "space": "O(1)"
+  },
+  "sections": [
+    {
+      "id": "intro",
+      "title": "Introduction to Searching",
+      "content": "Searching algorithms are designed to retrieve an element from any data structure where it is stored. The efficiency of a search algorithm is typically measured by its time complexity, which counts the maximum number of comparisons needed to find the target."
+    },
+    {
+      "id": "linear",
+      "title": "Linear Search",
+      "content": "Linear Search is the most straightforward searching algorithm. It operates by sequentially checking each element in the list, starting from the first, until a match is found or the entire list has been searched.\n\n**Pros:** \n- Very simple to implement.\n- Works on both sorted and unsorted arrays.\n\n**Cons:** \n- Highly inefficient for large datasets.\n\n**Complexities:**\n- **Time Complexity:** $O(n)$ in the worst case (the target is at the very end or not present), where $n$ is the number of elements.\n- **Space Complexity:** $O(1)$ because it only requires a single pointer to track the current index."
+    },
+    {
+      "id": "binary",
+      "title": "Binary Search",
+      "content": "Binary Search is a highly efficient algorithm, but it has one strict prerequisite: **the array must be sorted**. It works by repeatedly dividing the search space in half. \n\n1. It compares the target value to the middle element of the array.\n2. If they are equal, the search is successful.\n3. If the target is less than the middle element, the search continues in the lower half.\n4. If the target is greater, the search continues in the upper half.\n\n**Complexities:**\n- **Time Complexity:** $O(\\log n)$ in the worst case. Because the search space is halved every iteration, it can handle massive datasets exceptionally fast.\n- **Space Complexity:** $O(1)$ for the iterative approach."
+    }
+  ],
+  "quiz": [
+    {
+      "question": "What is the strict prerequisite for using Binary Search on an array?",
+      "options": [
+        "The array must only contain positive integers.",
+        "The array must be sorted.",
+        "The array must not contain any duplicate values.",
+        "The array must have an even number of elements."
+      ],
+      "correctAnswerIndex": 1,
+      "explanation": "Binary search fundamentally relies on the array being sorted to know which half of the data to discard at each step."
+    },
+    {
+      "question": "What is the worst-case time complexity of Linear Search?",
+      "options": [
+        "$O(1)$",
+        "$O(\\log n)$",
+        "$O(n)$",
+        "$O(n^2)$"
+      ],
+      "correctAnswerIndex": 2,
+      "explanation": "In the worst-case scenario (the element is at the very end or doesn't exist), Linear Search must check all $n$ elements, resulting in $O(n)$ time complexity."
+    },
+    {
+      "question": "If an array has 1,024 sorted elements, approximately what is the maximum number of comparisons Binary Search will make?",
+      "options": [
+        "10",
+        "512",
+        "1024",
+        "1"
+      ],
+      "correctAnswerIndex": 0,
+      "explanation": "Because Binary Search has a time complexity of $O(\\log n)$, and $\\log_2(1024) = 10$, it will take a maximum of about 10 comparisons to find the target or determine it isn't there."
+    }
+  ]
+}
