@@ -45,25 +45,30 @@ export default function TheoryPanel({ topicId = "arrays" }: { topicId?: string }
   useEffect(() => {
     logger.info(`UI Mount Step 1: Initializing TheoryPanel for topic: ${topicId}`);
     
-    // Route to the correct imported JSON data based on the active module
-    if (topicId === "arrays") {
-      setData(arrayData as ModuleData);
-    } else if (topicId === "searching") {
-      setData(searchingData as ModuleData);
-    } else if (topicId === "linked-lists") {
-      setData(linkedListData as ModuleData);
-    } else if (topicId === "stacks") {
-      setData(stackData as ModuleData);
-    } else if (topicId === "queues") {
-      setData(queueData as ModuleData);
-    } else if (topicId === "trees") {
-      setData(treeData as ModuleData);
-    } else if (topicId === "heaps") {
-      setData(heapData as ModuleData);
-    } else if (topicId === "graphs") {
-      setData(graphData as ModuleData);
-    } else {
-      logger.warn(`UI Point of Failure: Attempted to load unknown topic ID: ${topicId}`);
+    try {
+      // Route to the correct imported JSON data based on the active module
+      if (topicId === "arrays") {
+        setData(arrayData as ModuleData);
+      } else if (topicId === "searching") {
+        setData(searchingData as ModuleData);
+      } else if (topicId === "linked-lists") {
+        setData(linkedListData as ModuleData);
+      } else if (topicId === "stacks") {
+        setData(stackData as ModuleData);
+      } else if (topicId === "queues") {
+        setData(queueData as ModuleData);
+      } else if (topicId === "trees") {
+        setData(treeData as ModuleData);
+      } else if (topicId === "heaps") {
+        setData(heapData as ModuleData);
+      } else if (topicId === "graphs") {
+        setData(graphData as ModuleData);
+      } else {
+        logger.warn(`UI Point of Failure: Attempted to load unknown topic ID: ${topicId}`);
+        setData(null);
+      }
+    } catch (error) {
+      logger.error(`UI Point of Failure: Failed to parse JSON data for topic: ${topicId}`, error);
       setData(null);
     }
   }, [topicId]);
@@ -111,6 +116,30 @@ export default function TheoryPanel({ topicId = "arrays" }: { topicId?: string }
     };
   }, [data, topicId]);
 
+  // Helper function to render basic Markdown and LaTeX variables
+  const renderFormattedText = (text: string) => {
+    return text.split('\n').map((line, index) => {
+      // Handle Headings
+      if (line.startsWith('### ')) {
+        return <h3 key={index} className="text-xl font-bold text-slate-800 mt-6 mb-2 border-b border-slate-100 pb-2">{line.replace('### ', '')}</h3>;
+      }
+      if (line.startsWith('|') || line.startsWith(':-')) return null; // Very basic table skip to avoid clutter if used outside complexities
+
+      // Handle bold and math text
+      const parts = line.split(/(\*\*.*?\*\*|\$.*?\$)/g).map((part, i) => {
+        if (part.startsWith('**') && part.endsWith('**')) {
+          return <strong key={i} className="font-bold text-slate-800">{part.slice(2, -2)}</strong>;
+        }
+        if (part.startsWith('$') && part.endsWith('$')) {
+          return <span key={i} className="font-mono text-indigo-600 bg-indigo-50 px-1 rounded mx-0.5">{part.slice(1, -1)}</span>;
+        }
+        return part;
+      });
+
+      return <p key={index} className="mb-3">{parts}</p>;
+    });
+  };
+
   if (!data) {
     return (
       <div className="w-full h-full flex flex-col items-center justify-center p-8 bg-white border-r border-slate-200">
@@ -150,9 +179,9 @@ export default function TheoryPanel({ topicId = "arrays" }: { topicId?: string }
               <span className="w-1.5 h-6 bg-indigo-500 rounded-full mr-3"></span>
               {section.title}
             </h2>
-            <p className="text-slate-600 leading-relaxed whitespace-pre-line">
-              {section.content}
-            </p>
+            <div className="text-slate-600 leading-relaxed">
+              {renderFormattedText(section.content)}
+            </div>
           </section>
         ))}
       </div>

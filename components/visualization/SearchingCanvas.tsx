@@ -60,7 +60,7 @@ export default function SearchingCanvas() {
       parsedArray.length = MAX_ELEMENTS;
     }
     
-    // Sort automatically for binary search if selected, or just let user know
+    // Sort automatically for binary search if selected
     if (activeAlgorithm === "binary") {
       parsedArray = parsedArray.sort((a, b) => a - b);
     }
@@ -135,19 +135,25 @@ export default function SearchingCanvas() {
     return () => {
       if (timerRef.current) clearTimeout(timerRef.current);
     };
-  }, [isPlaying, currentFrame, history.length, speedLevel]);
+  }, [isPlaying, currentFrame, history, speedLevel]);
 
-  // --- 5. Interactive Completion Tracking ---
+  // --- 5. Interactive Completion & Point of Failure Tracking ---
   useEffect(() => {
-    if (isPlaybackMode && history.length > 0 && currentFrame === history.length - 1) {
-      const visualizationId = `search-${activeAlgorithm}`;
-      
-      markVisualizationComplete(CURRENT_USER_ID, "searching", visualizationId)
-        .catch((err) => {
-          logger.error(`UI Point of Failure: Network exception while marking visualization complete.`, err);
-        });
+    if (isPlaybackMode && history.length > 0) {
+      const frameData = history[currentFrame];
+      // Explicit point-of-failure logging for the current state transition
+      logger.info(`VISUALIZER RENDER [Frame ${currentFrame}]: ${frameData.logMessage || frameData.description}`);
+
+      // Mark completion if we hit the last frame
+      if (currentFrame === history.length - 1) {
+        const visualizationId = `search-${activeAlgorithm}`;
+        markVisualizationComplete(CURRENT_USER_ID, "searching", visualizationId)
+          .catch((err) => {
+            logger.error(`UI Point of Failure: Network exception while marking visualization complete.`, err);
+          });
+      }
     }
-  }, [currentFrame, history.length, isPlaybackMode, activeAlgorithm]);
+  }, [currentFrame, isPlaybackMode, activeAlgorithm, history]); // FIXED: Array size will strictly stay at 4 elements
 
   // --- 6. Visual Rendering Helpers ---
   const activeFrame = isPlaybackMode && history.length > 0 ? history[currentFrame] : null;
@@ -173,7 +179,7 @@ export default function SearchingCanvas() {
       </div>
 
       {/* The Visual Canvas */}
-      <div className="flex flex-col items-center justify-center w-full max-w-4xl p-8 bg-slate-50 relative overflow-x-auto rounded-3xl border-2 border-dashed border-slate-200 shadow-inner min-h-[300px] transition-all duration-300">
+      <div className="flex flex-col items-center justify-center w-full max-w-4xl p-8 bg-slate-50 relative overflow-x-auto rounded-3xl border-2 border-dashed border-slate-200 shadow-inner min-h-[350px] transition-all duration-300">
         
         <div className="mb-12 flex flex-col items-center animate-in fade-in zoom-in">
           <span className="text-xs font-bold text-slate-400 mb-2 uppercase tracking-widest">
@@ -184,8 +190,8 @@ export default function SearchingCanvas() {
           </div>
         </div>
 
-        {/* Array Container */}
-        <div className="flex items-end space-x-3 relative min-h-[140px] px-8">
+        {/* Array Container - Increased min-h and added pb-20 to prevent pointer clipping */}
+        <div className="flex items-start space-x-3 relative min-h-[200px] px-8 pb-20">
           {renderArray.map((item, index) => {
             const isCurrent = renderPointers.current === index;
             const isLow = renderPointers.low === index;
@@ -193,7 +199,7 @@ export default function SearchingCanvas() {
             const isHigh = renderPointers.high === index;
 
             return (
-              <div key={item.id} className="flex flex-col items-center group relative">
+              <div key={item.id} className="flex flex-col items-center group relative mt-4">
                 
                 {/* Array Box */}
                 <div 
@@ -210,15 +216,15 @@ export default function SearchingCanvas() {
                   {index}
                 </div>
 
-                {/* Pointers Area */}
-                <div className="absolute top-[90px] flex flex-col items-center gap-1 w-full text-[10px] font-bold uppercase tracking-wider">
+                {/* Pointers Area - Pushed below the index to ensure complete visibility */}
+                <div className="absolute top-[85px] flex flex-col items-center gap-1 w-full text-[10px] font-bold uppercase tracking-wider z-20">
                   {(isCurrent || isLow || isMid || isHigh) && (
                     <div className="text-slate-400 text-lg -mt-2 mb-1 leading-none">↑</div>
                   )}
-                  {isCurrent && <span className="text-indigo-600 bg-indigo-50 px-1.5 py-0.5 rounded">Curr</span>}
-                  {isLow && <span className="text-blue-600 bg-blue-50 px-1.5 py-0.5 rounded">Low</span>}
-                  {isMid && <span className="text-amber-600 bg-amber-50 px-1.5 py-0.5 rounded">Mid</span>}
-                  {isHigh && <span className="text-red-600 bg-red-50 px-1.5 py-0.5 rounded">High</span>}
+                  {isCurrent && <span className="text-indigo-600 bg-indigo-50 px-1.5 py-0.5 rounded shadow-sm border border-indigo-100">Curr</span>}
+                  {isLow && <span className="text-blue-600 bg-blue-50 px-1.5 py-0.5 rounded shadow-sm border border-blue-100">Low</span>}
+                  {isMid && <span className="text-amber-600 bg-amber-50 px-1.5 py-0.5 rounded shadow-sm border border-amber-100">Mid</span>}
+                  {isHigh && <span className="text-red-600 bg-red-50 px-1.5 py-0.5 rounded shadow-sm border border-red-100">High</span>}
                 </div>
               </div>
             );

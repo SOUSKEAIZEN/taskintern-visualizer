@@ -16,17 +16,17 @@
     {
       "id": "intro",
       "title": "Introduction to Searching",
-      "content": "Searching algorithms are designed to retrieve an element from any data structure where it is stored. The efficiency of a search algorithm is typically measured by its time complexity, which counts the maximum number of comparisons needed to find the target."
+      "content": "Searching algorithms are fundamental computational processes designed to retrieve information stored within a data structure. The choice of algorithm heavily depends on the underlying data structure (e.g., whether it is sorted or unsorted) and dictates the overall performance, typically measured in time and space complexity."
     },
     {
       "id": "linear",
-      "title": "Linear Search",
-      "content": "Linear Search is the most straightforward searching algorithm. It operates by sequentially checking each element in the list, starting from the first, until a match is found or the entire list has been searched.\n\n**Pros:** \n- Very simple to implement.\n- Works on both sorted and unsorted arrays.\n\n**Cons:** \n- Highly inefficient for large datasets.\n\n**Complexities:**\n- **Time Complexity:** $O(n)$ in the worst case (the target is at the very end or not present), where $n$ is the number of elements.\n- **Space Complexity:** $O(1)$ because it only requires a single pointer to track the current index."
+      "title": "Linear Search: The Sequential Approach",
+      "content": "Linear Search is the most intuitive searching algorithm. It operates by traversing the array sequentially from the first index ($i = 0$) to the last ($i = n - 1$), comparing each element to the target value.\n\n### How it Works\n1. Start at the first element.\n2. If the current element equals the target, return its index.\n3. If not, move to the next element.\n4. If the end of the array is reached without a match, the target does not exist.\n\n### Complexity Analysis\n| Scenario | Time Complexity | Space Complexity |\n| :--- | :--- | :--- |\n| **Best Case** | $O(1)$ (Target is the first element) | $O(1)$ |\n| **Average Case** | $O(n)$ | $O(1)$ |\n| **Worst Case** | $O(n)$ (Target is at the end or missing) | $O(1)$ |\n\n**Pros:** Extremely simple to implement; works on completely unsorted data.\n**Cons:** Highly inefficient for large datasets, as the search time scales linearly with the number of elements."
     },
     {
       "id": "binary",
-      "title": "Binary Search",
-      "content": "Binary Search is a highly efficient algorithm, but it has one strict prerequisite: **the array must be sorted**. It works by repeatedly dividing the search space in half. \n\n1. It compares the target value to the middle element of the array.\n2. If they are equal, the search is successful.\n3. If the target is less than the middle element, the search continues in the lower half.\n4. If the target is greater, the search continues in the upper half.\n\n**Complexities:**\n- **Time Complexity:** $O(\\log n)$ in the worst case. Because the search space is halved every iteration, it can handle massive datasets exceptionally fast.\n- **Space Complexity:** $O(1)$ for the iterative approach."
+      "title": "Binary Search: The Divide & Conquer Approach",
+      "content": "Binary Search is a highly efficient algorithm that follows the divide-and-conquer paradigm. **Crucial Prerequisite: The data must be sorted.** Instead of scanning sequentially, it eliminates half of the remaining search space with every comparison.\n\n### How it Works\n1. Define two pointers: `low` (start of the array) and `high` (end of the array).\n2. Calculate the middle index: `mid = Math.floor((low + high) / 2)`.\n3. Compare the target to the element at `mid`:\n   - **Match:** Target found! Return `mid`.\n   - **Target < Mid:** The target must lie in the left half. Update `high = mid - 1`.\n   - **Target > Mid:** The target must lie in the right half. Update `low = mid + 1`.\n4. Repeat until `low > high` (target not found).\n\n### Complexity Analysis\n| Scenario | Time Complexity | Space Complexity |\n| :--- | :--- | :--- |\n| **Best Case** | $O(1)$ (Target is exactly in the middle) | $O(1)$ |\n| **Average Case** | $O(\\log n)$ | $O(1)$ |\n| **Worst Case** | $O(\\log n)$ | $O(1)$ |\n\n**Why is it $O(\\log n)$?** Because the search space $n$ is repeatedly divided by 2. The maximum number of steps $k$ required to reach a single element is modeled by the equation $n / 2^k = 1$, which solves to $k = \\log_2 n$."
     }
   ],
   "quiz": [
