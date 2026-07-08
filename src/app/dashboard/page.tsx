@@ -36,6 +36,8 @@ interface DashboardData {
 // Master list to calculate "Pending" statuses
 const ALL_MODULES = [
   { id: "arrays", label: "Array Operations" },
+  { id: "searching", label: "Searching Algorithms" },
+  { id: "hashmaps", label: "Hash Maps" },
   { id: "linked-lists", label: "Linked Lists" },
   { id: "stacks", label: "Stacks" },
   { id: "queues", label: "Queues" },
@@ -48,6 +50,8 @@ const ALL_MODULES = [
 // Adjust the 'visCount' to match the exact number of interactive visualizations per page
 const MODULE_CONFIG: Record<string, { hasTheory: boolean, visCount: number }> = {
   "arrays": { hasTheory: true, visCount: 4 }, 
+  "searching": { hasTheory: true, visCount: 2 }, // Linear, Binary
+  "hashmaps": { hasTheory: true, visCount: 1 },  // Chaining
   "linked-lists": { hasTheory: true, visCount: 3 },
   "stacks": { hasTheory: true, visCount: 2 },
   "queues": { hasTheory: true, visCount: 2 },
@@ -119,7 +123,7 @@ const DashboardPage = () => {
     return (
       <div className="flex items-center justify-center h-full w-full">
         <div className="animate-pulse flex flex-col items-center space-y-4">
-          <div className="w-12 h-12 border-4 border-indigo-200 border-t-indigo-600 rounded-full animate-spin"></div>
+          <div className="w-12 h-12 border-4 border-indigo-200 border-t-indigo-600 rounded-full animate-spin mb-4"></div>
           <p className="text-slate-500 font-medium">Fetching Real-Time Analytics...</p>
         </div>
       </div>
