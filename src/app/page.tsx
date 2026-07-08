@@ -5,6 +5,7 @@ import { useSearchParams } from "next/navigation";
 import { logger } from "../../lib/logger";
 import ArrayCanvas from "../../components/visualization/ArrayCanvas";
 import SearchingCanvas from "../../components/visualization/SearchingCanvas";
+import HashMapCanvas from "../../components/visualization/HashMapCanvas";
 import LinkedListCanvas from "../../components/visualization/LinkedListCanvas";
 import StackCanvas from "../../components/visualization/StackCanvas";
 import QueueCanvas from "../../components/visualization/QueueCanvas";
@@ -225,6 +226,7 @@ function WorkspaceContent() {
                   <span className="text-5xl">
                     {activeModule === "arrays" ? "🚀" : 
                      activeModule === "searching" ? "🔍" : 
+                     activeModule === "hashmaps" ? "🗄️" : 
                      activeModule === "linked-lists" ? "🔗" : 
                      activeModule === "stacks" ? "🥞" : 
                      activeModule === "queues" ? "🚶" : 
@@ -250,6 +252,7 @@ function WorkspaceContent() {
                 {/* Dynamically render the correct visualization engine */}
                 {activeModule === "arrays" ? <ArrayCanvas /> : 
                  activeModule === "searching" ? <SearchingCanvas /> : 
+                 activeModule === "hashmaps" ? <HashMapCanvas /> : 
                  activeModule === "linked-lists" ? <LinkedListCanvas /> : 
                  activeModule === "stacks" ? <StackCanvas /> :
                  activeModule === "queues" ? <QueueCanvas /> :

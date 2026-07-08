@@ -7,6 +7,7 @@ import { logger } from "../../lib/logger";
 const MODULES = [
   { id: "arrays", label: "Array Operations", icon: "🚀" },
   { id: "searching", label: "Searching Algorithms", icon: "🔍" },
+  { id: "hashmaps", label: "Hash Maps", icon: "🗄️" },
   { id: "linked-lists", label: "Linked Lists", icon: "🔗" },
   { id: "stacks", label: "Stacks", icon: "🥞" },
   { id: "queues", label: "Queues", icon: "🚶" },

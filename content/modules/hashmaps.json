@@ -1,0 +1,77 @@
+{
+  "id": "hashmaps",
+  "moduleId": "3",
+  "difficulty": "Intermediate",
+  "title": "Hash Maps & Hashing",
+  "description": "A powerful data structure that uses mathematical functions to map keys directly to their values for extremely fast operations.",
+  "complexities": {
+    "search": {
+      "best": "O(1)",
+      "average": "O(1)",
+      "worst": "O(n)"
+    },
+    "insertion": {
+      "best": "O(1)",
+      "average": "O(1)",
+      "worst": "O(n)"
+    },
+    "deletion": {
+      "best": "O(1)",
+      "average": "O(1)",
+      "worst": "O(n)"
+    },
+    "space": "O(n)"
+  },
+  "sections": [
+    {
+      "id": "intro",
+      "title": "Introduction to Hash Maps",
+      "content": "A Hash Map (or Hash Table) is a data structure that implements an associative array abstract data type, a structure that can map keys to values. Hash maps are incredibly popular because, on average, they provide constant time $O(1)$ complexity for lookups, insertions, and deletions."
+    },
+    {
+      "id": "hash-functions",
+      "title": "The Hash Function & Modulo Operator",
+      "content": "To store a key-value pair, the Hash Map needs to figure out exactly which 'bucket' (array index) to put it in. It does this in two steps:\n\n### 1. The Hash Function\nThe string key is passed through a mathematical function that converts it into a large integer (the hash code). For example, summing the ASCII values of the characters.\n\n### 2. The Modulo Operation\nBecause arrays have a fixed size, the large integer is reduced to fit within the array bounds using the modulo operator (`%`). \nFormula: `target_bucket = hash_code % array_length`."
+    },
+    {
+      "id": "collisions",
+      "title": "Collisions & Separate Chaining",
+      "content": "What happens when two completely different keys calculate to the exact same bucket? This is called a **Collision**.\n\n### Separate Chaining\nOne of the most common ways to resolve collisions is 'Separate Chaining'. Instead of storing the value directly in the bucket, each bucket holds a reference to another data structure (usually an array or linked list). When a collision occurs, the new key-value pair is simply appended to the chain in that specific bucket.\n\n### The Worst Case Scenario\nIf the hash function is poor and maps *every* key to the exact same bucket, the Hash Map degrades into a single long chain. In this worst-case scenario, searching through the chain takes $O(n)$ time."
+    }
+  ],
+  "quiz": [
+    {
+      "question": "What is the average time complexity for searching, inserting, and deleting in a Hash Map?",
+      "options": [
+        "$O(1)$",
+        "$O(\\log n)$",
+        "$O(n)$",
+        "$O(n^2)$"
+      ],
+      "correctAnswerIndex": 0,
+      "explanation": "Hash Maps use hash functions to jump directly to the target bucket, allowing for constant $O(1)$ time complexity on average."
+    },
+    {
+      "question": "What is a 'collision' in the context of a Hash Map?",
+      "options": [
+        "When the Hash Map runs out of memory.",
+        "When two different keys compute to the exact same bucket index.",
+        "When a key is deleted while it is being searched.",
+        "When the modulo operator returns a negative number."
+      ],
+      "correctAnswerIndex": 1,
+      "explanation": "A collision occurs when the hash function and modulo operation assign two distinct keys to the same index in the underlying array."
+    },
+    {
+      "question": "How does 'Separate Chaining' resolve collisions?",
+      "options": [
+        "It deletes the old key and replaces it with the new key.",
+        "It searches for the next available empty bucket in the array.",
+        "It stores multiple key-value pairs in the same bucket using a secondary data structure like a list.",
+        "It forces the array to double in size immediately."
+      ],
+      "correctAnswerIndex": 2,
+      "explanation": "Separate chaining allows buckets to hold a list of items, so colliding pairs simply get appended to that bucket's list."
+    }
+  ]
+}

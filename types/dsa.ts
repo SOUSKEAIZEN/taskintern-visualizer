@@ -76,3 +76,26 @@ export interface SearchState {
   target: number;
   foundIndex: number | null;
 }
+
+// ---------------------------------------------------------
+// Hash Map Specific Interfaces
+// ---------------------------------------------------------
+
+export interface HashNode {
+  id: string;
+  key: string;
+  value: string | number;
+  state: VisualState;
+}
+
+/**
+ * The absolute state of the hash map operation at any given step.
+ * Uses an array of arrays to visually represent separate chaining for collisions.
+ */
+export interface HashMapState {
+  buckets: HashNode[][];
+  currentKey: string | null;
+  hashValue: number | null;     // Raw integer from the hash function
+  targetBucket: number | null;  // Final index after applying modulo (hashValue % tableSize)
+  operation: "insert" | "search" | "delete" | null;
+}

@@ -11,6 +11,8 @@ import treeData from "../../content/modules/trees.json";
 import heapData from "../../content/modules/heaps.json";
 import graphData from "../../content/modules/graphs.json";
 import searchingData from "../../content/modules/searching.json";
+// 1. Import the newly created Hash Map data
+import hashMapData from "../../content/modules/hashmaps.json";
 
 interface TheorySection {
   id: string;
@@ -46,11 +48,13 @@ export default function TheoryPanel({ topicId = "arrays" }: { topicId?: string }
     logger.info(`UI Mount Step 1: Initializing TheoryPanel for topic: ${topicId}`);
     
     try {
-      // Route to the correct imported JSON data based on the active module
+      // 2. Route to the correct imported JSON data based on the active module
       if (topicId === "arrays") {
         setData(arrayData as ModuleData);
       } else if (topicId === "searching") {
         setData(searchingData as ModuleData);
+      } else if (topicId === "hashmaps") { // Add routing for Hash Maps
+        setData(hashMapData as ModuleData);
       } else if (topicId === "linked-lists") {
         setData(linkedListData as ModuleData);
       } else if (topicId === "stacks") {
