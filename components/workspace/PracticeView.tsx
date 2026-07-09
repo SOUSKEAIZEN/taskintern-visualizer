@@ -19,11 +19,14 @@ export default function PracticeView() {
   const [code, setCode] = useState(QUESTIONS[0].starterCode["python"]);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [result, setResult] = useState<any>(null);
+  const [activeTab, setActiveTab] = useState(0);
 
-  const handleSelect = (q: any) => {
+  const handleSelect = (e: React.ChangeEvent<HTMLSelectElement>) => {
+    const q = QUESTIONS.find(q => q.id === e.target.value) || QUESTIONS[0];
     setSelectedQuestion(q);
     setCode(q.starterCode[language]);
     setResult(null);
+    setActiveTab(0);
   };
 
   const handleLanguageChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
@@ -35,6 +38,7 @@ export default function PracticeView() {
   const handleSubmit = async () => {
     setIsSubmitting(true);
     setResult(null);
+    setActiveTab(0);
 
     try {
       const response = await fetch("http://localhost:5005/api/submit", {
@@ -51,109 +55,157 @@ export default function PracticeView() {
     }
   };
 
-  return (
-    <div className="flex h-full w-full bg-slate-50 border border-slate-200 rounded-2xl overflow-hidden shadow-sm">
-      {/* Sidebar List */}
-      <div className="w-1/4 border-r border-slate-200 bg-white overflow-y-auto">
-        <div className="p-4 bg-slate-100 font-bold text-slate-700 uppercase text-sm sticky top-0">Questions</div>
-        {QUESTIONS.map(q => (
-          <div 
-            key={q.id} 
-            onClick={() => handleSelect(q)}
-            className={`p-4 border-b border-slate-100 cursor-pointer transition-colors ${selectedQuestion.id === q.id ? 'bg-indigo-50 border-l-4 border-l-indigo-500' : 'hover:bg-slate-50 border-l-4 border-l-transparent'}`}
-          >
-            <div className="text-xs font-bold text-slate-400 uppercase mb-1">{q.category}</div>
-            <div className="font-semibold text-slate-800">{q.title}</div>
-            <div className={`text-xs font-bold mt-2 ${q.difficulty === 'Easy' ? 'text-emerald-500' : 'text-amber-500'}`}>{q.difficulty}</div>
-          </div>
-        ))}
-      </div>
+  const currentTestcase = result?.testcases?.[activeTab];
 
-      {/* Main Content Area */}
-      <div className="w-3/4 flex flex-col relative">
-        <div className="flex flex-1 overflow-hidden">
-          {/* Question Details */}
-          <div className="w-1/2 overflow-y-auto p-6 border-r border-slate-200 bg-white">
-            <h1 className="text-2xl font-extrabold text-slate-900 mb-2">{selectedQuestion.title}</h1>
-            <div className={`text-sm font-bold uppercase tracking-wider mb-6 ${selectedQuestion.difficulty === 'Easy' ? 'text-emerald-600' : 'text-amber-600'}`}>
-              {selectedQuestion.difficulty}
-            </div>
-            
-            <h3 className="text-sm font-bold text-slate-400 uppercase tracking-wider mb-2">Description</h3>
-            <p className="text-slate-700 mb-6 leading-relaxed">{selectedQuestion.description}</p>
-            
-            <h3 className="text-sm font-bold text-slate-400 uppercase tracking-wider mb-2">Input Format</h3>
-            <p className="text-slate-700 mb-6 bg-slate-50 p-3 rounded-lg border border-slate-100">{selectedQuestion.inputFormat}</p>
-            
-            <h3 className="text-sm font-bold text-slate-400 uppercase tracking-wider mb-2">Output Format</h3>
-            <p className="text-slate-700 mb-6 bg-slate-50 p-3 rounded-lg border border-slate-100">{selectedQuestion.outputFormat}</p>
-          </div>
-          
-          {/* Editor Area */}
-          <div className="w-1/2 flex flex-col">
-            <div className="flex items-center justify-between p-3 bg-slate-100 border-b border-slate-200">
-              <select 
-                value={language} 
-                onChange={handleLanguageChange}
-                className="px-3 py-1.5 border border-slate-300 rounded-lg text-sm font-semibold text-slate-700 outline-none"
-              >
-                <option value="cpp">C++ (GCC 20)</option>
-                <option value="java">Java (OpenJDK)</option>
-                <option value="python">Python (3.11)</option>
-              </select>
-              <button 
-                onClick={handleSubmit} 
-                disabled={isSubmitting}
-                className={`px-4 py-1.5 rounded-lg font-bold text-white transition-all text-sm ${isSubmitting ? 'bg-slate-400' : 'bg-emerald-600 hover:bg-emerald-700'}`}
-              >
-                {isSubmitting ? 'Evaluating...' : 'Submit Code'}
-              </button>
-            </div>
-            <div className="flex-1">
-              <Editor
-                height="100%"
-                language={language}
-                theme="vs-light"
-                value={code}
-                onChange={(val) => setCode(val || "")}
-                options={{ minimap: { enabled: false }, fontSize: 14 }}
-              />
-            </div>
+  return (
+    <div className="flex flex-col h-full w-full bg-slate-50 border border-slate-200 rounded-2xl overflow-hidden shadow-sm">
+      {/* Header Toolbar */}
+      <div className="flex items-center justify-between p-3 bg-white border-b border-slate-200 shrink-0">
+        <div className="flex items-center space-x-4">
+          <div className="flex items-center space-x-2 bg-slate-100 px-3 py-1.5 rounded-lg border border-slate-200">
+            <span className="text-sm font-bold text-slate-500 uppercase">Problem:</span>
+            <select 
+              value={selectedQuestion.id}
+              onChange={handleSelect}
+              className="bg-transparent text-sm font-bold text-slate-800 outline-none cursor-pointer"
+            >
+              {QUESTIONS.map(q => (
+                <option key={q.id} value={q.id}>{q.title}</option>
+              ))}
+            </select>
           </div>
         </div>
+        <div className="flex items-center space-x-3">
+          <select 
+            value={language} 
+            onChange={handleLanguageChange}
+            className="px-3 py-1.5 border border-slate-300 rounded-lg text-sm font-semibold text-slate-700 outline-none cursor-pointer"
+          >
+            <option value="cpp">C++ (GCC 20)</option>
+            <option value="java">Java (OpenJDK)</option>
+            <option value="python">Python (3.11)</option>
+          </select>
+          <button 
+            onClick={handleSubmit} 
+            disabled={isSubmitting}
+            className={`px-6 py-1.5 rounded-lg font-bold text-white transition-all text-sm flex items-center space-x-2 ${isSubmitting ? 'bg-slate-400 cursor-not-allowed' : 'bg-emerald-600 hover:bg-emerald-700'}`}
+          >
+            {isSubmitting ? (
+              <>
+                <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
+                <span>Judging...</span>
+              </>
+            ) : (
+              <>
+                <span>☁️ Submit Code</span>
+              </>
+            )}
+          </button>
+        </div>
+      </div>
 
-        {/* Results Panel */}
-        {result && (
-          <div className="h-64 border-t border-slate-200 bg-white flex flex-col shadow-inner shrink-0">
-            <div className={`p-3 font-bold text-white ${result.status === 'Accepted' ? 'bg-emerald-500' : 'bg-rose-500'} flex justify-between`}>
-              <span>Status: {result.status}</span>
-              {result.total !== undefined && <span>Testcases: {result.passed} / {result.total} Passed</span>}
-            </div>
-            <div className="flex-1 p-4 overflow-y-auto bg-slate-900 text-sm font-mono space-y-4">
-              {result.failedCase && (
-                <div>
-                  <div className="text-slate-400 font-bold mb-1">Failed on Input:</div>
-                  <div className="bg-slate-800 p-2 rounded text-slate-200 whitespace-pre-wrap">{result.failedCase}</div>
-                </div>
-              )}
-              {result.expected && (
-                <div>
-                  <div className="text-slate-400 font-bold mb-1">Expected Output:</div>
-                  <div className="bg-slate-800 p-2 rounded text-emerald-400 whitespace-pre-wrap">{result.expected}</div>
-                </div>
-              )}
-              {result.received && (
-                <div>
-                  <div className="text-slate-400 font-bold mb-1">Your Output / Error:</div>
-                  <div className="bg-slate-800 p-2 rounded text-rose-400 whitespace-pre-wrap">{result.received}</div>
-                </div>
-              )}
-              <div className="text-slate-500 pt-2 border-t border-slate-800">
-                Execution Time: {result.executionTime}ms | Memory: {result.memory}
-              </div>
-            </div>
+      {/* Main 2-Pane Content Area */}
+      <div className="flex flex-1 overflow-hidden">
+        
+        {/* Left Pane: Question Details */}
+        <div className="w-1/2 overflow-y-auto p-6 border-r border-slate-200 bg-white flex flex-col">
+          <div className="flex items-center space-x-3 mb-4">
+            <h1 className="text-2xl font-extrabold text-slate-900">{selectedQuestion.title}</h1>
+            <span className={`px-2.5 py-1 text-xs font-bold uppercase rounded-full ${selectedQuestion.difficulty === 'Easy' ? 'bg-emerald-100 text-emerald-700' : 'bg-amber-100 text-amber-700'}`}>
+              {selectedQuestion.difficulty}
+            </span>
           </div>
-        )}
+          
+          <div className="prose prose-slate max-w-none">
+            <p className="text-slate-700 mb-6 leading-relaxed text-sm md:text-base">{selectedQuestion.description}</p>
+            
+            <h3 className="text-sm font-bold text-slate-400 uppercase tracking-wider mb-2">Input Format</h3>
+            <p className="text-slate-700 mb-6 bg-slate-50 p-4 rounded-xl border border-slate-100 font-mono text-sm">{selectedQuestion.inputFormat}</p>
+            
+            <h3 className="text-sm font-bold text-slate-400 uppercase tracking-wider mb-2">Output Format</h3>
+            <p className="text-slate-700 mb-6 bg-slate-50 p-4 rounded-xl border border-slate-100 font-mono text-sm">{selectedQuestion.outputFormat}</p>
+          </div>
+        </div>
+        
+        {/* Right Pane: Editor & Results */}
+        <div className="w-1/2 flex flex-col bg-slate-50 relative">
+          {/* Editor Area */}
+          <div className={`flex flex-col transition-all duration-300 ${result ? 'h-1/2' : 'h-full'}`}>
+            <Editor
+              height="100%"
+              language={language}
+              theme="vs-light"
+              value={code}
+              onChange={(val) => setCode(val || "")}
+              options={{ minimap: { enabled: false }, fontSize: 14, padding: { top: 16 } }}
+            />
+          </div>
+
+          {/* Results Area (slides up when result exists) */}
+          {result && (
+            <div className="h-1/2 border-t-2 border-slate-200 bg-white flex flex-col shadow-[0_-4px_6px_-1px_rgba(0,0,0,0.05)] z-10">
+              
+              {/* Status Header */}
+              <div className={`px-4 py-2 font-bold text-white flex justify-between items-center ${result.status === 'Accepted' ? 'bg-emerald-500' : result.status === 'Connection Error' ? 'bg-slate-500' : 'bg-rose-500'}`}>
+                <span className="flex items-center space-x-2">
+                  {result.status === 'Accepted' ? <span>✅</span> : result.status === 'Connection Error' ? <span>🔌</span> : <span>❌</span>}
+                  <span>{result.status}</span>
+                </span>
+                {result.total !== undefined && <span>{result.passed} / {result.total} Testcases Passed</span>}
+              </div>
+
+              {/* Testcase Tabs */}
+              {result.testcases && result.testcases.length > 0 && (
+                <div className="flex bg-slate-100 border-b border-slate-200 overflow-x-auto custom-scrollbar">
+                  {result.testcases.map((tc: any, idx: number) => (
+                    <button
+                      key={idx}
+                      onClick={() => setActiveTab(idx)}
+                      className={`px-4 py-2 text-sm font-bold transition-colors whitespace-nowrap flex items-center space-x-2 border-r border-slate-200 ${activeTab === idx ? 'bg-white text-indigo-600 border-b-2 border-b-indigo-600' : 'text-slate-500 hover:bg-slate-200'}`}
+                    >
+                      <span className={`w-2 h-2 rounded-full ${tc.passed ? 'bg-emerald-500' : 'bg-rose-500'}`}></span>
+                      <span>Case {idx + 1}</span>
+                    </button>
+                  ))}
+                </div>
+              )}
+
+              {/* Testcase Details */}
+              <div className="flex-1 overflow-y-auto bg-white p-4 custom-scrollbar">
+                {currentTestcase ? (
+                  <div className="space-y-4">
+                    <div>
+                      <div className="text-xs font-bold text-slate-400 uppercase mb-1">Input</div>
+                      <div className="bg-slate-50 p-3 rounded-lg border border-slate-200 font-mono text-sm text-slate-800 whitespace-pre-wrap">{currentTestcase.input}</div>
+                    </div>
+                    <div>
+                      <div className="text-xs font-bold text-slate-400 uppercase mb-1">Expected Output</div>
+                      <div className="bg-slate-50 p-3 rounded-lg border border-slate-200 font-mono text-sm text-slate-800 whitespace-pre-wrap">{currentTestcase.expected}</div>
+                    </div>
+                    <div>
+                      <div className="text-xs font-bold text-slate-400 uppercase mb-1">Actual Output / Error</div>
+                      <div className={`p-3 rounded-lg border font-mono text-sm whitespace-pre-wrap ${currentTestcase.passed ? 'bg-emerald-50 border-emerald-200 text-emerald-800' : 'bg-rose-50 border-rose-200 text-rose-800'}`}>
+                        {currentTestcase.actual || <span className="italic text-slate-400">No output</span>}
+                      </div>
+                    </div>
+                  </div>
+                ) : (
+                  <div className="h-full flex items-center justify-center text-slate-400 font-bold text-sm">
+                    {result.received || "No testcase data available."}
+                  </div>
+                )}
+              </div>
+
+              {/* Footer Meta */}
+              {result.executionTime !== undefined && (
+                <div className="px-4 py-2 bg-slate-50 border-t border-slate-200 text-xs font-bold text-slate-500 flex justify-between">
+                  <span>Execution Time: {result.executionTime}ms</span>
+                  <span>Memory: {result.memory}</span>
+                </div>
+              )}
+            </div>
+          )}
+        </div>
       </div>
     </div>
   );

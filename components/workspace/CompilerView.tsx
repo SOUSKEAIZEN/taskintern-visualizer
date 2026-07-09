@@ -63,75 +63,83 @@ export default function CompilerView() {
   return (
     <div className="flex flex-col h-full w-full bg-slate-50 border border-slate-200 rounded-2xl overflow-hidden shadow-sm">
       {/* Header Toolbar */}
-      <div className="flex items-center justify-between p-4 bg-white border-b border-slate-200">
-        <div className="flex items-center space-x-4">
-          <h2 className="text-xl font-bold text-slate-800">Online Compiler</h2>
+      <div className="flex items-center justify-between p-3 bg-white border-b border-slate-200 shrink-0">
+        <h2 className="text-xl font-bold text-slate-800 ml-2">Online Compiler</h2>
+        <div className="flex items-center space-x-3">
           <select 
             value={language} 
             onChange={handleLanguageChange}
-            className="px-4 py-2 border border-slate-300 rounded-lg text-sm font-semibold text-slate-700 outline-none focus:border-indigo-500"
+            className="px-3 py-1.5 border border-slate-300 rounded-lg text-sm font-semibold text-slate-700 outline-none cursor-pointer"
           >
             {SUPPORTED_LANGUAGES.map(lang => (
               <option key={lang.id} value={lang.id}>{lang.label}</option>
             ))}
           </select>
+          <button 
+            onClick={handleRun} 
+            disabled={isCompiling}
+            className={`px-6 py-1.5 rounded-lg font-bold text-white transition-all flex items-center space-x-2 text-sm ${isCompiling ? 'bg-slate-400 cursor-not-allowed' : 'bg-indigo-600 hover:bg-indigo-700'}`}
+          >
+            {isCompiling ? (
+              <>
+                <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
+                <span>Compiling...</span>
+              </>
+            ) : (
+              <>
+                <span>▶ Run Code</span>
+              </>
+            )}
+          </button>
         </div>
-        <button 
-          onClick={handleRun} 
-          disabled={isCompiling}
-          className={`px-6 py-2 rounded-lg font-bold text-white transition-all flex items-center space-x-2 ${isCompiling ? 'bg-slate-400 cursor-not-allowed' : 'bg-indigo-600 hover:bg-indigo-700'}`}
-        >
-          {isCompiling ? (
-            <>
-              <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
-              <span>Compiling...</span>
-            </>
-          ) : (
-            <>
-              <span>▶ Run Code</span>
-            </>
-          )}
-        </button>
       </div>
 
-      <div className="flex flex-1 overflow-hidden">
-        {/* Editor Section */}
-        <div className="w-2/3 border-r border-slate-200">
+      <div className="flex flex-col flex-1 overflow-hidden relative">
+        {/* Editor Section (Top) */}
+        <div className="flex-1 min-h-[50%]">
           <Editor
             height="100%"
             language={language}
             theme="vs-light"
             value={code}
             onChange={(val) => setCode(val || "")}
-            options={{ minimap: { enabled: false }, fontSize: 14 }}
+            options={{ minimap: { enabled: false }, fontSize: 14, padding: { top: 16 } }}
           />
         </div>
 
-        {/* I/O Section */}
-        <div className="w-1/3 flex flex-col bg-white">
-          <div className="flex-1 border-b border-slate-200 flex flex-col">
-            <div className="p-2 bg-slate-100 text-xs font-bold text-slate-500 uppercase border-b border-slate-200">Input (stdin)</div>
+        {/* I/O Section (Bottom) */}
+        <div className="h-64 flex bg-white border-t-2 border-slate-200 shadow-[0_-4px_6px_-1px_rgba(0,0,0,0.05)] z-10 shrink-0">
+          
+          {/* Stdin (Left) */}
+          <div className="w-1/3 border-r border-slate-200 flex flex-col bg-slate-50">
+            <div className="px-4 py-2 bg-white border-b border-slate-200 text-xs font-bold text-slate-500 uppercase flex items-center space-x-2">
+              <span>⌨️</span><span>Input (stdin)</span>
+            </div>
             <textarea
-              className="flex-1 w-full p-4 resize-none outline-none font-mono text-sm text-slate-700"
+              className="flex-1 w-full p-4 resize-none outline-none font-mono text-sm text-slate-700 bg-transparent"
               placeholder="Enter input here..."
               value={stdin}
               onChange={(e) => setStdin(e.target.value)}
             />
           </div>
           
-          <div className="flex-1 flex flex-col">
-            <div className="p-2 bg-slate-100 text-xs font-bold text-slate-500 uppercase border-b border-slate-200 flex justify-between items-center">
-              <span>Output Console</span>
-              <button onClick={handleClear} className="text-slate-400 hover:text-rose-500">Clear</button>
+          {/* Output (Right) */}
+          <div className="w-2/3 flex flex-col bg-white">
+            <div className="px-4 py-2 bg-white border-b border-slate-200 text-xs font-bold text-slate-500 uppercase flex justify-between items-center">
+              <div className="flex items-center space-x-2">
+                <span>🖥️</span><span>Output Console</span>
+              </div>
+              <button onClick={handleClear} className="text-slate-400 hover:text-rose-500 transition-colors">Clear</button>
             </div>
-            <div className="flex-1 overflow-auto p-4 bg-slate-900 text-slate-300 font-mono text-sm whitespace-pre-wrap">
-              {stdout && <div className="text-emerald-400 mb-2">{stdout}</div>}
-              {stderr && <div className="text-rose-400">{stderr}</div>}
-              {!stdout && !stderr && <div className="text-slate-600 italic">No output yet...</div>}
+            <div className="flex-1 overflow-auto p-4 font-mono text-sm whitespace-pre-wrap custom-scrollbar">
+              {stdout && <div className="text-emerald-700 bg-emerald-50 p-3 rounded-lg border border-emerald-100 mb-2">{stdout}</div>}
+              {stderr && <div className="text-rose-700 bg-rose-50 p-3 rounded-lg border border-rose-100">{stderr}</div>}
+              {!stdout && !stderr && <div className="text-slate-400 italic flex items-center justify-center h-full">No output yet...</div>}
             </div>
             {executionTime !== null && (
-              <div className="p-2 bg-slate-800 text-slate-400 text-xs border-t border-slate-700">
-                Execution Time: {executionTime}ms | Limits: 3.0s, 256MB
+              <div className="px-4 py-2 bg-slate-50 border-t border-slate-200 text-xs font-bold text-slate-500 flex justify-between">
+                <span>Execution Time: {executionTime}ms</span>
+                <span>Limits: 3.0s, 256MB</span>
               </div>
             )}
           </div>
