@@ -5,6 +5,8 @@ import Link from "next/link";
 import { logger } from "../../lib/logger";
 
 const MODULES = [
+  { id: "compiler", label: "Online Compiler", icon: "🖥️" },
+  { id: "practice", label: "Practice Questions", icon: "📝" },
   { id: "arrays", label: "Array Operations", icon: "🚀" },
   { id: "searching", label: "Searching Algorithms", icon: "🔍" },
   { id: "hashmaps", label: "Hash Maps", icon: "🗄️" },

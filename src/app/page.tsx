@@ -12,6 +12,8 @@ import QueueCanvas from "../../components/visualization/QueueCanvas";
 import TreeCanvas from "../../components/visualization/TreeCanvas";
 import HeapCanvas from "../../components/visualization/HeapCanvas";
 import GraphCanvas from "../../components/visualization/GraphCanvas";
+import CompilerView from "../../components/workspace/CompilerView";
+import PracticeView from "../../components/workspace/PracticeView";
 import TheoryPanel from "../../components/workspace/TheoryPanel";
 // Note: We will need to update the updateModuleProgress action to accept timeSpent in the next step
 // import { updateModuleProgress } from "../../lib/actions/progress";
@@ -135,7 +137,7 @@ function WorkspaceContent() {
     <div className="flex h-full w-full relative">
       
       {/* Left Pane: Educational Theory Content */}
-      {!isFullscreen && (
+      {!isFullscreen && activeModule !== "compiler" && activeModule !== "practice" && (
         <div 
           style={{ width: `${leftPaneWidth}%` }}
           className="h-full overflow-y-auto bg-white border-r border-slate-200 z-10 shadow-sm relative flex-shrink-0"
@@ -145,7 +147,7 @@ function WorkspaceContent() {
       )}
 
       {/* Draggable Split-Pane Divider */}
-      {!isFullscreen && (
+      {!isFullscreen && activeModule !== "compiler" && activeModule !== "practice" && (
         <div 
           className="w-1.5 hover:w-2 bg-slate-200 hover:bg-indigo-400 cursor-col-resize z-20 transition-all flex items-center justify-center group"
           onMouseDown={(e) => {
@@ -173,18 +175,18 @@ function WorkspaceContent() {
 
       {/* Right Pane: Interactive Workspace */}
       <div 
-        style={{ width: isFullscreen ? '100%' : `${100 - leftPaneWidth}%` }}
+        style={{ width: (isFullscreen || activeModule === "compiler" || activeModule === "practice") ? '100%' : `${100 - leftPaneWidth}%` }}
         className="h-full overflow-y-auto p-4 md:p-8 bg-slate-50/50 space-y-8 pb-24 relative custom-scrollbar flex-grow transition-all duration-300"
       >
-        <div className={`w-full mx-auto ${isFullscreen ? 'max-w-7xl' : 'max-w-4xl'}`}>
+        <div className={`w-full h-full mx-auto ${(isFullscreen || activeModule === "compiler" || activeModule === "practice") ? 'max-w-none' : 'max-w-4xl'}`}>
           
           {/* Main Visualization Area */}
-          <div className="bg-white border border-slate-200 rounded-3xl shadow-sm p-4 md:p-8 flex flex-col items-center justify-center min-h-[500px] relative overflow-hidden transition-all duration-500">
+          <div className="bg-white border border-slate-200 rounded-3xl shadow-sm p-4 md:p-8 flex flex-col items-center justify-center min-h-[500px] relative overflow-hidden transition-all duration-500 h-full">
             
             <div className="absolute top-0 right-0 -mr-16 -mt-16 w-64 h-64 bg-indigo-50 rounded-full blur-3xl opacity-60 pointer-events-none"></div>
 
             {/* Top Right Controls (Timer & Fullscreen) */}
-            {isVisualizing && (
+            {isVisualizing && activeModule !== "compiler" && activeModule !== "practice" && (
               <div className="absolute top-4 right-4 flex items-center gap-3 z-20">
                 {/* Live Timer Display */}
                 <div className="flex items-center gap-2 px-3 py-2 bg-slate-900 text-white rounded-lg shadow-sm font-mono text-sm">
@@ -247,10 +249,12 @@ function WorkspaceContent() {
                 </button>
               </div>
             ) : (
-              <div className="flex flex-col items-center w-full animate-in fade-in duration-500 z-10 mt-12">
+              <div className={`flex flex-col items-center w-full animate-in fade-in duration-500 z-10 ${activeModule === "compiler" || activeModule === "practice" ? "h-full" : "mt-12"}`}>
                 
                 {/* Dynamically render the correct visualization engine */}
-                {activeModule === "arrays" ? <ArrayCanvas /> : 
+                {activeModule === "compiler" ? <CompilerView /> :
+                 activeModule === "practice" ? <PracticeView /> :
+                 activeModule === "arrays" ? <ArrayCanvas /> : 
                  activeModule === "searching" ? <SearchingCanvas /> : 
                  activeModule === "hashmaps" ? <HashMapCanvas /> : 
                  activeModule === "linked-lists" ? <LinkedListCanvas /> : 
@@ -261,10 +265,12 @@ function WorkspaceContent() {
                  activeModule === "graphs" ? <GraphCanvas /> :
                  <div className="text-slate-500 font-bold p-8">Module Engine in Development</div>}
                 
-                <p className="text-sm text-emerald-600 font-bold bg-emerald-50 px-5 py-2.5 rounded-full border border-emerald-200 mt-10 shadow-sm flex items-center gap-2">
-                  <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
-                  Interactive Canvas Active. Time is being tracked.
-                </p>
+                {activeModule !== "compiler" && activeModule !== "practice" && (
+                  <p className="text-sm text-emerald-600 font-bold bg-emerald-50 px-5 py-2.5 rounded-full border border-emerald-200 mt-10 shadow-sm flex items-center gap-2">
+                    <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
+                    Interactive Canvas Active. Time is being tracked.
+                  </p>
+                )}
               </div>
             )}
           </div>
