@@ -7,14 +7,16 @@ import { ArrayElement, AlgorithmStep } from "../../types/dsa";
 import { 
   generateBubbleSortSteps, 
   generateSelectionSortSteps, 
-  generateInsertionSortSteps 
+  generateInsertionSortSteps,
+  generateMergeSortSteps,
+  generateQuickSortSteps
 } from "../../lib/algorithms/sorting";
 
 interface ArrayCanvasProps {
   initialData?: number[];
 }
 
-type AlgorithmType = "bubble" | "selection" | "insertion";
+type AlgorithmType = "bubble" | "selection" | "insertion" | "merge" | "quick";
 
 export default function ArrayCanvas({ initialData = [45, 10, 24, 92, 7] }: ArrayCanvasProps) {
   // --- States ---
@@ -99,6 +101,12 @@ export default function ArrayCanvas({ initialData = [45, 10, 24, 92, 7] }: Array
         break;
       case "insertion":
         steps = generateInsertionSortSteps(baseArray);
+        break;
+      case "merge":
+        steps = generateMergeSortSteps(baseArray);
+        break;
+      case "quick":
+        steps = generateQuickSortSteps(baseArray);
         break;
     }
 
@@ -221,8 +229,8 @@ export default function ArrayCanvas({ initialData = [45, 10, 24, 92, 7] }: Array
             </div>
           ))
         ) : (
-          activeFrame?.map((element) => (
-            <div key={element.id} className={`w-16 h-16 border-2 rounded-xl flex items-center justify-center text-2xl font-bold transition-all duration-300 ${getStyleForState(element.state)}`}>
+          activeFrame?.map((element, idx) => (
+            <div key={`${element.id}-${idx}`} className={`w-16 h-16 border-2 rounded-xl flex items-center justify-center text-2xl font-bold transition-all duration-300 ${getStyleForState(element.state)}`}>
               {element.value}
             </div>
           ))
@@ -265,6 +273,8 @@ export default function ArrayCanvas({ initialData = [45, 10, 24, 92, 7] }: Array
                 <option value="bubble">Bubble Sort</option>
                 <option value="selection">Selection Sort</option>
                 <option value="insertion">Insertion Sort</option>
+                <option value="merge">Merge Sort</option>
+                <option value="quick">Quick Sort</option>
               </select>
               <button 
                 onClick={handleStartSorting} 

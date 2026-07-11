@@ -217,3 +217,201 @@ export const generateInsertionSortSteps = (initialValues: number[]): AlgorithmSt
 
   return history;
 };
+
+// =========================================================
+// 4. MERGE SORT
+// =========================================================
+export const generateMergeSortSteps = (initialValues: number[]): AlgorithmStep<ArrayElement[]>[] => {
+  logger.info(`Algorithm Engine: Initializing Merge Sort for array of length ${initialValues.length}.`);
+
+  const history: AlgorithmStep<ArrayElement[]>[] = [];
+  let currentArray: ArrayElement[] = initialValues.map((val) => ({ id: generateId(), value: val, state: "default" }));
+
+  history.push({ snapshot: cloneState(currentArray), description: "Starting Merge Sort.", activeIds: [] });
+
+  const mergeSortHelper = (arr: ArrayElement[], l: number, r: number) => {
+    if (l >= r) return;
+    const m = l + Math.floor((r - l) / 2);
+    
+    // Highlight division
+    for(let i = l; i <= r; i++) arr[i].state = "active";
+    history.push({
+      snapshot: cloneState(currentArray),
+      description: `Dividing array from index ${l} to ${r} into two halves.`,
+      activeIds: arr.slice(l, r + 1).map(x => x.id),
+    });
+    for(let i = l; i <= r; i++) arr[i].state = "default";
+
+    mergeSortHelper(arr, l, m);
+    mergeSortHelper(arr, m + 1, r);
+    merge(arr, l, m, r);
+  };
+
+  const merge = (arr: ArrayElement[], l: number, m: number, r: number) => {
+    const left = arr.slice(l, m + 1).map(x => ({...x}));
+    const right = arr.slice(m + 1, r + 1).map(x => ({...x}));
+    
+    let i = 0, j = 0, k = l;
+    
+    while (i < left.length && j < right.length) {
+      left[i].state = "comparing";
+      right[j].state = "comparing";
+      history.push({
+        snapshot: cloneState(currentArray),
+        description: `Comparing ${left[i].value} and ${right[j].value}.`,
+        activeIds: [left[i].id, right[j].id],
+      });
+      
+      if (left[i].value <= right[j].value) {
+        arr[k] = { ...left[i], state: "swapping" };
+        i++;
+      } else {
+        arr[k] = { ...right[j], state: "swapping" };
+        j++;
+      }
+      history.push({
+        snapshot: cloneState(currentArray),
+        description: `Placed ${arr[k].value} into the merged array.`,
+        activeIds: [arr[k].id],
+      });
+      arr[k].state = "default";
+      k++;
+    }
+    
+    while (i < left.length) {
+      arr[k] = { ...left[i], state: "swapping" };
+      history.push({
+        snapshot: cloneState(currentArray),
+        description: `Copying remaining element ${arr[k].value} from left half.`,
+        activeIds: [arr[k].id],
+      });
+      arr[k].state = "default";
+      i++;
+      k++;
+    }
+    
+    while (j < right.length) {
+      arr[k] = { ...right[j], state: "swapping" };
+      history.push({
+        snapshot: cloneState(currentArray),
+        description: `Copying remaining element ${arr[k].value} from right half.`,
+        activeIds: [arr[k].id],
+      });
+      arr[k].state = "default";
+      j++;
+      k++;
+    }
+    
+    for(let x = l; x <= r; x++) arr[x].state = "sorted";
+    history.push({
+      snapshot: cloneState(currentArray),
+      description: `Merged subarray from index ${l} to ${r}.`,
+      activeIds: arr.slice(l, r + 1).map(x => x.id),
+    });
+    for(let x = l; x <= r; x++) arr[x].state = "default";
+  };
+
+  mergeSortHelper(currentArray, 0, currentArray.length - 1);
+
+  logger.info(`Algorithm Engine: Merge Sort complete. Generated ${history.length} video frames.`);
+  currentArray = currentArray.map(el => ({ ...el, state: "sorted" }));
+  history.push({ snapshot: cloneState(currentArray), description: "Array is fully sorted!", activeIds: [] });
+
+  return history;
+};
+
+// =========================================================
+// 5. QUICK SORT
+// =========================================================
+export const generateQuickSortSteps = (initialValues: number[]): AlgorithmStep<ArrayElement[]>[] => {
+  logger.info(`Algorithm Engine: Initializing Quick Sort for array of length ${initialValues.length}.`);
+
+  const history: AlgorithmStep<ArrayElement[]>[] = [];
+  let currentArray: ArrayElement[] = initialValues.map((val) => ({ id: generateId(), value: val, state: "default" }));
+
+  history.push({ snapshot: cloneState(currentArray), description: "Starting Quick Sort.", activeIds: [] });
+
+  const partition = (arr: ArrayElement[], low: number, high: number): number => {
+    const pivot = arr[high];
+    pivot.state = "active";
+    history.push({
+      snapshot: cloneState(currentArray),
+      description: `Choosing ${pivot.value} as the pivot.`,
+      activeIds: [pivot.id],
+    });
+
+    let i = low - 1;
+
+    for (let j = low; j < high; j++) {
+      arr[j].state = "comparing";
+      history.push({
+        snapshot: cloneState(currentArray),
+        description: `Comparing ${arr[j].value} with pivot ${pivot.value}.`,
+        activeIds: [arr[j].id, pivot.id],
+      });
+
+      if (arr[j].value < pivot.value) {
+        i++;
+        if (i !== j) {
+           arr[i].state = "swapping";
+           arr[j].state = "swapping";
+           history.push({
+             snapshot: cloneState(currentArray),
+             description: `${arr[j].value} < ${pivot.value}. Swapping ${arr[i].value} and ${arr[j].value}.`,
+             activeIds: [arr[i].id, arr[j].id],
+           });
+           const temp = arr[i];
+           arr[i] = arr[j];
+           arr[j] = temp;
+           arr[i].state = "default";
+        }
+      }
+      if (i > -1 && i !== j) arr[i].state = "default";
+      arr[j].state = "default";
+    }
+
+    arr[i + 1].state = "swapping";
+    pivot.state = "swapping";
+    history.push({
+      snapshot: cloneState(currentArray),
+      description: `Moving pivot ${pivot.value} to its correct position. Swapping with ${arr[i + 1].value}.`,
+      activeIds: [arr[i + 1].id, pivot.id],
+    });
+
+    const temp = arr[i + 1];
+    arr[i + 1] = arr[high];
+    arr[high] = temp;
+    
+    arr[i + 1].state = "sorted";
+    history.push({
+      snapshot: cloneState(currentArray),
+      description: `Pivot ${arr[i + 1].value} is now in its sorted position.`,
+      activeIds: [arr[i + 1].id],
+    });
+
+    return i + 1;
+  };
+
+  const quickSortHelper = (arr: ArrayElement[], low: number, high: number) => {
+    if (low < high) {
+      const pi = partition(arr, low, high);
+      quickSortHelper(arr, low, pi - 1);
+      quickSortHelper(arr, pi + 1, high);
+    } else if (low === high) {
+      arr[low].state = "sorted";
+      history.push({
+        snapshot: cloneState(currentArray),
+        description: `Element ${arr[low].value} is sorted trivially.`,
+        activeIds: [arr[low].id],
+      });
+    }
+  };
+
+  quickSortHelper(currentArray, 0, currentArray.length - 1);
+
+  logger.info(`Algorithm Engine: Quick Sort complete. Generated ${history.length} video frames.`);
+  currentArray = currentArray.map(el => ({ ...el, state: "sorted" }));
+  history.push({ snapshot: cloneState(currentArray), description: "Array is fully sorted!", activeIds: [] });
+
+  return history;
+};
