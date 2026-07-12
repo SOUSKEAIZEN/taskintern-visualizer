@@ -1,294 +1,176 @@
 "use client";
 
-import { useState, useEffect, Suspense, useRef } from "react";
-import { useSearchParams } from "next/navigation";
-import { logger } from "../../lib/logger";
-import ArrayCanvas from "../../components/visualization/ArrayCanvas";
-import SearchingCanvas from "../../components/visualization/SearchingCanvas";
-import HashMapCanvas from "../../components/visualization/HashMapCanvas";
-import LinkedListCanvas from "../../components/visualization/LinkedListCanvas";
-import StackCanvas from "../../components/visualization/StackCanvas";
-import QueueCanvas from "../../components/visualization/QueueCanvas";
-import TreeCanvas from "../../components/visualization/TreeCanvas";
-import HeapCanvas from "../../components/visualization/HeapCanvas";
-import GraphCanvas from "../../components/visualization/GraphCanvas";
-import CompilerView from "../../components/workspace/CompilerView";
-import PracticeView from "../../components/workspace/PracticeView";
-import TheoryPanel from "../../components/workspace/TheoryPanel";
-// Note: We will need to update the updateModuleProgress action to accept timeSpent in the next step
-// import { updateModuleProgress } from "../../lib/actions/progress";
+import { useState } from "react";
+import { signIn } from "next-auth/react";
+import { useRouter } from "next/navigation";
+import { registerUser } from "../../lib/actions/auth";
 
-function WorkspaceContent() {
-  const searchParams = useSearchParams();
-  const urlModule = searchParams.get("module") || "arrays";
+export default function LoginPage() {
+  const [isLogin, setIsLogin] = useState(true);
+  const [error, setError] = useState("");
+  const router = useRouter();
 
-  const [activeModule, setActiveModule] = useState(urlModule);
-  const [isVisualizing, setIsVisualizing] = useState(false);
-  
-  // UI UX States
-  const [isFullscreen, setIsFullscreen] = useState(false);
-  const [leftPaneWidth, setLeftPaneWidth] = useState(33.33); 
+  async function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
+    e.preventDefault();
+    setError("");
+    const formData = new FormData(e.currentTarget);
+    const email = formData.get("email") as string;
+    const password = formData.get("password") as string;
 
-  // --- Time Tracking & Analytics States ---
-  const [activeTime, setActiveTime] = useState(0); // For UI display (seconds)
-  const sessionStartTimeRef = useRef<number | null>(null);
-  const activeModuleRef = useRef<string>(activeModule);
-  
-  const CURRENT_USER_ID = "placeholder-student-id-123";
+    if (isLogin) {
+      const res = await signIn("credentials", {
+        redirect: false,
+        email,
+        password,
+      });
 
-  // Keeps the ref in sync with the state so event listeners can access the latest value
-  useEffect(() => {
-    activeModuleRef.current = activeModule;
-  }, [activeModule]);
-
-  // Sync URL parameter to the active module state
-  useEffect(() => {
-    if (urlModule !== activeModule) {
-      logger.info(`URL State Change: Switching active module to ${urlModule.toUpperCase()}`);
-      
-      // If they switch modules while visualizing, force a timer stop and sync
-      if (isVisualizing) {
-        logger.info(`Timer Logic: Auto-stopping session due to module switch.`);
-        handleStopVisualization();
+      if (res?.error) {
+        setError(res.error);
+      } else {
+        router.push("/portal");
       }
-      
-      setActiveModule(urlModule);
-      setIsVisualizing(false); 
-      setIsFullscreen(false); 
-    }
-  }, [urlModule]);
-
-  // --- Real-time Timer Logic ---
-  useEffect(() => {
-    let interval: NodeJS.Timeout;
-
-    if (isVisualizing) {
-      logger.info(`Timer Logic Step 1: Starting active learning session for [${activeModule}]`);
-      sessionStartTimeRef.current = Date.now();
-      setActiveTime(0); // Reset UI timer
-      
-      interval = setInterval(() => {
-        setActiveTime((prev) => prev + 1);
-      }, 1000);
-    }
-
-    return () => {
-      if (interval) clearInterval(interval);
-    };
-  }, [isVisualizing, activeModule]);
-
-  // --- Safely Catch Page Close / Refresh ---
-  useEffect(() => {
-    const handleBeforeUnload = (e: BeforeUnloadEvent) => {
-      if (sessionStartTimeRef.current) {
-        const timeSpent = Math.floor((Date.now() - sessionStartTimeRef.current) / 1000);
-        logger.warn(`Browser Event [beforeunload]: Emergency syncing ${timeSpent}s for ${activeModuleRef.current} before tab closes.`);
-        syncProgressToDatabase(activeModuleRef.current, timeSpent);
+    } else {
+      const name = formData.get("name") as string;
+      const res = await registerUser(formData);
+      if (res.error) {
+        setError(res.error);
+      } else {
+        // Automatically sign in after register
+        const signRes = await signIn("credentials", {
+          redirect: false,
+          email,
+          password,
+        });
+        if (signRes?.error) {
+           setError("Registered successfully, but login failed.");
+        } else {
+           router.push("/portal");
+        }
       }
-    };
-
-    window.addEventListener("beforeunload", handleBeforeUnload);
-    return () => window.removeEventListener("beforeunload", handleBeforeUnload);
-  }, []);
-
-  const syncProgressToDatabase = async (topicId: string, timeSpentSeconds: number) => {
-    if (timeSpentSeconds <= 0) return;
-    
-    logger.info(`DB Sync Init: Preparing to send ${timeSpentSeconds}s to backend for ${topicId}`);
-    try {
-      // NOTE: The backend action needs to be updated to handle timeSpent appending.
-      // await updateModuleProgress(CURRENT_USER_ID, topicId, false, timeSpentSeconds);
-      logger.info(`DB Sync Success: (Simulated) Saved ${timeSpentSeconds}s for ${topicId}.`);
-    } catch (err) {
-      logger.error(`DB Sync Point of Failure: Could not save time for ${topicId}`, err);
     }
-  };
-
-  const handleStartVisualization = () => {
-    logger.info(`State Change: User mounted the interactive ${activeModule} Canvas.`);
-    setIsVisualizing(true);
-  };
-
-  const handleStopVisualization = () => {
-    logger.info(`State Change: User unmounted the interactive ${activeModule} Canvas.`);
-    setIsVisualizing(false);
-    
-    if (sessionStartTimeRef.current) {
-      const totalTimeSpent = Math.floor((Date.now() - sessionStartTimeRef.current) / 1000);
-      logger.info(`Timer Logic Step 2: Session ended natively. Total time: ${totalTimeSpent}s`);
-      syncProgressToDatabase(activeModule, totalTimeSpent);
-      sessionStartTimeRef.current = null;
-    }
-  };
-
-  const toggleFullscreen = () => {
-    logger.info(`UI Interaction: User toggled fullscreen mode to ${!isFullscreen}`);
-    setIsFullscreen(!isFullscreen);
-  };
-
-  // Helper to format the active time for the UI
-  const formatUIClock = (totalSeconds: number) => {
-    const m = Math.floor(totalSeconds / 60).toString().padStart(2, '0');
-    const s = (totalSeconds % 60).toString().padStart(2, '0');
-    return `${m}:${s}`;
-  };
+  }
 
   return (
-    <div className="flex h-full w-full relative">
+    <div className="min-h-screen flex items-center justify-center bg-slate-50 py-12 px-4 sm:px-6 lg:px-8 relative overflow-hidden">
       
-      {/* Left Pane: Educational Theory Content */}
-      {!isFullscreen && activeModule !== "compiler" && activeModule !== "practice" && (
-        <div 
-          style={{ width: `${leftPaneWidth}%` }}
-          className="h-full overflow-y-auto bg-white border-r border-slate-200 z-10 shadow-sm relative flex-shrink-0"
-        >
-          <TheoryPanel topicId={activeModule} />
+      {/* Background blobs for premium feel */}
+      <div className="absolute top-0 -left-4 w-72 h-72 bg-indigo-300 rounded-full mix-blend-multiply filter blur-2xl opacity-30 animate-blob"></div>
+      <div className="absolute top-0 -right-4 w-72 h-72 bg-purple-300 rounded-full mix-blend-multiply filter blur-2xl opacity-30 animate-blob animation-delay-2000"></div>
+      <div className="absolute -bottom-8 left-20 w-72 h-72 bg-pink-300 rounded-full mix-blend-multiply filter blur-2xl opacity-30 animate-blob animation-delay-4000"></div>
+
+      <div className="max-w-md w-full space-y-8 bg-white p-10 rounded-3xl shadow-xl z-10 relative">
+        <div>
+          <h2 className="mt-6 text-center text-4xl font-extrabold text-slate-900 tracking-tight">
+            {isLogin ? "Welcome back" : "Create an account"}
+          </h2>
+          <p className="mt-2 text-center text-sm text-slate-600">
+            {isLogin ? "Sign in to continue your journey" : "Start your DSA mastery today"}
+          </p>
         </div>
-      )}
 
-      {/* Draggable Split-Pane Divider */}
-      {!isFullscreen && activeModule !== "compiler" && activeModule !== "practice" && (
-        <div 
-          className="w-1.5 hover:w-2 bg-slate-200 hover:bg-indigo-400 cursor-col-resize z-20 transition-all flex items-center justify-center group"
-          onMouseDown={(e) => {
-            const startX = e.clientX;
-            const startWidth = leftPaneWidth;
-            
-            const onMouseMove = (moveEvent: MouseEvent) => {
-              const delta = ((moveEvent.clientX - startX) / window.innerWidth) * 100;
-              const newWidth = Math.max(20, Math.min(startWidth + delta, 60)); 
-              setLeftPaneWidth(newWidth);
-            };
-            
-            const onMouseUp = () => {
-              document.removeEventListener("mousemove", onMouseMove);
-              document.removeEventListener("mouseup", onMouseUp);
-            };
-            
-            document.addEventListener("mousemove", onMouseMove);
-            document.addEventListener("mouseup", onMouseUp);
-          }}
-        >
-          <div className="h-8 w-1 bg-slate-400 group-hover:bg-white rounded-full"></div>
-        </div>
-      )}
-
-      {/* Right Pane: Interactive Workspace */}
-      <div 
-        style={{ width: (isFullscreen || activeModule === "compiler" || activeModule === "practice") ? '100%' : `${100 - leftPaneWidth}%` }}
-        className="h-full overflow-y-auto p-4 md:p-8 bg-slate-50/50 space-y-8 pb-24 relative custom-scrollbar flex-grow transition-all duration-300"
-      >
-        <div className={`w-full h-full mx-auto ${(isFullscreen || activeModule === "compiler" || activeModule === "practice") ? 'max-w-none' : 'max-w-4xl'}`}>
-          
-          {/* Main Visualization Area */}
-          <div className="bg-white border border-slate-200 rounded-3xl shadow-sm p-4 md:p-8 flex flex-col items-center justify-center min-h-[500px] relative overflow-hidden transition-all duration-500 h-full">
-            
-            <div className="absolute top-0 right-0 -mr-16 -mt-16 w-64 h-64 bg-indigo-50 rounded-full blur-3xl opacity-60 pointer-events-none"></div>
-
-            {/* Top Right Controls (Timer & Fullscreen) */}
-            {isVisualizing && activeModule !== "compiler" && activeModule !== "practice" && (
-              <div className="absolute top-4 right-4 flex items-center gap-3 z-20">
-                {/* Live Timer Display */}
-                <div className="flex items-center gap-2 px-3 py-2 bg-slate-900 text-white rounded-lg shadow-sm font-mono text-sm">
-                  <span className="w-2 h-2 rounded-full bg-red-500 animate-pulse"></span>
-                  {formatUIClock(activeTime)}
-                </div>
-
-                <button
-                  onClick={toggleFullscreen}
-                  className="p-2 bg-white border border-slate-200 hover:bg-slate-50 text-slate-500 hover:text-indigo-600 rounded-lg shadow-sm transition-all flex items-center space-x-2"
-                  title={isFullscreen ? "Exit Fullscreen" : "Enter Fullscreen"}
-                >
-                  {isFullscreen ? (
-                    <>
-                      <span className="text-sm font-bold">Exit</span>
-                      <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M4 14h4v4m0-4l-5 5m11-5h4v4m-4-4l5 5M4 10h4V6m0 4l-5-5m11 5h4V6m-4 4l5-5" /></svg>
-                    </>
-                  ) : (
-                    <>
-                      <span className="text-sm font-bold">Fullscreen</span>
-                      <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M4 8V4m0 0h4M4 4l5 5m11-1V4m0 0h-4m4 0l-5 5M4 16v4m0 0h4m-4 0l5-5m11 5l-5-5m5 5v-4m0 4h-4" /></svg>
-                    </>
-                  )}
-                </button>
-                
-                <button
-                  onClick={handleStopVisualization}
-                  className="p-2 bg-red-50 border border-red-100 hover:bg-red-100 text-red-600 rounded-lg shadow-sm transition-all"
-                  title="Stop Learning Session"
-                >
-                  <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M6 18L18 6M6 6l12 12" /></svg>
-                </button>
+        <form className="mt-8 space-y-6" onSubmit={handleSubmit}>
+          <div className="rounded-md shadow-sm space-y-4">
+            {!isLogin && (
+              <div>
+                <label className="sr-only">Full Name</label>
+                <input
+                  name="name"
+                  type="text"
+                  required
+                  className="appearance-none rounded-xl relative block w-full px-4 py-3 border border-slate-300 placeholder-slate-500 text-slate-900 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 focus:z-10 sm:text-sm"
+                  placeholder="Full Name"
+                />
               </div>
             )}
-
-            {!isVisualizing ? (
-              <div className="text-center space-y-6 animate-in fade-in zoom-in-95 duration-500 z-10">
-                <div className="w-24 h-24 bg-indigo-100 rounded-3xl flex items-center justify-center mx-auto mb-4 border-4 border-white shadow-md transition-all">
-                  <span className="text-5xl">
-                    {activeModule === "arrays" ? "🚀" : 
-                     activeModule === "searching" ? "🔍" : 
-                     activeModule === "hashmaps" ? "🗄️" : 
-                     activeModule === "linked-lists" ? "🔗" : 
-                     activeModule === "stacks" ? "🥞" : 
-                     activeModule === "queues" ? "🚶" : 
-                     activeModule === "trees" ? "🌳" : 
-                     activeModule === "heaps" ? "⛰️" : 
-                     activeModule === "graphs" ? "🕸️" : "⚙️"}
-                  </span>
-                </div>
-                <h2 className="text-3xl font-extrabold text-slate-800 tracking-tight">Ready to Visualize?</h2>
-                <p className="text-slate-500 max-w-sm mx-auto text-lg leading-relaxed capitalize">
-                  Initialize the canvas to interact with {activeModule.replace("-", " ")} and observe algorithms executing in real-time.
-                </p>
-                <button
-                  onClick={handleStartVisualization}
-                  className="mt-4 px-10 py-4 bg-indigo-600 text-white font-bold rounded-2xl shadow-lg hover:bg-indigo-700 hover:shadow-indigo-200 transition-all active:scale-95 capitalize"
-                >
-                  Initialize {activeModule.replace("-", " ")} Engine
-                </button>
-              </div>
-            ) : (
-              <div className={`flex flex-col items-center w-full animate-in fade-in duration-500 z-10 ${activeModule === "compiler" || activeModule === "practice" ? "h-full" : "mt-12"}`}>
-                
-                {/* Dynamically render the correct visualization engine */}
-                {activeModule === "compiler" ? <CompilerView /> :
-                 activeModule === "practice" ? <PracticeView /> :
-                 activeModule === "arrays" ? <ArrayCanvas /> : 
-                 activeModule === "searching" ? <SearchingCanvas /> : 
-                 activeModule === "hashmaps" ? <HashMapCanvas /> : 
-                 activeModule === "linked-lists" ? <LinkedListCanvas /> : 
-                 activeModule === "stacks" ? <StackCanvas /> :
-                 activeModule === "queues" ? <QueueCanvas /> :
-                 activeModule === "trees" ? <TreeCanvas /> :
-                 activeModule === "heaps" ? <HeapCanvas /> :
-                 activeModule === "graphs" ? <GraphCanvas /> :
-                 <div className="text-slate-500 font-bold p-8">Module Engine in Development</div>}
-                
-                {activeModule !== "compiler" && activeModule !== "practice" && (
-                  <p className="text-sm text-emerald-600 font-bold bg-emerald-50 px-5 py-2.5 rounded-full border border-emerald-200 mt-10 shadow-sm flex items-center gap-2">
-                    <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
-                    Interactive Canvas Active. Time is being tracked.
-                  </p>
-                )}
-              </div>
-            )}
+            <div>
+              <label className="sr-only">Email address</label>
+              <input
+                name="email"
+                type="email"
+                autoComplete="email"
+                required
+                className="appearance-none rounded-xl relative block w-full px-4 py-3 border border-slate-300 placeholder-slate-500 text-slate-900 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 focus:z-10 sm:text-sm"
+                placeholder="Email address"
+              />
+            </div>
+            <div>
+              <label className="sr-only">Password</label>
+              <input
+                name="password"
+                type="password"
+                autoComplete={isLogin ? "current-password" : "new-password"}
+                required
+                className="appearance-none rounded-xl relative block w-full px-4 py-3 border border-slate-300 placeholder-slate-500 text-slate-900 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 focus:z-10 sm:text-sm"
+                placeholder="Password"
+              />
+            </div>
           </div>
+
+          {error && <div className="text-red-500 text-sm font-medium text-center">{error}</div>}
+
+          <div>
+            <button
+              type="submit"
+              className="group relative w-full flex justify-center py-3 px-4 border border-transparent text-sm font-bold rounded-xl text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 shadow-lg hover:shadow-indigo-300 transition-all active:scale-95"
+            >
+              {isLogin ? "Sign In" : "Sign Up"}
+            </button>
+          </div>
+        </form>
+
+        <div className="mt-6">
+          <div className="relative">
+            <div className="absolute inset-0 flex items-center">
+              <div className="w-full border-t border-slate-300" />
+            </div>
+            <div className="relative flex justify-center text-sm">
+              <span className="px-2 bg-white text-slate-500 font-medium">Or continue with</span>
+            </div>
+          </div>
+
+          <div className="mt-6">
+            <button
+              onClick={() => signIn("google", { callbackUrl: "/portal" })}
+              className="w-full flex items-center justify-center px-4 py-3 border border-slate-300 rounded-xl shadow-sm bg-white text-sm font-bold text-slate-700 hover:bg-slate-50 transition-all"
+            >
+              <svg className="h-5 w-5 mr-2" viewBox="0 0 24 24">
+                <path
+                  d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"
+                  fill="#4285F4"
+                />
+                <path
+                  d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"
+                  fill="#34A853"
+                />
+                <path
+                  d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z"
+                  fill="#FBBC05"
+                />
+                <path
+                  d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"
+                  fill="#EA4335"
+                />
+              </svg>
+              Sign in with Google
+            </button>
+          </div>
+        </div>
+
+        <div className="flex items-center justify-center mt-6">
+          <p className="text-sm text-slate-600 font-medium">
+            {isLogin ? "Don't have an account?" : "Already have an account?"}
+          </p>
+          <button
+            onClick={() => {
+              setIsLogin(!isLogin);
+              setError("");
+            }}
+            className="ml-2 text-sm font-bold text-indigo-600 hover:text-indigo-500 transition-colors"
+          >
+            {isLogin ? "Sign up" : "Sign in"}
+          </button>
         </div>
       </div>
     </div>
-  );
-}
-
-// Next.js requires useSearchParams to be wrapped in a Suspense boundary
-export default function Home() {
-  return (
-    <Suspense fallback={
-      <div className="flex items-center justify-center h-full w-full">
-        <div className="w-8 h-8 border-4 border-indigo-200 border-t-indigo-600 rounded-full animate-spin"></div>
-      </div>
-    }>
-      <WorkspaceContent />
-    </Suspense>
   );
 }

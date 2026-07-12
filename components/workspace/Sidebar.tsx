@@ -4,9 +4,7 @@ import { useState } from "react";
 import Link from "next/link";
 import { logger } from "../../lib/logger";
 
-const MODULES = [
-  { id: "compiler", label: "Online Compiler", icon: "🖥️" },
-  { id: "practice", label: "Practice Questions", icon: "📝" },
+const LEARN_MODULES = [
   { id: "arrays", label: "Array Operations", icon: "🚀" },
   { id: "searching", label: "Searching Algorithms", icon: "🔍" },
   { id: "hashmaps", label: "Hash Maps", icon: "🗄️" },
@@ -18,13 +16,25 @@ const MODULES = [
   { id: "graphs", label: "Graphs (BFS/DFS)", icon: "🕸️" },
 ];
 
-export default function Sidebar() {
+const PRACTICE_MODULES = [
+  { id: "compiler", label: "Online Compiler", icon: "🖥️" },
+  { id: "practice", label: "Practice Questions", icon: "📝" },
+];
+
+interface SidebarProps {
+  mode: "learn" | "practice";
+}
+
+export default function Sidebar({ mode }: SidebarProps) {
   const [isCollapsed, setIsCollapsed] = useState(false);
 
   const toggleSidebar = () => {
     logger.info(`UI Interaction: Sidebar ${!isCollapsed ? "collapsed" : "expanded"} by user.`);
     setIsCollapsed(!isCollapsed);
   };
+
+  const modules = mode === "learn" ? LEARN_MODULES : PRACTICE_MODULES;
+  const basePath = mode === "learn" ? "/learn" : "/practice";
 
   return (
     <aside 
@@ -46,15 +56,14 @@ export default function Sidebar() {
       <nav className="flex-1 space-y-2 text-sm font-medium pt-4 overflow-y-auto overflow-x-hidden custom-scrollbar">
         {!isCollapsed && (
           <div className="text-xs font-bold text-slate-400 uppercase tracking-wider mb-4 mt-2 px-2">
-            Learning Modules
+            {mode === "learn" ? "Learning Modules" : "Practice Hub"}
           </div>
         )}
 
-        {MODULES.map((mod) => (
-          // We use URL query parameters (?module=...) so the main page knows what to load without complex global state
+        {modules.map((mod) => (
           <Link 
             key={mod.id} 
-            href={`/?module=${mod.id}`}
+            href={`${basePath}?module=${mod.id}`}
             onClick={() => logger.info(`UI Interaction: User navigated to module [${mod.id}]`)}
           >
             <div 
@@ -70,8 +79,19 @@ export default function Sidebar() {
         ))}
       </nav>
 
-      {/* Bottom Dashboard Link */}
-      <div className={`pt-4 pb-6 mt-2 border-t border-slate-100 flex ${isCollapsed ? 'justify-center' : ''}`}>
+      {/* Bottom Links */}
+      <div className={`pt-4 pb-6 mt-2 border-t border-slate-100 flex flex-col gap-2 ${isCollapsed ? 'items-center' : ''}`}>
+        <Link 
+          href="/portal"
+          onClick={() => logger.info("UI Interaction: User navigated back to Portal")}
+        >
+          <div className={`p-3 bg-slate-50 text-slate-600 rounded-xl cursor-pointer font-bold hover:bg-indigo-600 hover:text-white hover:shadow-md transition-all flex items-center ${
+            isCollapsed ? "justify-center" : "justify-between w-full space-x-2"
+          }`}>
+            <span className="text-lg">🚪</span>
+            {!isCollapsed && <span className="whitespace-nowrap flex-1">Back to Portal</span>}
+          </div>
+        </Link>
         <Link 
           href="/dashboard"
           onClick={() => logger.info("UI Interaction: User navigated to Dashboard")}

@@ -231,7 +231,7 @@ const DashboardPage = () => {
           </div>
           {lastAccessedModule && (
             <Link 
-              href={`/?module=${lastAccessedModule.topicId}`}
+              href="/portal"
               className="px-6 py-2 bg-slate-900 hover:bg-slate-800 text-white text-sm font-semibold rounded-xl transition-colors shadow-sm"
             >
               Resume Learning &rarr;

@@ -45,25 +45,20 @@ export default function RootLayout({
               <span className="text-slate-700 text-lg">DSA Visualizer</span>
             </Link>
           </div>
-          <Link href="/dashboard">
-             <span className="text-sm font-bold px-5 py-2.5 bg-indigo-50 hover:bg-indigo-100 text-indigo-700 rounded-lg cursor-pointer transition-colors border border-indigo-200 shadow-sm">
-               My Dashboard
-             </span>
-          </Link>
+          <div className="flex items-center gap-4">
+            <Link href="/dashboard">
+               <span className="text-sm font-bold px-5 py-2.5 bg-indigo-50 hover:bg-indigo-100 text-indigo-700 rounded-lg cursor-pointer transition-colors border border-indigo-200 shadow-sm">
+                 My Dashboard
+               </span>
+            </Link>
+          </div>
         </header>
 
-        {/* Main Application Workspace */}
-        <div className="flex flex-1 h-[calc(100vh-4rem)] overflow-hidden">
-          
-          {/* Injecting our newly created interactive Sidebar */}
-          <Sidebar />
-
-          {/* Dynamic Page Content Canvas */}
-          <main className="flex-1 overflow-hidden relative bg-slate-100/50">
-            {children}
-          </main>
-          
-        </div>
+        {/* Dynamic Page Content Canvas */}
+        <main className="flex-1 overflow-auto relative">
+          {children}
+        </main>
+        
       </body>
     </html>
   );
