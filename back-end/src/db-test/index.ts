@@ -1,7 +1,10 @@
-require('dotenv').config({ path: __dirname + '/../.env' });
-const fs = require('fs');
-const pg = require('pg');
-const url = require('url');
+import * as fs from 'fs';
+import * as pg from 'pg';
+import * as url from 'url';
+import * as path from 'path';
+import * as dotenv from 'dotenv';
+
+dotenv.config({ path: path.join(__dirname, '../../.env') });
 
 const config = {
     user: process.env.DB_USER,
