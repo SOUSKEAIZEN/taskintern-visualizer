@@ -125,17 +125,17 @@ export default function TheoryPanel({ topicId = "arrays" }: { topicId?: string }
     return text.split('\n').map((line, index) => {
       // Handle Headings
       if (line.startsWith('### ')) {
-        return <h3 key={index} className="text-xl font-bold text-slate-800 mt-6 mb-2 border-b border-slate-100 pb-2">{line.replace('### ', '')}</h3>;
+        return <h3 key={index} className="text-xl font-bold text-text-heading mt-6 mb-2 border-b border-border-default pb-2">{line.replace('### ', '')}</h3>;
       }
       if (line.startsWith('|') || line.startsWith(':-')) return null; // Very basic table skip to avoid clutter if used outside complexities
 
       // Handle bold and math text
       const parts = line.split(/(\*\*.*?\*\*|\$.*?\$)/g).map((part, i) => {
         if (part.startsWith('**') && part.endsWith('**')) {
-          return <strong key={i} className="font-bold text-slate-800">{part.slice(2, -2)}</strong>;
+          return <strong key={i} className="font-bold text-text-heading">{part.slice(2, -2)}</strong>;
         }
         if (part.startsWith('$') && part.endsWith('$')) {
-          return <span key={i} className="font-mono text-indigo-600 bg-indigo-50 px-1 rounded mx-0.5">{part.slice(1, -1)}</span>;
+          return <span key={i} className="font-mono text-primary bg-primary/10 px-1 rounded mx-0.5">{part.slice(1, -1)}</span>;
         }
         return part;
       });
@@ -146,44 +146,44 @@ export default function TheoryPanel({ topicId = "arrays" }: { topicId?: string }
 
   if (!data) {
     return (
-      <div className="w-full h-full flex flex-col items-center justify-center p-8 bg-white border-r border-slate-200">
-        <div className="w-8 h-8 border-4 border-indigo-200 border-t-indigo-600 rounded-full animate-spin mb-4"></div>
-        <p className="text-slate-500 font-medium">Loading educational content...</p>
+      <div className="w-full h-full flex flex-col items-center justify-center p-8 bg-bg-card border-r border-border-default">
+        <div className="w-8 h-8 border-4 border-primary/20 border-t-indigo-600 rounded-full animate-spin mb-4"></div>
+        <p className="text-text-secondary font-medium">Loading educational content...</p>
       </div>
     );
   }
 
   return (
-    <div className="w-full h-full overflow-y-auto bg-white border-r border-slate-200 p-8 custom-scrollbar relative">
+    <div className="w-full h-full overflow-y-auto bg-bg-card border-r border-border-default p-8 custom-scrollbar relative">
       {/* Header Section */}
       <div className="mb-8">
         <div className="flex items-center space-x-3 mb-3">
-          <span className="px-3 py-1 bg-emerald-100 text-emerald-700 text-xs font-bold uppercase tracking-wider rounded-full">
+          <span className="px-3 py-1 bg-accent-success/10 text-accent-success text-xs font-bold uppercase tracking-wider rounded-full">
             {data.difficulty}
           </span>
-          <span className="text-sm font-semibold text-slate-400 uppercase tracking-wide">
+          <span className="text-sm font-semibold text-text-placeholder uppercase tracking-wide">
             Module {data.moduleId}
           </span>
         </div>
-        <h1 className="text-4xl font-extrabold text-slate-900 tracking-tight mb-4">
+        <h1 className="text-4xl font-extrabold text-text-heading tracking-tight mb-4">
           {data.title}
         </h1>
-        <p className="text-lg text-slate-600 leading-relaxed">
+        <p className="text-lg text-text-secondary leading-relaxed">
           {data.description}
         </p>
       </div>
 
-      <hr className="border-slate-100 mb-8" />
+      <hr className="border-border-default mb-8" />
 
       {/* Dynamic Text Sections */}
       <div className="space-y-8 mb-12">
         {data.sections.map((section) => (
           <section key={section.id} className="animate-in fade-in slide-in-from-bottom-4 duration-500">
-            <h2 className="text-2xl font-bold text-slate-800 mb-3 flex items-center">
-              <span className="w-1.5 h-6 bg-indigo-500 rounded-full mr-3"></span>
+            <h2 className="text-2xl font-bold text-text-heading mb-3 flex items-center">
+              <span className="w-1.5 h-6 bg-primary rounded-full mr-3"></span>
               {section.title}
             </h2>
-            <div className="text-slate-600 leading-relaxed">
+            <div className="text-text-secondary leading-relaxed">
               {renderFormattedText(section.content)}
             </div>
           </section>
@@ -191,7 +191,7 @@ export default function TheoryPanel({ topicId = "arrays" }: { topicId?: string }
       </div>
 
       {/* Graphic Design: Time Complexity Table */}
-      <div className="bg-slate-50 rounded-2xl border border-slate-200 overflow-hidden shadow-sm mb-6">
+      <div className="bg-bg-main rounded-card border border-border-default overflow-hidden shadow-sm mb-6">
         <div className="bg-slate-900 px-6 py-4">
           <h3 className="text-lg font-bold text-white flex items-center space-x-2">
             <span>⚡</span>
@@ -202,23 +202,23 @@ export default function TheoryPanel({ topicId = "arrays" }: { topicId?: string }
         <div className="p-1">
           <table className="w-full text-left border-collapse">
             <thead>
-              <tr className="bg-slate-100/50">
-                <th className="py-3 px-5 text-xs font-bold text-slate-500 uppercase tracking-wider border-b border-slate-200 rounded-tl-xl">Operation</th>
-                <th className="py-3 px-5 text-xs font-bold text-emerald-600 uppercase tracking-wider border-b border-slate-200">Best</th>
-                <th className="py-3 px-5 text-xs font-bold text-amber-600 uppercase tracking-wider border-b border-slate-200">Average</th>
-                <th className="py-3 px-5 text-xs font-bold text-rose-600 uppercase tracking-wider border-b border-slate-200 rounded-tr-xl">Worst</th>
+              <tr className="bg-bg-main/50">
+                <th className="py-3 px-5 text-[13px] font-heading font-bold text-text-secondary uppercase tracking-widest border-b border-border-default rounded-tl-xl">Operation</th>
+                <th className="py-3 px-5 text-[13px] font-heading font-bold text-accent-success uppercase tracking-widest border-b border-border-default">Best</th>
+                <th className="py-3 px-5 text-[13px] font-heading font-bold text-accent-warning uppercase tracking-widest border-b border-border-default">Average</th>
+                <th className="py-3 px-5 text-[13px] font-heading font-bold text-accent-error uppercase tracking-widest border-b border-border-default rounded-tr-xl">Worst</th>
               </tr>
             </thead>
-            <tbody className="divide-y divide-slate-100 bg-white">
+            <tbody className="divide-y divide-border-default bg-bg-card">
               {["access", "search", "insertion", "deletion"].map((op) => {
                 const metric = data.complexities[op] as any;
                 if (!metric) return null;
                 return (
-                  <tr key={op} className="hover:bg-slate-50/50 transition-colors">
-                    <td className="py-3 px-5 font-semibold text-slate-700 capitalize">{op}</td>
-                    <td className="py-3 px-5 font-mono text-sm font-medium text-emerald-700 bg-emerald-50/30">{metric.best}</td>
-                    <td className="py-3 px-5 font-mono text-sm font-medium text-amber-700 bg-amber-50/30">{metric.average}</td>
-                    <td className="py-3 px-5 font-mono text-sm font-medium text-rose-700 bg-rose-50/30">{metric.worst}</td>
+                  <tr key={op} className="hover:bg-bg-main/50 transition-colors">
+                    <td className="py-3 px-5 font-semibold text-text-heading capitalize">{op}</td>
+                    <td className="py-3 px-5 font-mono text-[14px] font-bold text-accent-success bg-accent-success/5">{metric.best}</td>
+                    <td className="py-3 px-5 font-mono text-[14px] font-bold text-accent-warning bg-accent-warning/5">{metric.average}</td>
+                    <td className="py-3 px-5 font-mono text-[14px] font-bold text-accent-error bg-accent-error/5">{metric.worst}</td>
                   </tr>
                 );
               })}
@@ -227,9 +227,9 @@ export default function TheoryPanel({ topicId = "arrays" }: { topicId?: string }
         </div>
         
         {/* Space Complexity Footer */}
-        <div className="bg-slate-100/50 px-6 py-3 border-t border-slate-200 flex justify-between items-center rounded-b-2xl">
-          <span className="text-sm font-bold text-slate-600">Space Complexity</span>
-          <span className="px-3 py-1 bg-indigo-100 text-indigo-700 font-mono text-sm font-bold rounded-lg border border-indigo-200">
+        <div className="bg-bg-main/50 px-6 py-3 border-t border-border-default flex justify-between items-center rounded-b-2xl">
+          <span className="text-sm font-bold text-text-secondary">Space Complexity</span>
+          <span className="px-3 py-1 bg-primary/10 text-primary font-mono text-sm font-bold rounded-btn border border-primary/20">
             {data.complexities.space as string}
           </span>
         </div>

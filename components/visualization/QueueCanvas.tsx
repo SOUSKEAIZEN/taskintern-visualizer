@@ -95,9 +95,9 @@ export default function QueueCanvas() {
       case "peeking":
         return "bg-emerald-400 text-emerald-950 border-emerald-500 shadow-emerald-200 scale-110 z-10 ring-4 ring-emerald-100";
       case "new":
-        return "bg-indigo-500 text-white border-indigo-600 shadow-indigo-200 animate-in slide-in-from-right-8 duration-300";
+        return "bg-primary text-white border-primary shadow-primary/20 animate-in slide-in-from-right-8 duration-300";
       default:
-        return "bg-white text-slate-700 border-slate-300 shadow-sm hover:border-indigo-400 hover:text-indigo-700 hover:shadow-md";
+        return "bg-bg-card text-text-heading border-border-default shadow-sm hover:border-primary hover:text-primary hover:shadow-premium";
     }
   };
 
@@ -106,12 +106,12 @@ export default function QueueCanvas() {
       
       {/* Educational Header */}
       <div className="text-center">
-        <h3 className="text-xl font-bold text-slate-800">FIFO Memory Queue</h3>
-        <p className="text-sm text-slate-500">First-In, First-Out. Elements enqueue at the rear and dequeue from the front.</p>
+        <h3 className="text-xl font-bold text-text-heading">FIFO Memory Queue</h3>
+        <p className="text-sm text-text-secondary">First-In, First-Out. Elements enqueue at the rear and dequeue from the front.</p>
       </div>
 
       {/* The Visual Canvas */}
-      <div className="flex items-center justify-center p-4 md:p-8 bg-slate-50 border-2 border-dashed border-slate-200 rounded-3xl w-full min-h-[350px] shadow-inner">
+      <div className="flex items-center justify-center p-4 md:p-8 bg-bg-main border-2 border-dashed border-border-default rounded-card w-full min-h-[420px] shrink-0 shadow-inner">
         
         {/* Layout Wrapper to prevent overlap */}
         <div className="flex items-center justify-between w-full max-w-5xl space-x-2 md:space-x-4">
@@ -126,9 +126,9 @@ export default function QueueCanvas() {
           </div>
 
           {/* The Queue "Tube" Container */}
-          <div className="relative flex-1 h-36 border-y-8 border-slate-300 bg-slate-100 flex items-center px-4 shadow-inner overflow-x-auto custom-scrollbar">
+          <div className="relative flex-1 h-36 border-y-8 border-border-default bg-bg-main flex items-center px-4 shadow-inner overflow-x-auto custom-scrollbar">
             {queue.length === 0 ? (
-              <div className="w-full flex items-center justify-center text-slate-400 font-bold uppercase tracking-widest text-sm">
+              <div className="w-full flex items-center justify-center text-text-placeholder font-bold uppercase tracking-widest text-sm">
                 Queue is Empty
               </div>
             ) : (
@@ -136,7 +136,7 @@ export default function QueueCanvas() {
                 {queue.map((element) => (
                   <div 
                     key={element.id} 
-                    className={`w-16 h-16 shrink-0 flex items-center justify-center border-2 rounded-xl text-2xl font-black transition-all duration-300 ${getElementStyles(element.state)}`}
+                    className={`w-16 h-16 shrink-0 flex items-center justify-center border-2 rounded-btn text-2xl font-black transition-all duration-300 ${getElementStyles(element.state)}`}
                   >
                     {element.value}
                   </div>
@@ -146,7 +146,7 @@ export default function QueueCanvas() {
           </div>
 
           {/* Rear Indicator (Right) - Using shrink-0 to prevent squishing */}
-          <div className="flex flex-col items-center text-indigo-500 font-bold tracking-widest text-xs uppercase z-20 shrink-0">
+          <div className="flex flex-col items-center text-primary font-bold tracking-widest text-xs uppercase z-20 shrink-0">
             <span>Rear</span>
             <span className="hidden md:inline">(Enqueue)</span>
             <svg className="w-5 h-5 mt-1 animate-pulse" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -161,26 +161,26 @@ export default function QueueCanvas() {
       <div className="flex flex-col items-center space-y-6 w-full max-w-2xl">
         
         {/* Data Input & Primary Operations */}
-        <div className="flex flex-wrap items-center justify-center gap-4 bg-white p-4 rounded-2xl border border-slate-200 shadow-sm w-full">
+        <div className="flex flex-wrap items-center justify-center gap-4 bg-bg-card p-4 rounded-card border border-border-default shadow-sm w-full">
           <input 
             type="number" 
             placeholder={`Value (Max ${MAX_QUEUE_SIZE})`}
             value={customValue}
             onChange={(e) => setCustomValue(e.target.value)}
             disabled={isAnimating}
-            className="w-40 px-4 py-2 border-2 border-slate-200 rounded-xl outline-none focus:border-indigo-400 text-slate-700 font-medium transition-colors"
+            className="w-40 px-4 py-2 border-2 border-border-default rounded-btn outline-none focus:border-primary text-text-heading font-medium transition-colors"
           />
           <button 
             onClick={handleEnqueue} 
             disabled={isAnimating}
-            className="px-8 py-2 bg-indigo-600 text-white font-bold rounded-xl shadow-md hover:bg-indigo-700 transition-colors disabled:opacity-50"
+            className="px-8 py-2 bg-primary text-white font-bold rounded-btn shadow-premium hover:bg-primary-hover transition-colors disabled:opacity-50"
           >
             Enqueue (Rear)
           </button>
           <button 
             onClick={handleDequeue} 
             disabled={isAnimating || queue.length === 0}
-            className="px-8 py-2 bg-rose-50 text-rose-600 font-bold rounded-xl hover:bg-rose-100 transition-colors disabled:opacity-50"
+            className="px-8 py-2 bg-rose-50 text-rose-600 font-bold rounded-btn hover:bg-rose-100 transition-colors disabled:opacity-50"
           >
             Dequeue (Front)
           </button>
@@ -191,14 +191,14 @@ export default function QueueCanvas() {
           <button 
             onClick={handlePeek} 
             disabled={isAnimating || queue.length === 0}
-            className="px-8 py-2 bg-emerald-50 text-emerald-700 font-bold rounded-xl hover:bg-emerald-100 transition-colors disabled:opacity-50 shadow-sm"
+            className="px-8 py-2 bg-accent-success/10 text-accent-success font-bold rounded-btn hover:bg-accent-success/10 transition-colors disabled:opacity-50 shadow-sm"
           >
             👀 Peek at Front
           </button>
           <button 
             onClick={handleClear} 
             disabled={isAnimating || queue.length === 0}
-            className="px-6 py-2 text-slate-500 font-medium hover:text-slate-800 transition-colors"
+            className="px-6 py-2 text-text-secondary font-medium hover:text-text-heading transition-colors"
           >
             Clear Queue
           </button>

@@ -1,19 +1,27 @@
 // taskintern-visualizer/src/app/layout.tsx
 
 import type { Metadata } from "next";
-import { Geist, Geist_Mono } from "next/font/google";
+import { Plus_Jakarta_Sans, Inter, JetBrains_Mono } from "next/font/google";
 import Link from "next/link";
 import "./globals.css";
 import { logger } from "../../lib/logger";
 import Sidebar from "../../components/workspace/Sidebar";
+import ThemeToggle from "../../components/ThemeToggle";
 
-const geistSans = Geist({
-  variable: "--font-geist-sans",
+const fontHeading = Plus_Jakarta_Sans({
+  variable: "--font-plus-jakarta-sans",
   subsets: ["latin"],
+  weight: ["700", "800"],
 });
 
-const geistMono = Geist_Mono({
-  variable: "--font-geist-mono",
+const fontBody = Inter({
+  variable: "--font-inter",
+  subsets: ["latin"],
+  weight: ["400", "500"],
+});
+
+const fontMono = JetBrains_Mono({
+  variable: "--font-jetbrains-mono",
   subsets: ["latin"],
 });
 
@@ -27,27 +35,27 @@ export default function RootLayout({
 }: Readonly<{
   children: React.ReactNode;
 }>) {
-  // Server-side log to track when the application shell successfully mounts
   logger.info("RootLayout initialized: Mounting main application shell.");
 
   return (
     <html
       lang="en"
-      className={`${geistSans.variable} ${geistMono.variable} h-full antialiased`}
+      className={`${fontHeading.variable} ${fontBody.variable} ${fontMono.variable} h-full antialiased`}
     >
-      <body className="h-screen flex flex-col bg-slate-50 text-slate-900 overflow-hidden">
+      <body className="h-screen flex flex-col bg-bg-main text-text-body overflow-hidden">
         
-        {/* Top Navigation Header */}
-        <header className="h-16 border-b bg-white flex items-center justify-between px-6 font-bold shadow-sm z-30 shrink-0">
+        {/* Top Navigation Header - Premium Redesign */}
+        <header className="h-16 border-b border-border-default bg-bg-card/80 backdrop-blur-md flex items-center justify-between px-6 font-bold z-30 shrink-0">
           <div className="flex items-center cursor-pointer">
-            <Link href="/">
-              <span className="text-indigo-600 mr-2 text-xl">Taskintern</span> 
-              <span className="text-slate-700 text-lg">DSA Visualizer</span>
+            <Link href="/portal">
+              <span className="text-primary mr-2 text-xl tracking-tight">Taskintern</span> 
+              <span className="text-text-heading text-lg font-bold tracking-tight">DSA Visualizer</span>
             </Link>
           </div>
           <div className="flex items-center gap-4">
+            <ThemeToggle />
             <Link href="/dashboard">
-               <span className="text-sm font-bold px-5 py-2.5 bg-indigo-50 hover:bg-indigo-100 text-indigo-700 rounded-lg cursor-pointer transition-colors border border-indigo-200 shadow-sm">
+               <span className="text-sm font-bold px-5 py-2 text-primary hover:bg-primary/10 rounded-btn cursor-pointer transition-colors shadow-sm border border-transparent hover:border-primary/20">
                  My Dashboard
                </span>
             </Link>

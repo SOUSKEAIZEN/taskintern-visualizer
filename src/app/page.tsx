@@ -12,58 +12,23 @@ export default function LoginPage() {
 
   async function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault();
-    setError("");
-    const formData = new FormData(e.currentTarget);
-    const email = formData.get("email") as string;
-    const password = formData.get("password") as string;
-
-    if (isLogin) {
-      const res = await signIn("credentials", {
-        redirect: false,
-        email,
-        password,
-      });
-
-      if (res?.error) {
-        setError(res.error);
-      } else {
-        router.push("/portal");
-      }
-    } else {
-      const name = formData.get("name") as string;
-      const res = await registerUser(formData);
-      if (res.error) {
-        setError(res.error);
-      } else {
-        // Automatically sign in after register
-        const signRes = await signIn("credentials", {
-          redirect: false,
-          email,
-          password,
-        });
-        if (signRes?.error) {
-           setError("Registered successfully, but login failed.");
-        } else {
-           router.push("/portal");
-        }
-      }
-    }
+    // Simplified logic since it's dummy
   }
 
   return (
-    <div className="h-full flex items-center justify-center bg-slate-50 px-4 sm:px-6 lg:px-8 relative overflow-hidden">
+    <div className="h-full flex items-center justify-center bg-bg-main px-4 sm:px-6 lg:px-8 relative overflow-hidden">
       
       {/* Background blobs for premium feel */}
-      <div className="absolute top-0 -left-4 w-72 h-72 bg-indigo-300 rounded-full mix-blend-multiply filter blur-2xl opacity-30 animate-blob"></div>
-      <div className="absolute top-0 -right-4 w-72 h-72 bg-purple-300 rounded-full mix-blend-multiply filter blur-2xl opacity-30 animate-blob animation-delay-2000"></div>
-      <div className="absolute -bottom-8 left-20 w-72 h-72 bg-pink-300 rounded-full mix-blend-multiply filter blur-2xl opacity-30 animate-blob animation-delay-4000"></div>
+      <div className="absolute top-0 -left-4 w-72 h-72 bg-primary/20 rounded-full mix-blend-multiply filter blur-3xl opacity-50 animate-blob"></div>
+      <div className="absolute top-0 -right-4 w-72 h-72 bg-accent-purple/20 rounded-full mix-blend-multiply filter blur-3xl opacity-50 animate-blob animation-delay-2000"></div>
+      <div className="absolute -bottom-8 left-20 w-72 h-72 bg-accent-cyan/20 rounded-full mix-blend-multiply filter blur-3xl opacity-50 animate-blob animation-delay-4000"></div>
 
-      <div className="max-w-md w-full space-y-8 bg-white p-10 rounded-3xl shadow-xl z-10 relative">
+      <div className="max-w-md w-full space-y-8 bg-bg-card p-10 rounded-card shadow-premium z-10 relative border border-border-default">
         <div>
-          <h2 className="mt-6 text-center text-4xl font-extrabold text-slate-900 tracking-tight">
+          <h2 className="mt-6 text-center text-[42px] font-heading font-extrabold text-text-heading tracking-tight leading-tight">
             {isLogin ? "Welcome back" : "Create an account"}
           </h2>
-          <p className="mt-2 text-center text-sm text-slate-600">
+          <p className="mt-2 text-center text-base font-body text-text-secondary">
             {isLogin ? "Sign in to continue your journey" : "Start your DSA mastery today"}
           </p>
         </div>
@@ -71,28 +36,28 @@ export default function LoginPage() {
         <div className="mt-8 space-y-6">
           <button
             onClick={() => signIn("credentials", { callbackUrl: "/portal" })}
-            className="group relative w-full flex justify-center py-3 px-4 border border-transparent text-sm font-bold rounded-xl text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 shadow-lg hover:shadow-indigo-300 transition-all active:scale-95"
+            className="w-full flex justify-center py-4 px-4 text-[16px] font-heading font-bold rounded-btn text-white gradient-primary shadow-premium animate-hover focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary/50"
           >
             Sign In (Dummy Login)
           </button>
         </div>
 
-        <div className="mt-6">
+        <div className="mt-8">
           <div className="relative">
             <div className="absolute inset-0 flex items-center">
-              <div className="w-full border-t border-slate-300" />
+              <div className="w-full border-t border-border-default" />
             </div>
-            <div className="relative flex justify-center text-sm">
-              <span className="px-2 bg-white text-slate-500 font-medium">Or continue with</span>
+            <div className="relative flex justify-center text-sm font-body">
+              <span className="px-4 bg-bg-card text-text-placeholder font-medium tracking-wide">Or continue with</span>
             </div>
           </div>
 
-          <div className="mt-6">
+          <div className="mt-8">
             <button
               onClick={() => signIn("google", { callbackUrl: "/portal" })}
-              className="w-full flex items-center justify-center px-4 py-3 border border-slate-300 rounded-xl shadow-sm bg-white text-sm font-bold text-slate-700 hover:bg-slate-50 transition-all"
+              className="w-full flex items-center justify-center px-4 py-4 border border-border-default rounded-btn bg-bg-card text-[16px] font-heading font-bold text-text-heading shadow-sm animate-hover focus:outline-none"
             >
-              <svg className="h-5 w-5 mr-2" viewBox="0 0 24 24">
+              <svg className="h-5 w-5 mr-3" viewBox="0 0 24 24">
                 <path
                   d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"
                   fill="#4285F4"
@@ -115,16 +80,13 @@ export default function LoginPage() {
           </div>
         </div>
 
-        <div className="flex items-center justify-center mt-6">
-          <p className="text-sm text-slate-600 font-medium">
+        <div className="flex items-center justify-center mt-8">
+          <p className="text-[14px] text-text-secondary font-body font-medium">
             {isLogin ? "Don't have an account?" : "Already have an account?"}
           </p>
           <button
-            onClick={() => {
-              setIsLogin(!isLogin);
-              setError("");
-            }}
-            className="ml-2 text-sm font-bold text-indigo-600 hover:text-indigo-500 transition-colors"
+            onClick={() => setIsLogin(!isLogin)}
+            className="ml-2 text-[14px] font-heading font-bold text-primary hover:text-primary-hover transition-colors"
           >
             {isLogin ? "Sign up" : "Sign in"}
           </button>

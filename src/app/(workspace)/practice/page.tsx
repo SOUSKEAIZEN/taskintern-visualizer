@@ -140,7 +140,7 @@ function WorkspaceContent() {
       {!isFullscreen && activeModule !== "compiler" && activeModule !== "practice" && (
         <div 
           style={{ width: `${leftPaneWidth}%` }}
-          className="h-full overflow-y-auto bg-white border-r border-slate-200 z-10 shadow-sm relative flex-shrink-0"
+          className="h-full overflow-y-auto bg-bg-card border-r border-border-default z-10 shadow-sm relative flex-shrink-0"
         >
           <TheoryPanel topicId={activeModule} />
         </div>
@@ -169,34 +169,34 @@ function WorkspaceContent() {
             document.addEventListener("mouseup", onMouseUp);
           }}
         >
-          <div className="h-8 w-1 bg-slate-400 group-hover:bg-white rounded-full"></div>
+          <div className="h-8 w-1 bg-slate-400 group-hover:bg-bg-card rounded-full"></div>
         </div>
       )}
 
       {/* Right Pane: Interactive Workspace */}
       <div 
         style={{ width: (isFullscreen || activeModule === "compiler" || activeModule === "practice") ? '100%' : `${100 - leftPaneWidth}%` }}
-        className="h-full overflow-y-auto p-4 md:p-8 bg-slate-50/50 space-y-8 pb-24 relative custom-scrollbar flex-grow transition-all duration-300"
+        className="h-full overflow-y-auto p-4 md:p-8 bg-bg-main/50 space-y-8 pb-24 relative custom-scrollbar flex-grow transition-all duration-300"
       >
         <div className={`w-full h-full mx-auto ${(isFullscreen || activeModule === "compiler" || activeModule === "practice") ? 'max-w-none' : 'max-w-4xl'}`}>
           
           {/* Main Visualization Area */}
-          <div className="bg-white border border-slate-200 rounded-3xl shadow-sm p-4 md:p-8 flex flex-col items-center justify-center min-h-[500px] relative overflow-hidden transition-all duration-500 h-full">
+          <div className="bg-bg-card border border-border-default rounded-card shadow-sm p-4 md:p-8 flex flex-col items-center justify-center min-h-[500px] relative overflow-hidden transition-all duration-500 h-full">
             
-            <div className="absolute top-0 right-0 -mr-16 -mt-16 w-64 h-64 bg-indigo-50 rounded-full blur-3xl opacity-60 pointer-events-none"></div>
+            <div className="absolute top-0 right-0 -mr-16 -mt-16 w-64 h-64 bg-primary/10 rounded-full blur-3xl opacity-60 pointer-events-none"></div>
 
             {/* Top Right Controls (Timer & Fullscreen) */}
             {isVisualizing && activeModule !== "compiler" && activeModule !== "practice" && (
               <div className="absolute top-4 right-4 flex items-center gap-3 z-20">
                 {/* Live Timer Display */}
-                <div className="flex items-center gap-2 px-3 py-2 bg-slate-900 text-white rounded-lg shadow-sm font-mono text-sm">
+                <div className="flex items-center gap-2 px-3 py-2 bg-slate-900 text-white rounded-btn shadow-sm font-mono text-sm">
                   <span className="w-2 h-2 rounded-full bg-red-500 animate-pulse"></span>
                   {formatUIClock(activeTime)}
                 </div>
 
                 <button
                   onClick={toggleFullscreen}
-                  className="p-2 bg-white border border-slate-200 hover:bg-slate-50 text-slate-500 hover:text-indigo-600 rounded-lg shadow-sm transition-all flex items-center space-x-2"
+                  className="p-2 bg-bg-card border border-border-default hover:bg-bg-main text-text-secondary hover:text-primary rounded-btn shadow-sm transition-all flex items-center space-x-2"
                   title={isFullscreen ? "Exit Fullscreen" : "Enter Fullscreen"}
                 >
                   {isFullscreen ? (
@@ -214,7 +214,7 @@ function WorkspaceContent() {
                 
                 <button
                   onClick={handleStopVisualization}
-                  className="p-2 bg-red-50 border border-red-100 hover:bg-red-100 text-red-600 rounded-lg shadow-sm transition-all"
+                  className="p-2 bg-red-50 border border-red-100 hover:bg-red-100 text-red-600 rounded-btn shadow-sm transition-all"
                   title="Stop Learning Session"
                 >
                   <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M6 18L18 6M6 6l12 12" /></svg>
@@ -224,7 +224,7 @@ function WorkspaceContent() {
 
             {!isVisualizing ? (
               <div className="text-center space-y-6 animate-in fade-in zoom-in-95 duration-500 z-10">
-                <div className="w-24 h-24 bg-indigo-100 rounded-3xl flex items-center justify-center mx-auto mb-4 border-4 border-white shadow-md transition-all">
+                <div className="w-24 h-24 bg-primary/10 rounded-card flex items-center justify-center mx-auto mb-4 border-4 border-white shadow-premium transition-all">
                   <span className="text-5xl">
                     {activeModule === "arrays" ? "🚀" : 
                      activeModule === "searching" ? "🔍" : 
@@ -237,13 +237,13 @@ function WorkspaceContent() {
                      activeModule === "graphs" ? "🕸️" : "⚙️"}
                   </span>
                 </div>
-                <h2 className="text-3xl font-extrabold text-slate-800 tracking-tight">Ready to Visualize?</h2>
-                <p className="text-slate-500 max-w-sm mx-auto text-lg leading-relaxed capitalize">
+                <h2 className="text-3xl font-extrabold text-text-heading tracking-tight">Ready to Visualize?</h2>
+                <p className="text-text-secondary max-w-sm mx-auto text-lg leading-relaxed capitalize">
                   Initialize the canvas to interact with {activeModule.replace("-", " ")} and observe algorithms executing in real-time.
                 </p>
                 <button
                   onClick={handleStartVisualization}
-                  className="mt-4 px-10 py-4 bg-indigo-600 text-white font-bold rounded-2xl shadow-lg hover:bg-indigo-700 hover:shadow-indigo-200 transition-all active:scale-95 capitalize"
+                  className="mt-4 px-10 py-4 bg-primary text-white font-bold rounded-card shadow-premium hover:bg-primary-hover hover:shadow-primary/20 transition-all active:scale-95 capitalize"
                 >
                   Initialize {activeModule.replace("-", " ")} Engine
                 </button>
@@ -263,11 +263,11 @@ function WorkspaceContent() {
                  activeModule === "trees" ? <TreeCanvas /> :
                  activeModule === "heaps" ? <HeapCanvas /> :
                  activeModule === "graphs" ? <GraphCanvas /> :
-                 <div className="text-slate-500 font-bold p-8">Module Engine in Development</div>}
+                 <div className="text-text-secondary font-bold p-8">Module Engine in Development</div>}
                 
                 {activeModule !== "compiler" && activeModule !== "practice" && (
-                  <p className="text-sm text-emerald-600 font-bold bg-emerald-50 px-5 py-2.5 rounded-full border border-emerald-200 mt-10 shadow-sm flex items-center gap-2">
-                    <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
+                  <p className="text-sm text-accent-success font-bold bg-accent-success/10 px-5 py-2.5 rounded-full border border-emerald-200 mt-10 shadow-sm flex items-center gap-2">
+                    <span className="w-2 h-2 rounded-full bg-accent-success animate-pulse"></span>
                     Interactive Canvas Active. Time is being tracked.
                   </p>
                 )}
@@ -285,7 +285,7 @@ export default function Home() {
   return (
     <Suspense fallback={
       <div className="flex items-center justify-center h-full w-full">
-        <div className="w-8 h-8 border-4 border-indigo-200 border-t-indigo-600 rounded-full animate-spin"></div>
+        <div className="w-8 h-8 border-4 border-primary/20 border-t-indigo-600 rounded-full animate-spin"></div>
       </div>
     }>
       <WorkspaceContent />

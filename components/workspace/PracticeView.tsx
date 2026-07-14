@@ -58,16 +58,16 @@ export default function PracticeView() {
   const currentTestcase = result?.testcases?.[activeTab];
 
   return (
-    <div className="flex flex-col h-full w-full bg-slate-50 border border-slate-200 rounded-2xl overflow-hidden shadow-sm">
+    <div className="flex flex-col h-full w-full bg-bg-main border border-border-default rounded-card overflow-hidden shadow-sm">
       {/* Header Toolbar */}
-      <div className="flex items-center justify-between p-3 bg-white border-b border-slate-200 shrink-0">
+      <div className="flex items-center justify-between p-3 bg-bg-card border-b border-border-default shrink-0">
         <div className="flex items-center space-x-4">
-          <div className="flex items-center space-x-2 bg-slate-100 px-3 py-1.5 rounded-lg border border-slate-200">
-            <span className="text-sm font-bold text-slate-500 uppercase">Problem:</span>
+          <div className="flex items-center space-x-2 bg-bg-main px-3 py-1.5 rounded-btn border border-border-default">
+            <span className="text-sm font-bold text-text-secondary uppercase">Problem:</span>
             <select 
               value={selectedQuestion.id}
               onChange={handleSelect}
-              className="bg-transparent text-sm font-bold text-slate-800 outline-none cursor-pointer"
+              className="bg-transparent text-sm font-bold text-text-heading outline-none cursor-pointer"
             >
               {QUESTIONS.map(q => (
                 <option key={q.id} value={q.id}>{q.title}</option>
@@ -79,7 +79,7 @@ export default function PracticeView() {
           <select 
             value={language} 
             onChange={handleLanguageChange}
-            className="px-3 py-1.5 border border-slate-300 rounded-lg text-sm font-semibold text-slate-700 outline-none cursor-pointer"
+            className="px-3 py-1.5 border border-border-default rounded-btn text-sm font-semibold text-text-heading outline-none cursor-pointer"
           >
             <option value="cpp">C++ (GCC 20)</option>
             <option value="java">Java (OpenJDK)</option>
@@ -88,7 +88,7 @@ export default function PracticeView() {
           <button 
             onClick={handleSubmit} 
             disabled={isSubmitting}
-            className={`px-6 py-1.5 rounded-lg font-bold text-white transition-all text-sm flex items-center space-x-2 ${isSubmitting ? 'bg-slate-400 cursor-not-allowed' : 'bg-emerald-600 hover:bg-emerald-700'}`}
+            className={`px-6 py-1.5 rounded-btn font-bold text-white transition-all text-sm flex items-center space-x-2 ${isSubmitting ? 'bg-slate-400 cursor-not-allowed' : 'bg-accent-success hover:bg-emerald-700'}`}
           >
             {isSubmitting ? (
               <>
@@ -108,27 +108,27 @@ export default function PracticeView() {
       <div className="flex flex-1 overflow-hidden">
         
         {/* Left Pane: Question Details */}
-        <div className="w-1/2 overflow-y-auto p-6 border-r border-slate-200 bg-white flex flex-col">
+        <div className="w-1/2 overflow-y-auto p-6 border-r border-border-default bg-bg-card flex flex-col">
           <div className="flex items-center space-x-3 mb-4">
-            <h1 className="text-2xl font-extrabold text-slate-900">{selectedQuestion.title}</h1>
-            <span className={`px-2.5 py-1 text-xs font-bold uppercase rounded-full ${selectedQuestion.difficulty === 'Easy' ? 'bg-emerald-100 text-emerald-700' : 'bg-amber-100 text-amber-700'}`}>
+            <h1 className="text-2xl font-extrabold text-text-heading">{selectedQuestion.title}</h1>
+            <span className={`px-2.5 py-1 text-xs font-bold uppercase rounded-full ${selectedQuestion.difficulty === 'Easy' ? 'bg-accent-success/10 text-accent-success' : 'bg-amber-100 text-amber-700'}`}>
               {selectedQuestion.difficulty}
             </span>
           </div>
           
           <div className="prose prose-slate max-w-none">
-            <p className="text-slate-700 mb-6 leading-relaxed text-sm md:text-base">{selectedQuestion.description}</p>
+            <p className="text-text-heading mb-6 leading-relaxed text-sm md:text-base">{selectedQuestion.description}</p>
             
-            <h3 className="text-sm font-bold text-slate-400 uppercase tracking-wider mb-2">Input Format</h3>
-            <p className="text-slate-700 mb-6 bg-slate-50 p-4 rounded-xl border border-slate-100 font-mono text-sm">{selectedQuestion.inputFormat}</p>
+            <h3 className="text-sm font-bold text-text-placeholder uppercase tracking-wider mb-2">Input Format</h3>
+            <p className="text-text-heading mb-6 bg-bg-main p-4 rounded-btn border border-border-default font-mono text-sm">{selectedQuestion.inputFormat}</p>
             
-            <h3 className="text-sm font-bold text-slate-400 uppercase tracking-wider mb-2">Output Format</h3>
-            <p className="text-slate-700 mb-6 bg-slate-50 p-4 rounded-xl border border-slate-100 font-mono text-sm">{selectedQuestion.outputFormat}</p>
+            <h3 className="text-sm font-bold text-text-placeholder uppercase tracking-wider mb-2">Output Format</h3>
+            <p className="text-text-heading mb-6 bg-bg-main p-4 rounded-btn border border-border-default font-mono text-sm">{selectedQuestion.outputFormat}</p>
           </div>
         </div>
         
         {/* Right Pane: Editor & Results */}
-        <div className="w-1/2 flex flex-col bg-slate-50 relative">
+        <div className="w-1/2 flex flex-col bg-bg-main relative">
           {/* Editor Area */}
           <div className={`flex flex-col transition-all duration-300 ${result ? 'h-1/2' : 'h-full'}`}>
             <Editor
@@ -143,10 +143,10 @@ export default function PracticeView() {
 
           {/* Results Area (slides up when result exists) */}
           {result && (
-            <div className="h-1/2 border-t-2 border-slate-200 bg-white flex flex-col shadow-[0_-4px_6px_-1px_rgba(0,0,0,0.05)] z-10">
+            <div className="h-1/2 border-t-2 border-border-default bg-bg-card flex flex-col shadow-[0_-4px_6px_-1px_rgba(0,0,0,0.05)] z-10">
               
               {/* Status Header */}
-              <div className={`px-4 py-2 font-bold text-white flex justify-between items-center ${result.status === 'Accepted' ? 'bg-emerald-500' : result.status === 'Connection Error' ? 'bg-slate-500' : 'bg-rose-500'}`}>
+              <div className={`px-4 py-2 font-bold text-white flex justify-between items-center ${result.status === 'Accepted' ? 'bg-accent-success' : result.status === 'Connection Error' ? 'bg-slate-500' : 'bg-rose-500'}`}>
                 <span className="flex items-center space-x-2">
                   {result.status === 'Accepted' ? <span>✅</span> : result.status === 'Connection Error' ? <span>🔌</span> : <span>❌</span>}
                   <span>{result.status}</span>
@@ -156,14 +156,14 @@ export default function PracticeView() {
 
               {/* Testcase Tabs */}
               {result.testcases && result.testcases.length > 0 && (
-                <div className="flex bg-slate-100 border-b border-slate-200 overflow-x-auto custom-scrollbar">
+                <div className="flex bg-bg-main border-b border-border-default overflow-x-auto custom-scrollbar">
                   {result.testcases.map((tc: any, idx: number) => (
                     <button
                       key={idx}
                       onClick={() => setActiveTab(idx)}
-                      className={`px-4 py-2 text-sm font-bold transition-colors whitespace-nowrap flex items-center space-x-2 border-r border-slate-200 ${activeTab === idx ? 'bg-white text-indigo-600 border-b-2 border-b-indigo-600' : 'text-slate-500 hover:bg-slate-200'}`}
+                      className={`px-4 py-2 text-sm font-bold transition-colors whitespace-nowrap flex items-center space-x-2 border-r border-border-default ${activeTab === idx ? 'bg-bg-card text-primary border-b-2 border-b-indigo-600' : 'text-text-secondary hover:bg-slate-200'}`}
                     >
-                      <span className={`w-2 h-2 rounded-full ${tc.passed ? 'bg-emerald-500' : 'bg-rose-500'}`}></span>
+                      <span className={`w-2 h-2 rounded-full ${tc.passed ? 'bg-accent-success' : 'bg-rose-500'}`}></span>
                       <span>Case {idx + 1}</span>
                     </button>
                   ))}
@@ -171,26 +171,26 @@ export default function PracticeView() {
               )}
 
               {/* Testcase Details */}
-              <div className="flex-1 overflow-y-auto bg-white p-4 custom-scrollbar">
+              <div className="flex-1 overflow-y-auto bg-bg-card p-4 custom-scrollbar">
                 {currentTestcase ? (
                   <div className="space-y-4">
                     <div>
-                      <div className="text-xs font-bold text-slate-400 uppercase mb-1">Input</div>
-                      <div className="bg-slate-50 p-3 rounded-lg border border-slate-200 font-mono text-sm text-slate-800 whitespace-pre-wrap">{currentTestcase.input}</div>
+                      <div className="text-xs font-bold text-text-placeholder uppercase mb-1">Input</div>
+                      <div className="bg-bg-main p-3 rounded-btn border border-border-default font-mono text-sm text-text-heading whitespace-pre-wrap">{currentTestcase.input}</div>
                     </div>
                     <div>
-                      <div className="text-xs font-bold text-slate-400 uppercase mb-1">Expected Output</div>
-                      <div className="bg-slate-50 p-3 rounded-lg border border-slate-200 font-mono text-sm text-slate-800 whitespace-pre-wrap">{currentTestcase.expected}</div>
+                      <div className="text-xs font-bold text-text-placeholder uppercase mb-1">Expected Output</div>
+                      <div className="bg-bg-main p-3 rounded-btn border border-border-default font-mono text-sm text-text-heading whitespace-pre-wrap">{currentTestcase.expected}</div>
                     </div>
                     <div>
-                      <div className="text-xs font-bold text-slate-400 uppercase mb-1">Actual Output / Error</div>
-                      <div className={`p-3 rounded-lg border font-mono text-sm whitespace-pre-wrap ${currentTestcase.passed ? 'bg-emerald-50 border-emerald-200 text-emerald-800' : 'bg-rose-50 border-rose-200 text-rose-800'}`}>
-                        {currentTestcase.actual || <span className="italic text-slate-400">No output</span>}
+                      <div className="text-xs font-bold text-text-placeholder uppercase mb-1">Actual Output / Error</div>
+                      <div className={`p-3 rounded-btn border font-mono text-sm whitespace-pre-wrap ${currentTestcase.passed ? 'bg-accent-success/10 border-emerald-200 text-emerald-800' : 'bg-rose-50 border-rose-200 text-rose-800'}`}>
+                        {currentTestcase.actual || <span className="italic text-text-placeholder">No output</span>}
                       </div>
                     </div>
                   </div>
                 ) : (
-                  <div className="h-full flex items-center justify-center text-slate-400 font-bold text-sm">
+                  <div className="h-full flex items-center justify-center text-text-placeholder font-bold text-sm">
                     {result.received || "No testcase data available."}
                   </div>
                 )}
@@ -198,7 +198,7 @@ export default function PracticeView() {
 
               {/* Footer Meta */}
               {result.executionTime !== undefined && (
-                <div className="px-4 py-2 bg-slate-50 border-t border-slate-200 text-xs font-bold text-slate-500 flex justify-between">
+                <div className="px-4 py-2 bg-bg-main border-t border-border-default text-xs font-bold text-text-secondary flex justify-between">
                   <span>Execution Time: {result.executionTime}ms</span>
                   <span>Memory: {result.memory}</span>
                 </div>

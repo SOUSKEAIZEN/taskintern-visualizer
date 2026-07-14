@@ -61,15 +61,15 @@ export default function CompilerView() {
   };
 
   return (
-    <div className="flex flex-col h-full w-full bg-slate-50 border border-slate-200 rounded-2xl overflow-hidden shadow-sm">
+    <div className="flex flex-col h-full w-full bg-bg-main border border-border-default rounded-card overflow-hidden shadow-sm">
       {/* Header Toolbar */}
-      <div className="flex items-center justify-between p-3 bg-white border-b border-slate-200 shrink-0">
-        <h2 className="text-xl font-bold text-slate-800 ml-2">Online Compiler</h2>
+      <div className="flex items-center justify-between p-3 bg-bg-card border-b border-border-default shrink-0">
+        <h2 className="text-xl font-bold text-text-heading ml-2">Online Compiler</h2>
         <div className="flex items-center space-x-3">
           <select 
             value={language} 
             onChange={handleLanguageChange}
-            className="px-3 py-1.5 border border-slate-300 rounded-lg text-sm font-semibold text-slate-700 outline-none cursor-pointer"
+            className="px-3 py-1.5 border border-border-default rounded-btn text-sm font-semibold text-text-heading outline-none cursor-pointer"
           >
             {SUPPORTED_LANGUAGES.map(lang => (
               <option key={lang.id} value={lang.id}>{lang.label}</option>
@@ -78,7 +78,7 @@ export default function CompilerView() {
           <button 
             onClick={handleRun} 
             disabled={isCompiling}
-            className={`px-6 py-1.5 rounded-lg font-bold text-white transition-all flex items-center space-x-2 text-sm ${isCompiling ? 'bg-slate-400 cursor-not-allowed' : 'bg-indigo-600 hover:bg-indigo-700'}`}
+            className={`px-6 py-1.5 rounded-btn font-bold text-white transition-all flex items-center space-x-2 text-sm ${isCompiling ? 'bg-slate-400 cursor-not-allowed' : 'bg-primary hover:bg-primary-hover'}`}
           >
             {isCompiling ? (
               <>
@@ -108,15 +108,15 @@ export default function CompilerView() {
         </div>
 
         {/* I/O Section (Bottom) */}
-        <div className="h-64 flex bg-white border-t-2 border-slate-200 shadow-[0_-4px_6px_-1px_rgba(0,0,0,0.05)] z-10 shrink-0">
+        <div className="h-64 flex bg-bg-card border-t-2 border-border-default shadow-[0_-4px_6px_-1px_rgba(0,0,0,0.05)] z-10 shrink-0">
           
           {/* Stdin (Left) */}
-          <div className="w-1/3 border-r border-slate-200 flex flex-col bg-slate-50">
-            <div className="px-4 py-2 bg-white border-b border-slate-200 text-xs font-bold text-slate-500 uppercase flex items-center space-x-2">
+          <div className="w-1/3 border-r border-border-default flex flex-col bg-bg-main">
+            <div className="px-4 py-2 bg-bg-card border-b border-border-default text-xs font-bold text-text-secondary uppercase flex items-center space-x-2">
               <span>⌨️</span><span>Input (stdin)</span>
             </div>
             <textarea
-              className="flex-1 w-full p-4 resize-none outline-none font-mono text-sm text-slate-700 bg-transparent"
+              className="flex-1 w-full p-4 resize-none outline-none font-mono text-sm text-text-heading bg-transparent"
               placeholder="Enter input here..."
               value={stdin}
               onChange={(e) => setStdin(e.target.value)}
@@ -124,20 +124,20 @@ export default function CompilerView() {
           </div>
           
           {/* Output (Right) */}
-          <div className="w-2/3 flex flex-col bg-white">
-            <div className="px-4 py-2 bg-white border-b border-slate-200 text-xs font-bold text-slate-500 uppercase flex justify-between items-center">
+          <div className="w-2/3 flex flex-col bg-bg-card">
+            <div className="px-4 py-2 bg-bg-card border-b border-border-default text-xs font-bold text-text-secondary uppercase flex justify-between items-center">
               <div className="flex items-center space-x-2">
                 <span>🖥️</span><span>Output Console</span>
               </div>
-              <button onClick={handleClear} className="text-slate-400 hover:text-rose-500 transition-colors">Clear</button>
+              <button onClick={handleClear} className="text-text-placeholder hover:text-rose-500 transition-colors">Clear</button>
             </div>
             <div className="flex-1 overflow-auto p-4 font-mono text-sm whitespace-pre-wrap custom-scrollbar">
-              {stdout && <div className="text-emerald-700 bg-emerald-50 p-3 rounded-lg border border-emerald-100 mb-2">{stdout}</div>}
-              {stderr && <div className="text-rose-700 bg-rose-50 p-3 rounded-lg border border-rose-100">{stderr}</div>}
-              {!stdout && !stderr && <div className="text-slate-400 italic flex items-center justify-center h-full">No output yet...</div>}
+              {stdout && <div className="text-accent-success bg-accent-success/10 p-3 rounded-btn border border-emerald-100 mb-2">{stdout}</div>}
+              {stderr && <div className="text-rose-700 bg-rose-50 p-3 rounded-btn border border-rose-100">{stderr}</div>}
+              {!stdout && !stderr && <div className="text-text-placeholder italic flex items-center justify-center h-full">No output yet...</div>}
             </div>
             {executionTime !== null && (
-              <div className="px-4 py-2 bg-slate-50 border-t border-slate-200 text-xs font-bold text-slate-500 flex justify-between">
+              <div className="px-4 py-2 bg-bg-main border-t border-border-default text-xs font-bold text-text-secondary flex justify-between">
                 <span>Execution Time: {executionTime}ms</span>
                 <span>Limits: 3.0s, 256MB</span>
               </div>

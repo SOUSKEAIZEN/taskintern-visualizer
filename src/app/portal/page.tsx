@@ -10,17 +10,17 @@ export default async function PortalPage() {
   }
 
   return (
-    <div className="min-h-[calc(100vh-4rem)] flex flex-col items-center justify-center p-8 bg-slate-50 relative overflow-hidden">
+    <div className="h-full flex flex-col items-center justify-center p-8 bg-bg-main relative overflow-hidden">
       
-      {/* Decorative background elements */}
-      <div className="absolute top-0 right-0 -mr-20 -mt-20 w-96 h-96 bg-indigo-200 rounded-full blur-3xl opacity-40 pointer-events-none"></div>
-      <div className="absolute bottom-0 left-0 -ml-20 -mb-20 w-96 h-96 bg-emerald-200 rounded-full blur-3xl opacity-40 pointer-events-none"></div>
+      {/* Decorative premium background elements */}
+      <div className="absolute top-0 right-0 -mr-20 -mt-20 w-96 h-96 bg-primary/10 rounded-full blur-[100px] opacity-40 pointer-events-none"></div>
+      <div className="absolute bottom-0 left-0 -ml-20 -mb-20 w-96 h-96 bg-accent-cyan/10 rounded-full blur-[100px] opacity-40 pointer-events-none"></div>
 
-      <div className="z-10 text-center mb-12 animate-in fade-in slide-in-from-bottom-4 duration-700">
-        <h1 className="text-5xl font-extrabold text-slate-900 tracking-tight mb-4">
+      <div className="z-10 text-center mb-16 animate-in fade-in slide-in-from-bottom-4 duration-700">
+        <h1 className="text-[56px] font-heading font-extrabold text-text-heading tracking-tight mb-4 leading-tight">
           Welcome back, {session.user?.name || "Developer"}
         </h1>
-        <p className="text-xl text-slate-500 max-w-2xl mx-auto">
+        <p className="text-[16px] text-text-secondary font-body max-w-2xl mx-auto tracking-wide">
           Choose your module. Do you want to visualize data structures or test your skills in the compiler?
         </p>
       </div>
@@ -29,19 +29,18 @@ export default async function PortalPage() {
         
         {/* Learning Portal Card */}
         <Link href="/learn" className="group">
-          <div className="bg-white rounded-3xl p-10 border border-slate-200 shadow-lg hover:shadow-2xl hover:border-indigo-300 transition-all duration-300 h-full flex flex-col justify-center items-center text-center cursor-pointer relative overflow-hidden">
-            <div className="absolute inset-0 bg-gradient-to-br from-indigo-50 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
+          <div className="bg-bg-card rounded-card p-10 border border-transparent hover:border-border-hover shadow-premium hover:shadow-premium-hover transition-all duration-300 h-full flex flex-col justify-center items-center text-center cursor-pointer hover:-translate-y-1 hover:scale-[1.02]">
             
-            <div className="w-24 h-24 bg-indigo-100 text-indigo-600 rounded-2xl flex items-center justify-center text-5xl mb-6 shadow-inner group-hover:scale-110 transition-transform duration-500 z-10">
-              📚
+            <div className="w-16 h-16 bg-bg-main border border-border-default text-primary rounded-2xl flex items-center justify-center text-3xl mb-6 group-hover:scale-110 transition-transform duration-300 z-10">
+              <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"></path><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"></path></svg>
             </div>
             
-            <h2 className="text-3xl font-bold text-slate-800 mb-4 z-10">DSA Theory & Visualizer</h2>
-            <p className="text-slate-500 text-lg z-10">
+            <h2 className="text-[28px] font-heading font-bold text-text-heading mb-4 z-10">Theory & Visualizer</h2>
+            <p className="text-text-secondary text-[16px] font-body z-10 leading-relaxed">
               Master the core concepts of Data Structures and Algorithms with interactive, frame-by-frame visual engines.
             </p>
             
-            <div className="mt-8 px-6 py-3 bg-indigo-600 text-white font-bold rounded-xl shadow-md group-hover:bg-indigo-700 transition-colors z-10">
+            <div className="mt-8 px-6 py-3 bg-bg-main border border-border-default text-text-heading font-heading font-bold rounded-btn shadow-sm group-hover:bg-primary group-hover:text-white group-hover:border-primary transition-colors z-10">
               Enter Learning Portal →
             </div>
           </div>
@@ -49,19 +48,18 @@ export default async function PortalPage() {
 
         {/* Practice Portal Card */}
         <Link href="/practice" className="group">
-          <div className="bg-white rounded-3xl p-10 border border-slate-200 shadow-lg hover:shadow-2xl hover:border-emerald-300 transition-all duration-300 h-full flex flex-col justify-center items-center text-center cursor-pointer relative overflow-hidden">
-            <div className="absolute inset-0 bg-gradient-to-br from-emerald-50 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
+          <div className="bg-bg-card rounded-card p-10 border border-transparent hover:border-border-hover shadow-premium hover:shadow-premium-hover transition-all duration-300 h-full flex flex-col justify-center items-center text-center cursor-pointer hover:-translate-y-1 hover:scale-[1.02]">
             
-            <div className="w-24 h-24 bg-emerald-100 text-emerald-600 rounded-2xl flex items-center justify-center text-5xl mb-6 shadow-inner group-hover:scale-110 transition-transform duration-500 z-10">
-              💻
+            <div className="w-16 h-16 bg-bg-main border border-border-default text-text-heading rounded-2xl flex items-center justify-center text-3xl mb-6 group-hover:scale-110 transition-transform duration-300 z-10">
+              <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polyline points="16 18 22 12 16 6"></polyline><polyline points="8 6 2 12 8 18"></polyline></svg>
             </div>
             
-            <h2 className="text-3xl font-bold text-slate-800 mb-4 z-10">Practice & Compiler</h2>
-            <p className="text-slate-500 text-lg z-10">
-              Put your knowledge to the test. Solve curated LeetCode-style questions in an isolated Docker environment.
+            <h2 className="text-[28px] font-heading font-bold text-text-heading mb-4 z-10">Practice & Compiler</h2>
+            <p className="text-text-secondary text-[16px] font-body z-10 leading-relaxed">
+              Put your knowledge to the test. Solve curated LeetCode-style questions in an isolated environment.
             </p>
             
-            <div className="mt-8 px-6 py-3 bg-emerald-600 text-white font-bold rounded-xl shadow-md group-hover:bg-emerald-700 transition-colors z-10">
+            <div className="mt-8 px-6 py-3 bg-bg-main border border-border-default text-text-heading font-heading font-bold rounded-btn shadow-sm group-hover:bg-text-heading group-hover:text-bg-main transition-colors z-10">
               Enter Practice Engine →
             </div>
           </div>

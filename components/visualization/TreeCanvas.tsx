@@ -53,7 +53,7 @@ export default function TreeCanvas() {
 
     const traverseAndPosition = (node: TreeNode, depth: number, x: number, offset: number) => {
       node.x = x;
-      node.y = depth * LEVEL_HEIGHT + 40; // 40px top padding
+      node.y = depth * LEVEL_HEIGHT + 70; // 40px top padding
       nodes.push(node);
 
       if (node.left) {
@@ -236,11 +236,11 @@ export default function TreeCanvas() {
       case "active":
         return "bg-amber-100 border-amber-500 shadow-amber-200 scale-125 z-20 ring-4 ring-amber-100 text-amber-900";
       case "found":
-        return "bg-emerald-500 border-emerald-600 shadow-emerald-200 scale-125 z-20 ring-4 ring-emerald-200 text-white";
+        return "bg-accent-success border-emerald-600 shadow-emerald-200 scale-125 z-20 ring-4 ring-emerald-200 text-white";
       case "new":
-        return "bg-indigo-500 border-indigo-600 shadow-indigo-200 animate-in zoom-in duration-300 text-white z-10";
+        return "bg-primary border-primary shadow-primary/20 animate-in zoom-in duration-300 text-white z-10";
       default:
-        return "bg-white border-slate-300 shadow-sm hover:border-indigo-400 hover:text-indigo-700 hover:shadow-md text-slate-700";
+        return "bg-bg-card border-border-default shadow-sm hover:border-primary hover:text-primary hover:shadow-premium text-text-heading";
     }
   };
 
@@ -249,19 +249,19 @@ export default function TreeCanvas() {
       
       {/* Educational Header */}
       <div className="text-center">
-        <h3 className="text-xl font-bold text-slate-800">Binary Search Tree (BST)</h3>
-        <p className="text-sm text-slate-500">O(log n) structure. Left children are smaller, right children are larger.</p>
+        <h3 className="text-xl font-bold text-text-heading">Binary Search Tree (BST)</h3>
+        <p className="text-sm text-text-secondary">O(log n) structure. Left children are smaller, right children are larger.</p>
       </div>
 
       {/* The Visual Canvas */}
-      <div className="flex flex-col items-center justify-center p-4 bg-slate-50 border-2 border-dashed border-slate-200 rounded-3xl w-full shadow-inner overflow-x-auto custom-scrollbar">
+      <div className="flex flex-col items-center justify-center p-4 bg-bg-main border-2 border-dashed border-border-default rounded-card w-full shadow-inner overflow-x-auto custom-scrollbar">
         
         {renderNodes.length === 0 ? (
-          <div className="text-slate-400 font-medium text-lg min-h-[300px] flex items-center">
+          <div className="text-text-placeholder font-medium text-lg min-h-[300px] flex items-center">
             <span>Empty Tree (Root is Null)</span>
           </div>
         ) : (
-          <div className="relative min-w-[800px] h-[350px]">
+          <div className="relative min-w-[800px] h-[420px] shrink-0">
             
             {/* SVG Edge Layer */}
             <svg className="absolute inset-0 w-full h-full pointer-events-none z-0">
@@ -296,44 +296,44 @@ export default function TreeCanvas() {
       <div className="flex flex-col items-center space-y-6 w-full max-w-3xl">
         
         {/* Row 1: Insertions */}
-        <div className="flex flex-wrap items-center justify-center gap-4 bg-white p-4 rounded-2xl border border-slate-200 shadow-sm w-full">
+        <div className="flex flex-wrap items-center justify-center gap-4 bg-bg-card p-4 rounded-card border border-border-default shadow-sm w-full">
           <input 
             type="number" 
             placeholder="Node Value (e.g. 50)"
             value={customValue}
             onChange={(e) => setCustomValue(e.target.value)}
             disabled={isAnimating}
-            className="w-48 px-4 py-2 border-2 border-slate-200 rounded-xl outline-none focus:border-indigo-400 text-slate-700 font-medium transition-colors"
+            className="w-48 px-4 py-2 border-2 border-border-default rounded-btn outline-none focus:border-primary text-text-heading font-medium transition-colors"
           />
           <button 
             onClick={handleInsert} disabled={isAnimating}
-            className="px-8 py-2 bg-indigo-600 text-white font-bold rounded-xl shadow-md hover:bg-indigo-700 transition-colors disabled:opacity-50"
+            className="px-8 py-2 bg-primary text-white font-bold rounded-btn shadow-premium hover:bg-primary-hover transition-colors disabled:opacity-50"
           >
             Insert Node
           </button>
           <button 
             onClick={handleClear} disabled={isAnimating || !root}
-            className="px-6 py-2 bg-rose-50 text-rose-600 font-bold rounded-xl hover:bg-rose-100 transition-colors disabled:opacity-50 ml-auto"
+            className="px-6 py-2 bg-rose-50 text-rose-600 font-bold rounded-btn hover:bg-rose-100 transition-colors disabled:opacity-50 ml-auto"
           >
             Clear Tree
           </button>
         </div>
 
         {/* Row 2: Search Traversal Engine */}
-        <div className="flex flex-wrap items-center justify-center gap-4 bg-slate-900 p-4 rounded-2xl border border-slate-700 shadow-lg w-full">
-          <span className="text-slate-300 font-semibold px-2">Logarithmic Search:</span>
+        <div className="flex flex-wrap items-center justify-center gap-4 bg-bg-card p-4 rounded-card border border-border-default shadow-premium w-full">
+          <span className="text-text-secondary font-semibold px-2">Logarithmic Search:</span>
           <input 
             type="number" 
             placeholder="Find Target..."
             value={searchValue}
             onChange={(e) => setSearchValue(e.target.value)}
             disabled={isAnimating}
-            className="w-40 px-4 py-2 bg-slate-800 border-2 border-slate-600 rounded-xl outline-none focus:border-emerald-400 text-white font-medium transition-colors placeholder:text-slate-500"
+            className="w-40 px-4 py-2 bg-bg-main border-2 border-slate-600 rounded-btn outline-none focus:border-emerald-400 text-white font-medium transition-colors placeholder:text-text-secondary"
           />
           <button 
             onClick={handleSearch} 
             disabled={isAnimating || !searchValue || !root}
-            className="px-6 py-2 bg-emerald-500 text-white font-bold rounded-xl shadow hover:bg-emerald-600 transition-colors disabled:opacity-50"
+            className="px-6 py-2 bg-accent-success text-white font-bold rounded-btn shadow hover:bg-accent-success transition-colors disabled:opacity-50"
           >
             ▶ Animate O(log n)
           </button>

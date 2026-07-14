@@ -1,26 +1,147 @@
 /* css-lint-disable unknownAtRules */
 @import "tailwindcss";
 
-:root {
-  --background: #ffffff;
-  --foreground: #171717;
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
+@theme {
+  --color-bg-main: var(--bg-main);
+  --color-bg-card: var(--bg-card);
+  --color-bg-sidebar: var(--bg-sidebar);
+  
+  --color-primary: var(--primary);
+  --color-primary-hover: var(--primary-hover);
+  
+  --color-text-heading: var(--text-heading);
+  --color-text-body: var(--text-body);
+  --color-text-secondary: var(--text-secondary);
+  --color-text-placeholder: var(--text-placeholder);
+  
+  --color-border-default: var(--border-default);
+  --color-border-hover: var(--border-hover);
+  
+  --shadow-premium: var(--shadow-premium);
+  --shadow-premium-hover: var(--shadow-premium-hover);
+
+  --radius-btn: 16px;
+  --radius-card: 24px;
+  --radius-modal: 28px;
+
+  --font-heading: var(--font-heading);
+  --font-body: var(--font-body);
+  --font-mono: var(--font-mono);
+}
+
+:root, :root.light {
+  --bg-main: #F7F8FC;
+  --bg-card: #FFFFFF;
+  --bg-sidebar: #FCFCFD;
+
+  --primary: #5B5EF8;
+  --primary-hover: #4A4CF2;
+  --primary-pressed: #393CD9;
+
+  --accent-success: #22C55E;
+  --accent-warning: #F59E0B;
+  --accent-error: #EF4444;
+  --accent-info: #3B82F6;
+  --accent-purple: #7C3AED;
+  --accent-cyan: #06B6D4;
+
+  --text-heading: #111827;
+  --text-body: #475569;
+  --text-secondary: #64748B;
+  --text-placeholder: #94A3B8;
+
+  --border-default: #E5E7EB;
+  --border-hover: #CBD5E1;
+
+  --shadow-premium: 0 10px 40px rgba(15,23,42,.08);
+  --shadow-premium-hover: 0 20px 60px rgba(15,23,42,.12);
+  
+  --font-heading: var(--font-plus-jakarta-sans), sans-serif;
+  --font-body: var(--font-inter), sans-serif;
+  --font-mono: var(--font-jetbrains-mono), monospace;
 }
 
 @media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
+  :root:not(.light) {
+    --bg-main: #0B1120;
+    --bg-card: #111827;
+    --bg-sidebar: #0F172A;
+
+    --primary: #7C83FF;
+    --primary-hover: #8B90FF;
+    --primary-pressed: #9A9FFF;
+
+    --accent-success: #22C55E;
+    --accent-warning: #F59E0B;
+    --accent-error: #EF4444;
+    --accent-info: #3B82F6;
+    --accent-purple: #7C3AED;
+    --accent-cyan: #06B6D4;
+
+    --text-heading: #F8FAFC;
+    --text-body: #CBD5E1;
+    --text-secondary: #94A3B8;
+    --text-placeholder: #475569;
+
+    --border-default: #334155;
+    --border-hover: #475569;
+
+    --shadow-premium: 0 20px 60px rgba(0,0,0,.45);
+    --shadow-premium-hover: 0 25px 70px rgba(0,0,0,.6);
   }
 }
 
+:root.dark {
+  --bg-main: #0B1120;
+  --bg-card: #111827;
+  --bg-sidebar: #0F172A;
+
+  --primary: #7C83FF;
+  --primary-hover: #8B90FF;
+  --primary-pressed: #9A9FFF;
+
+  --accent-success: #22C55E;
+  --accent-warning: #F59E0B;
+  --accent-error: #EF4444;
+  --accent-info: #3B82F6;
+  --accent-purple: #7C3AED;
+  --accent-cyan: #06B6D4;
+
+  --text-heading: #F8FAFC;
+  --text-body: #CBD5E1;
+  --text-secondary: #94A3B8;
+  --text-placeholder: #475569;
+
+  --border-default: #334155;
+  --border-hover: #475569;
+
+  --shadow-premium: 0 20px 60px rgba(0,0,0,.45);
+  --shadow-premium-hover: 0 25px 70px rgba(0,0,0,.6);
+}
+
 body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: var(--font-sans), Arial, Helvetica, sans-serif;
+  background-color: var(--bg-main);
+  color: var(--text-body);
+  font-family: var(--font-body);
+}
+
+/* Animations & Transitions */
+.animate-hover {
+  transition: all 250ms ease;
+}
+.animate-hover:hover {
+  transform: translateY(-3px) scale(1.02);
+  box-shadow: var(--shadow-premium-hover);
+}
+
+.gradient-primary {
+  background: linear-gradient(135deg, #6366F1, #8B5CF6);
+}
+.gradient-secondary {
+  background: linear-gradient(135deg, #3B82F6, #06B6D4);
+}
+.gradient-success {
+  background: linear-gradient(135deg, #22C55E, #16A34A);
 }
 
 /* --- Custom EdTech UI Styles --- */
@@ -37,17 +158,17 @@ body {
 }
 
 .custom-scrollbar::-webkit-scrollbar-thumb {
-  background-color: #cbd5e1; /* slate-300 */
+  background-color: var(--border-hover);
   border-radius: 8px;
   transition: background-color 0.3s ease;
 }
 
 .custom-scrollbar::-webkit-scrollbar-thumb:hover {
-  background-color: #94a3b8; /* slate-400 */
+  background-color: var(--text-secondary);
 }
 
 /* Firefox Custom Scrollbar */
 .custom-scrollbar {
   scrollbar-width: thin;
-  scrollbar-color: #cbd5e1 transparent;
+  scrollbar-color: var(--border-hover) transparent;
 }

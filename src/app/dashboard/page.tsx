@@ -177,20 +177,20 @@ const DashboardPage = () => {
 
   // Codeforces-style Tiers
   let performanceTier = "Newbie";
-  let tierColor = "text-slate-600 bg-slate-100 border-slate-200";
+  let tierColor = "text-text-secondary bg-bg-main border-border-default";
   
   if (completionPercentage > 0 && completionPercentage <= 25) {
     performanceTier = "Pupil";
-    tierColor = "text-green-600 bg-green-50 border-green-200";
+    tierColor = "text-accent-success bg-accent-success/10 border-accent-success/20";
   } else if (completionPercentage > 25 && completionPercentage <= 75) {
     performanceTier = "Specialist";
-    tierColor = "text-cyan-600 bg-cyan-50 border-cyan-200";
+    tierColor = "text-accent-cyan bg-accent-cyan/10 border-accent-cyan/20";
   } else if (completionPercentage > 75 && completionPercentage < 100) {
     performanceTier = "Expert";
-    tierColor = "text-indigo-600 bg-indigo-50 border-indigo-200";
+    tierColor = "text-primary bg-primary/10 border-primary/20";
   } else if (completionPercentage === 100) {
     performanceTier = "Grandmaster";
-    tierColor = "text-red-600 bg-red-50 border-red-200";
+    tierColor = "text-accent-error bg-accent-error/10 border-accent-error/20";
   }
 
   const lastAccessedModule = [...userProgress].sort(
@@ -201,24 +201,24 @@ const DashboardPage = () => {
     <div className="max-w-5xl mx-auto p-8 h-full flex flex-col gap-8 animate-in fade-in duration-500">
       
       {/* Dashboard Header */}
-      <div className="bg-white p-8 rounded-3xl shadow-sm border border-slate-200 flex flex-col md:flex-row justify-between items-start md:items-end gap-6 shrink-0">
+      <div className="bg-bg-card p-8 rounded-card shadow-premium flex flex-col md:flex-row justify-between items-start md:items-end gap-6 shrink-0 border border-transparent">
         <div className="flex-1 w-full">
           <div className="flex items-center gap-3 mb-2">
-            <h1 className="text-3xl font-extrabold text-slate-800 tracking-tight">Dashboard</h1>
-            <span className="text-xs font-medium bg-emerald-100 text-emerald-700 px-2 py-1 rounded-full animate-pulse">
+            <h1 className="text-[42px] font-heading font-extrabold text-text-heading tracking-tight">Dashboard</h1>
+            <span className="text-[13px] font-heading font-bold bg-accent-success/10 text-accent-success px-3 py-1 rounded-tag animate-pulse">
               Live Sync Active
             </span>
           </div>
-          <p className="text-slate-500 mb-6">Real-time overview of your algorithmic journey.</p>
+          <p className="text-[16px] text-text-secondary font-body mb-8">Real-time overview of your algorithmic journey.</p>
           
           <div className="w-full max-w-md">
-            <div className="flex justify-between text-sm mb-2">
-              <span className="font-semibold text-slate-700">Overall Syllabus Progress</span>
-              <span className="font-bold text-indigo-600">{completionPercentage}%</span>
+            <div className="flex justify-between text-[14px] mb-3">
+              <span className="font-heading font-bold text-text-heading tracking-wide">Overall Syllabus Progress</span>
+              <span className="font-heading font-extrabold text-primary tabular-nums">{completionPercentage}%</span>
             </div>
-            <div className="w-full bg-slate-100 rounded-full h-2.5">
+            <div className="w-full bg-bg-main rounded-tag h-2">
               <div 
-                className="bg-indigo-600 h-2.5 rounded-full transition-all duration-1000 ease-out" 
+                className="gradient-primary h-2 rounded-tag transition-all duration-1000 ease-out" 
                 style={{ width: `${completionPercentage}%` }}
               ></div>
             </div>
@@ -226,88 +226,88 @@ const DashboardPage = () => {
         </div>
 
         <div className="flex flex-col items-end gap-4">
-          <div className={`text-sm font-bold px-5 py-2 rounded-full border shadow-sm ${tierColor}`}>
+          <div className={`text-[13px] font-heading font-bold px-4 py-2 rounded-tag border shadow-sm ${tierColor}`}>
             Tier: {performanceTier}
           </div>
           {lastAccessedModule && (
             <Link 
               href="/portal"
-              className="px-6 py-2 bg-slate-900 hover:bg-slate-800 text-white text-sm font-semibold rounded-xl transition-colors shadow-sm"
+              className="px-6 py-3 bg-text-heading hover:opacity-90 text-bg-main text-[14px] font-heading font-bold rounded-btn transition-opacity shadow-sm"
             >
               Resume Learning &rarr;
             </Link>
           )}
-          <span className="text-xs text-slate-400">
+          <span className="text-[13px] font-mono text-text-placeholder">
             Last synced: {lastSynced.toLocaleTimeString()}
           </span>
         </div>
       </div>
 
       {error ? (
-        <div className="bg-amber-50 border border-amber-200 text-amber-800 p-6 rounded-2xl text-center font-medium shadow-sm">
+        <div className="bg-accent-warning/10 border border-accent-warning text-accent-warning p-6 rounded-card text-center font-heading font-bold shadow-sm">
           {error}
         </div>
       ) : (
         <div className="grid grid-cols-1 md:grid-cols-2 gap-8 flex-1 min-h-0">
           
           {/* Speed & Analytics Card */}
-          <div className="bg-white p-8 rounded-3xl shadow-sm border border-slate-200">
-            <h2 className="text-xl font-bold text-slate-800 mb-6 flex items-center gap-2">
-              <span className="w-8 h-8 rounded-lg bg-blue-100 flex items-center justify-center text-blue-600">⏱️</span>
+          <div className="bg-bg-card p-8 rounded-card shadow-premium border border-transparent">
+            <h2 className="text-[22px] font-heading font-bold text-text-heading mb-6 flex items-center gap-3">
+              <span className="w-10 h-10 rounded-2xl bg-accent-info/10 flex items-center justify-center text-accent-info">⏱️</span>
               Speed Analytics
             </h2>
             
             <div className="grid grid-cols-2 gap-4">
-              <div className="bg-slate-50 p-4 rounded-2xl border border-slate-100">
-                <p className="text-xs text-slate-500 font-semibold uppercase tracking-wider mb-1">Total Time</p>
-                <p className="text-2xl font-black text-slate-800">{formatTime(totalTimeSeconds)}</p>
+              <div className="bg-bg-main p-5 rounded-[20px] border border-border-default">
+                <p className="text-[13px] text-text-secondary font-heading font-bold uppercase tracking-widest mb-2">Total Time</p>
+                <p className="text-[28px] font-mono font-bold text-text-heading tabular-nums">{formatTime(totalTimeSeconds)}</p>
               </div>
-              <div className="bg-slate-50 p-4 rounded-2xl border border-slate-100">
-                <p className="text-xs text-slate-500 font-semibold uppercase tracking-wider mb-1">Avg. Finish</p>
-                <p className="text-2xl font-black text-slate-800">{formatTime(avgTimePerCompleted)}</p>
+              <div className="bg-bg-main p-5 rounded-[20px] border border-border-default">
+                <p className="text-[13px] text-text-secondary font-heading font-bold uppercase tracking-widest mb-2">Avg. Finish</p>
+                <p className="text-[28px] font-mono font-bold text-text-heading tabular-nums">{formatTime(avgTimePerCompleted)}</p>
               </div>
-              <div className="bg-slate-50 p-4 rounded-2xl border border-slate-100">
-                <p className="text-xs text-slate-500 font-semibold uppercase tracking-wider mb-1">Started</p>
-                <p className="text-2xl font-black text-slate-800">{startedModules.length} / {TOTAL_MODULES}</p>
+              <div className="bg-bg-main p-5 rounded-[20px] border border-border-default">
+                <p className="text-[13px] text-text-secondary font-heading font-bold uppercase tracking-widest mb-2">Started</p>
+                <p className="text-[28px] font-mono font-bold text-text-heading tabular-nums">{startedModules.length} / {TOTAL_MODULES}</p>
               </div>
-              <div className="bg-slate-50 p-4 rounded-2xl border border-slate-100">
-                <p className="text-xs text-slate-500 font-semibold uppercase tracking-wider mb-1">Finished</p>
-                <p className="text-2xl font-black text-slate-800">{completedModules.length} / {TOTAL_MODULES}</p>
+              <div className="bg-bg-main p-5 rounded-[20px] border border-border-default">
+                <p className="text-[13px] text-text-secondary font-heading font-bold uppercase tracking-widest mb-2">Finished</p>
+                <p className="text-[28px] font-mono font-bold text-text-heading tabular-nums">{completedModules.length} / {TOTAL_MODULES}</p>
               </div>
             </div>
           </div>
 
           {/* Module Master Status Card */}
-          <div className="bg-white p-8 rounded-3xl shadow-sm border border-slate-200 flex flex-col min-h-0">
-            <h2 className="text-xl font-bold text-slate-800 mb-6 flex items-center gap-2 shrink-0">
-              <span className="w-8 h-8 rounded-lg bg-emerald-100 flex items-center justify-center text-emerald-600">📋</span>
+          <div className="bg-bg-card p-8 rounded-card shadow-premium border border-transparent flex flex-col min-h-0">
+            <h2 className="text-[22px] font-heading font-bold text-text-heading mb-6 flex items-center gap-3 shrink-0">
+              <span className="w-10 h-10 rounded-2xl bg-accent-success/10 flex items-center justify-center text-accent-success">📋</span>
               Module Status
             </h2>
             
-            <div className="space-y-4 overflow-y-auto custom-scrollbar pr-2 flex-1 min-h-0">
+            <div className="space-y-4 overflow-y-auto custom-scrollbar pr-4 flex-1 min-h-0">
               {moduleStatusList.map((mod) => (
-                <div key={mod.id} className="flex flex-col p-4 rounded-xl bg-slate-50 border border-slate-100 gap-3">
+                <div key={mod.id} className="flex flex-col p-5 rounded-[20px] bg-bg-main border border-border-default gap-4 hover:border-border-hover transition-colors">
                   <div className="flex items-center justify-between">
                     <div className="flex flex-col">
-                      <span className="font-semibold text-sm text-slate-700">{mod.label}</span>
-                      <span className="text-xs text-slate-400">Time: {formatTime(mod.timeSpent)}</span>
+                      <span className="font-heading font-bold text-[16px] text-text-heading tracking-wide">{mod.label}</span>
+                      <span className="text-[13px] font-mono text-text-secondary mt-1 tabular-nums">Time: {formatTime(mod.timeSpent)}</span>
                     </div>
                     
                     {mod.status === "Completed" && (
-                      <span className="px-3 py-1 bg-emerald-100 text-emerald-700 text-xs font-bold rounded-full">Completed</span>
+                      <span className="px-3 py-1 bg-accent-success/10 text-accent-success text-[13px] font-heading font-bold rounded-tag">Completed</span>
                     )}
                     {mod.status === "Started" && (
-                      <span className="px-3 py-1 bg-amber-100 text-amber-700 text-xs font-bold rounded-full">{mod.percentage}%</span>
+                      <span className="px-3 py-1 bg-accent-warning/10 text-accent-warning text-[13px] font-heading font-bold rounded-tag tabular-nums">{mod.percentage}%</span>
                     )}
                     {mod.status === "Pending" && (
-                      <span className="px-3 py-1 bg-slate-200 text-slate-500 text-xs font-bold rounded-full">Pending</span>
+                      <span className="px-3 py-1 bg-border-default text-text-secondary text-[13px] font-heading font-bold rounded-tag">Pending</span>
                     )}
                   </div>
 
                   {/* Individual Module Progress Bar */}
-                  <div className="w-full bg-slate-200 rounded-full h-1.5">
+                  <div className="w-full bg-bg-card rounded-tag h-1.5 border border-border-default">
                     <div 
-                      className={`h-1.5 rounded-full transition-all duration-700 ease-out ${mod.status === 'Completed' ? 'bg-emerald-500' : 'bg-amber-500'}`}
+                      className={`h-1.5 rounded-tag transition-all duration-700 ease-out ${mod.status === 'Completed' ? 'gradient-success' : 'bg-accent-warning'}`}
                       style={{ width: `${mod.percentage}%` }}
                     ></div>
                   </div>

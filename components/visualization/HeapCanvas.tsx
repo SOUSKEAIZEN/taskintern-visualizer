@@ -30,7 +30,7 @@ export default function HeapCanvas() {
 
   // Mathematically calculate Tree coordinates based on Array Index
   const getCoords = (index: number) => {
-    if (index === 0) return { x: CANVAS_WIDTH / 2, y: 40 };
+    if (index === 0) return { x: CANVAS_WIDTH / 2, y: 70 };
     
     const level = Math.floor(Math.log2(index + 1));
     const nodesInLevel = Math.pow(2, level);
@@ -38,7 +38,7 @@ export default function HeapCanvas() {
     
     const spacing = CANVAS_WIDTH / nodesInLevel;
     const x = (posInLevel + 0.5) * spacing;
-    const y = level * LEVEL_HEIGHT + 40;
+    const y = level * LEVEL_HEIGHT + 70;
     
     return { x, y };
   };
@@ -211,9 +211,9 @@ export default function HeapCanvas() {
       case "swapping":
         return "bg-rose-500 border-rose-600 shadow-rose-200 scale-110 z-20 ring-4 ring-rose-200 text-white";
       case "new":
-        return "bg-indigo-500 border-indigo-600 shadow-indigo-200 animate-in zoom-in duration-300 text-white z-10";
+        return "bg-primary border-primary shadow-primary/20 animate-in zoom-in duration-300 text-white z-10";
       default:
-        return "bg-white border-slate-300 shadow-sm hover:border-indigo-400 hover:text-indigo-700 hover:shadow-md text-slate-700";
+        return "bg-bg-card border-border-default shadow-sm hover:border-primary hover:text-primary hover:shadow-premium text-text-heading";
     }
   };
 
@@ -222,19 +222,19 @@ export default function HeapCanvas() {
       
       {/* Educational Header */}
       <div className="text-center">
-        <h3 className="text-xl font-bold text-slate-800">Max-Heap Visualizer</h3>
-        <p className="text-sm text-slate-500">Notice how the flat Array below maps perfectly to the Complete Binary Tree above.</p>
+        <h3 className="text-xl font-bold text-text-heading">Max-Heap Visualizer</h3>
+        <p className="text-sm text-text-secondary">Notice how the flat Array below maps perfectly to the Complete Binary Tree above.</p>
       </div>
 
       {/* The Visual Canvas */}
-      <div className="flex flex-col items-center w-full bg-slate-50 border-2 border-dashed border-slate-200 rounded-3xl shadow-inner overflow-hidden">
+      <div className="flex flex-col items-center w-full bg-bg-main border-2 border-dashed border-border-default rounded-card shadow-inner overflow-hidden">
         
         {/* Top Section: The Tree Representation (Wrapped in scrollable container) */}
-        <div className="w-full overflow-x-auto custom-scrollbar border-b-2 border-slate-200 bg-white/50">
-          <div className="relative w-[800px] mx-auto h-[360px]">
+        <div className="w-full overflow-x-auto custom-scrollbar border-b-2 border-border-default bg-bg-card/50">
+          <div className="relative w-[800px] mx-auto h-[420px] shrink-0">
             
             {/* Background Label */}
-            <span className="absolute top-4 left-6 text-sm font-bold text-slate-400 uppercase tracking-widest z-10">
+            <span className="absolute top-4 left-6 text-sm font-bold text-text-placeholder uppercase tracking-widest z-10">
               Logical Representation (Tree)
             </span>
 
@@ -281,18 +281,18 @@ export default function HeapCanvas() {
 
         {/* Bottom Section: The Array Representation */}
         <div className="w-full p-8 flex flex-col items-center overflow-x-auto custom-scrollbar">
-          <span className="text-sm font-bold text-slate-400 uppercase tracking-widest mb-4">
+          <span className="text-sm font-bold text-text-placeholder uppercase tracking-widest mb-4">
             Physical Representation (Array)
           </span>
           
           <div className="flex items-center space-x-2">
             {heap.length === 0 ? (
-              <span className="text-slate-400 font-medium">Heap is Empty</span>
+              <span className="text-text-placeholder font-medium">Heap is Empty</span>
             ) : (
               heap.map((node, i) => (
                 <div key={`arr-${node.id}`} className="flex flex-col items-center space-y-2 shrink-0">
-                  <span className="text-xs font-bold text-slate-400">[{i}]</span>
-                  <div className={`w-14 h-14 border-2 rounded-lg flex items-center justify-center text-xl font-bold transition-all duration-300 ${getNodeStyles(node.state)}`}>
+                  <span className="text-xs font-bold text-text-placeholder">[{i}]</span>
+                  <div className={`w-14 h-14 border-2 rounded-btn flex items-center justify-center text-xl font-bold transition-all duration-300 ${getNodeStyles(node.state)}`}>
                     {node.value}
                   </div>
                 </div>
@@ -305,30 +305,30 @@ export default function HeapCanvas() {
 
       {/* Control Panel */}
       <div className="flex flex-col items-center space-y-6 w-full max-w-3xl">
-        <div className="flex flex-wrap items-center justify-center gap-4 bg-white p-4 rounded-2xl border border-slate-200 shadow-sm w-full">
+        <div className="flex flex-wrap items-center justify-center gap-4 bg-bg-card p-4 rounded-card border border-border-default shadow-sm w-full">
           <input 
             type="number" 
             placeholder={`Value (Max ${MAX_SIZE})`}
             value={customValue}
             onChange={(e) => setCustomValue(e.target.value)}
             disabled={isAnimating}
-            className="w-48 px-4 py-2 border-2 border-slate-200 rounded-xl outline-none focus:border-indigo-400 text-slate-700 font-medium transition-colors"
+            className="w-48 px-4 py-2 border-2 border-border-default rounded-btn outline-none focus:border-primary text-text-heading font-medium transition-colors"
           />
           <button 
             onClick={handleInsert} disabled={isAnimating}
-            className="px-8 py-2 bg-indigo-600 text-white font-bold rounded-xl shadow-md hover:bg-indigo-700 transition-colors disabled:opacity-50"
+            className="px-8 py-2 bg-primary text-white font-bold rounded-btn shadow-premium hover:bg-primary-hover transition-colors disabled:opacity-50"
           >
             Insert & Bubble Up
           </button>
           <button 
             onClick={handleExtractMax} disabled={isAnimating || heap.length === 0}
-            className="px-8 py-2 bg-rose-50 text-rose-600 font-bold rounded-xl hover:bg-rose-100 transition-colors disabled:opacity-50"
+            className="px-8 py-2 bg-rose-50 text-rose-600 font-bold rounded-btn hover:bg-rose-100 transition-colors disabled:opacity-50"
           >
             Extract Max & Heapify
           </button>
           <button 
             onClick={handleClear} disabled={isAnimating || heap.length === 0}
-            className="px-4 py-2 text-slate-400 hover:text-slate-700 transition-colors disabled:opacity-50 ml-auto"
+            className="px-4 py-2 text-text-placeholder hover:text-text-heading transition-colors disabled:opacity-50 ml-auto"
           >
             Clear
           </button>

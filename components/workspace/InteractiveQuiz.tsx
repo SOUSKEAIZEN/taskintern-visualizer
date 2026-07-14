@@ -109,17 +109,17 @@ export default function InteractiveQuiz({ topicId, userId }: InteractiveQuizProp
 
   if (isFinished) {
     return (
-      <div className="w-full max-w-2xl mx-auto bg-white p-8 rounded-2xl shadow-sm border border-slate-200 text-center animate-in zoom-in-95 duration-500">
-        <h2 className="text-3xl font-extrabold text-slate-800 mb-4">Module Complete!</h2>
-        <div className="text-6xl font-black text-indigo-600 mb-6">
+      <div className="w-full max-w-2xl mx-auto bg-bg-card p-8 rounded-card shadow-sm border border-border-default text-center animate-in zoom-in-95 duration-500">
+        <h2 className="text-3xl font-extrabold text-text-heading mb-4">Module Complete!</h2>
+        <div className="text-6xl font-black text-primary mb-6">
           {score} / {activeQuestions.length}
         </div>
-        <p className="text-slate-500 mb-8">You have successfully completed the {topicId} quiz.</p>
+        <p className="text-text-secondary mb-8">You have successfully completed the {topicId} quiz.</p>
         
         <button 
           onClick={handleSaveResults}
           disabled={isSubmitting}
-          className="px-8 py-3 bg-emerald-500 text-white font-bold rounded-xl shadow-md hover:bg-emerald-600 transition-all active:scale-95 disabled:opacity-50"
+          className="px-8 py-3 bg-accent-success text-white font-bold rounded-btn shadow-premium hover:bg-accent-success transition-all active:scale-95 disabled:opacity-50"
         >
           {isSubmitting ? "Saving to Database..." : "Save Score & Complete Module"}
         </button>
@@ -130,20 +130,20 @@ export default function InteractiveQuiz({ topicId, userId }: InteractiveQuizProp
   const activeQ = activeQuestions[currentQuestion];
 
   return (
-    <div className="w-full max-w-2xl mx-auto bg-white p-8 rounded-2xl shadow-sm border border-slate-200">
+    <div className="w-full max-w-2xl mx-auto bg-bg-card p-8 rounded-card shadow-sm border border-border-default">
       <div className="flex justify-between items-center mb-8">
-        <h3 className="text-xl font-bold text-slate-800 flex items-center gap-2">
-          <span className="bg-indigo-100 text-indigo-700 px-3 py-1 rounded-lg text-sm uppercase tracking-wider font-bold">
+        <h3 className="text-xl font-bold text-text-heading flex items-center gap-2">
+          <span className="bg-primary/10 text-primary px-3 py-1 rounded-btn text-sm uppercase tracking-wider font-bold">
             {topicId.replace("-", " ")} Knowledge Check
           </span>
         </h3>
-        <span className="text-sm font-semibold text-slate-400">
+        <span className="text-sm font-semibold text-text-placeholder">
           Question {currentQuestion + 1} of {activeQuestions.length}
         </span>
       </div>
 
       <div className="mb-8">
-        <h4 className="text-2xl font-medium text-slate-700 leading-snug">
+        <h4 className="text-2xl font-medium text-text-heading leading-snug">
           {activeQ.question}
         </h4>
       </div>
@@ -153,7 +153,7 @@ export default function InteractiveQuiz({ topicId, userId }: InteractiveQuizProp
           <button
             key={idx}
             onClick={() => handleAnswerClick(idx, idx === activeQ.correctIndex)}
-            className="w-full text-left p-4 rounded-xl border-2 border-slate-100 bg-slate-50 hover:border-indigo-400 hover:bg-indigo-50 hover:text-indigo-700 font-medium text-slate-600 transition-all active:scale-[0.98]"
+            className="w-full text-left p-4 rounded-btn border-2 border-border-default bg-bg-main hover:border-primary hover:bg-primary/10 hover:text-primary font-medium text-text-secondary transition-all active:scale-[0.98]"
           >
             {option}
           </button>

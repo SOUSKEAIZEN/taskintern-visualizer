@@ -20,13 +20,13 @@ export default function GraphCanvas() {
   // --- Standard Graph Topology ---
   // We use a fixed, aesthetically pleasing graph layout with a cycle (4-5) to demonstrate traversal properly.
   const initialNodes: GraphNode[] = [
-    { id: 0, label: "0", x: 400, y: 60, state: "default" },
-    { id: 1, label: "1", x: 250, y: 160, state: "default" },
-    { id: 2, label: "2", x: 550, y: 160, state: "default" },
-    { id: 3, label: "3", x: 150, y: 280, state: "default" },
-    { id: 4, label: "4", x: 350, y: 280, state: "default" },
-    { id: 5, label: "5", x: 450, y: 280, state: "default" },
-    { id: 6, label: "6", x: 650, y: 280, state: "default" },
+    { id: 0, label: "0", x: 400, y: 90, state: "default" },
+    { id: 1, label: "1", x: 250, y: 190, state: "default" },
+    { id: 2, label: "2", x: 550, y: 190, state: "default" },
+    { id: 3, label: "3", x: 150, y: 310, state: "default" },
+    { id: 4, label: "4", x: 350, y: 310, state: "default" },
+    { id: 5, label: "5", x: 450, y: 310, state: "default" },
+    { id: 6, label: "6", x: 650, y: 310, state: "default" },
   ];
 
   const edges: GraphEdge[] = [
@@ -158,9 +158,9 @@ export default function GraphCanvas() {
       case "active":
         return "bg-amber-100 border-amber-500 shadow-amber-200 scale-125 z-20 ring-4 ring-amber-100 text-amber-900";
       case "visited":
-        return "bg-indigo-500 border-indigo-600 shadow-indigo-200 scale-110 z-10 text-white";
+        return "bg-primary border-primary shadow-primary/20 scale-110 z-10 text-white";
       default:
-        return "bg-white border-slate-300 shadow-sm text-slate-700";
+        return "bg-bg-card border-border-default shadow-sm text-text-heading";
     }
   };
 
@@ -169,14 +169,14 @@ export default function GraphCanvas() {
       
       {/* Educational Header */}
       <div className="text-center">
-        <h3 className="text-xl font-bold text-slate-800">Graph Traversal (BFS & DFS)</h3>
-        <p className="text-sm text-slate-500">Watch how Breadth-First expands radially, while Depth-First plunges into branches.</p>
+        <h3 className="text-xl font-bold text-text-heading">Graph Traversal (BFS & DFS)</h3>
+        <p className="text-sm text-text-secondary">Watch how Breadth-First expands radially, while Depth-First plunges into branches.</p>
       </div>
 
       {/* The Visual Canvas */}
-      <div className="flex flex-col items-center justify-center p-4 bg-slate-50 border-2 border-dashed border-slate-200 rounded-3xl w-full shadow-inner overflow-x-auto custom-scrollbar relative">
+      <div className="flex flex-col items-center justify-start pt-8 pb-4 bg-bg-main border-2 border-dashed border-border-default rounded-card w-full shadow-inner overflow-x-auto custom-scrollbar relative">
         
-        <div className="relative min-w-[800px] h-[360px]">
+        <div className="relative min-w-[800px] h-[400px] shrink-0">
           
           {/* SVG Edge Layer */}
           <svg className="absolute inset-0 w-full h-full pointer-events-none z-0">
@@ -217,19 +217,19 @@ export default function GraphCanvas() {
 
       {/* Control Panel */}
       <div className="flex flex-col items-center space-y-6 w-full max-w-3xl">
-        <div className="flex flex-wrap items-center justify-center gap-4 bg-slate-900 p-4 rounded-2xl border border-slate-700 shadow-lg w-full">
-          <span className="text-slate-300 font-semibold px-2">Traversal Engine:</span>
+        <div className="flex flex-wrap items-center justify-center gap-4 bg-bg-card p-4 rounded-card border border-border-default shadow-premium w-full">
+          <span className="text-text-secondary font-semibold px-2">Traversal Engine:</span>
           <button 
             onClick={handleBFS} 
             disabled={isAnimating}
-            className="px-6 py-2 bg-emerald-500 text-white font-bold rounded-xl shadow hover:bg-emerald-600 transition-colors disabled:opacity-50"
+            className="px-6 py-2 bg-accent-success text-white font-bold rounded-btn shadow hover:bg-accent-success transition-colors disabled:opacity-50"
           >
             ▶ Run BFS (Level Order)
           </button>
           <button 
             onClick={handleDFS} 
             disabled={isAnimating}
-            className="px-6 py-2 bg-indigo-500 text-white font-bold rounded-xl shadow hover:bg-indigo-600 transition-colors disabled:opacity-50"
+            className="px-6 py-2 bg-primary text-white font-bold rounded-btn shadow hover:bg-primary transition-colors disabled:opacity-50"
           >
             ▶ Run DFS (Depth First)
           </button>
@@ -237,7 +237,7 @@ export default function GraphCanvas() {
           <button 
             onClick={handleReset} 
             disabled={isAnimating}
-            className="px-4 py-2 text-slate-400 hover:text-white transition-colors disabled:opacity-50"
+            className="px-4 py-2 text-text-placeholder hover:text-white transition-colors disabled:opacity-50"
           >
             Reset Graph
           </button>
