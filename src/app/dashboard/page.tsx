@@ -198,10 +198,10 @@ const DashboardPage = () => {
   )[0];
 
   return (
-    <div className="max-w-5xl mx-auto space-y-8 animate-in fade-in duration-500">
+    <div className="max-w-5xl mx-auto p-8 h-full flex flex-col gap-8 animate-in fade-in duration-500">
       
       {/* Dashboard Header */}
-      <div className="bg-white p-8 rounded-3xl shadow-sm border border-slate-200 flex flex-col md:flex-row justify-between items-start md:items-end gap-6">
+      <div className="bg-white p-8 rounded-3xl shadow-sm border border-slate-200 flex flex-col md:flex-row justify-between items-start md:items-end gap-6 shrink-0">
         <div className="flex-1 w-full">
           <div className="flex items-center gap-3 mb-2">
             <h1 className="text-3xl font-extrabold text-slate-800 tracking-tight">Dashboard</h1>
@@ -248,7 +248,7 @@ const DashboardPage = () => {
           {error}
         </div>
       ) : (
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-8 flex-1 min-h-0">
           
           {/* Speed & Analytics Card */}
           <div className="bg-white p-8 rounded-3xl shadow-sm border border-slate-200">
@@ -278,13 +278,13 @@ const DashboardPage = () => {
           </div>
 
           {/* Module Master Status Card */}
-          <div className="bg-white p-8 rounded-3xl shadow-sm border border-slate-200">
-            <h2 className="text-xl font-bold text-slate-800 mb-6 flex items-center gap-2">
+          <div className="bg-white p-8 rounded-3xl shadow-sm border border-slate-200 flex flex-col min-h-0">
+            <h2 className="text-xl font-bold text-slate-800 mb-6 flex items-center gap-2 shrink-0">
               <span className="w-8 h-8 rounded-lg bg-emerald-100 flex items-center justify-center text-emerald-600">📋</span>
               Module Status
             </h2>
             
-            <div className="space-y-4 max-h-[340px] overflow-y-auto custom-scrollbar pr-2">
+            <div className="space-y-4 overflow-y-auto custom-scrollbar pr-2 flex-1 min-h-0">
               {moduleStatusList.map((mod) => (
                 <div key={mod.id} className="flex flex-col p-4 rounded-xl bg-slate-50 border border-slate-100 gap-3">
                   <div className="flex items-center justify-between">

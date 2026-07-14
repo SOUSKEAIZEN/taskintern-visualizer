@@ -6,42 +6,21 @@ import { prisma } from "../lib/db";
 import bcrypt from "bcryptjs";
 
 export const { handlers, auth, signIn, signOut } = NextAuth({
-  adapter: PrismaAdapter(prisma),
   session: { strategy: "jwt" },
   pages: {
     signIn: "/",
   },
   providers: [
-    GoogleProvider({
-      clientId: process.env.GOOGLE_CLIENT_ID || "mock-client-id",
-      clientSecret: process.env.GOOGLE_CLIENT_SECRET || "mock-client-secret",
-    }),
     CredentialsProvider({
       name: "Credentials",
-      credentials: {
-        email: { label: "Email", type: "email" },
-        password: { label: "Password", type: "password" }
-      },
+      credentials: {},
       async authorize(credentials) {
-        if (!credentials?.email || !credentials?.password) {
-          throw new Error("Missing email or password");
-        }
-
-        const user = await prisma.user.findUnique({
-          where: { email: credentials.email as string }
-        });
-
-        if (!user || !user.password) {
-          throw new Error("No user found with this email");
-        }
-
-        const isValid = await bcrypt.compare(credentials.password as string, user.password);
-
-        if (!isValid) {
-          throw new Error("Invalid password");
-        }
-
-        return user;
+        // Dummy login: always return a fake user
+        return {
+          id: "dummy-user-id",
+          name: "Taskintern User",
+          email: "user@taskintern.com",
+        };
       }
     })
   ],
