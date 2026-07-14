@@ -1,0 +1,17 @@
+version: '3.8'
+
+services:
+  judge-cpp:
+    build:
+      context: ./docker/cpp
+    image: judge-cpp:latest
+
+  judge-java:
+    build:
+      context: ./docker/java
+    image: judge-java:latest
+
+  judge-python:
+    build:
+      context: ./docker/python
+    image: judge-python:latest
