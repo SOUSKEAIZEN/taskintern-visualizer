@@ -253,15 +253,15 @@ export default function ArrayCanvas({ initialData = [45, 10, 24, 92, 7] }: Array
             />
             <button 
               onClick={handleApplyCustomInput}
-              className="px-6 py-2 bg-blue-100 text-blue-700 font-semibold rounded-btn hover:bg-blue-200 transition-colors whitespace-nowrap"
+              className="btn-secondary"
             >
               Apply Array
             </button>
           </div>
 
           <div className="flex flex-wrap justify-center gap-4 w-full">
-            <button onClick={handleAddElement} className="px-6 py-2 bg-slate-200 text-text-heading font-semibold rounded-btn hover:bg-slate-300 transition-colors whitespace-nowrap">Add Random</button>
-            <button onClick={handleRemoveElement} className="px-6 py-2 bg-slate-200 text-text-heading font-semibold rounded-btn hover:bg-slate-300 transition-colors whitespace-nowrap">Remove</button>
+            <button onClick={handleAddElement} className="btn-secondary">Add Random</button>
+            <button onClick={handleRemoveElement} className="btn-secondary">Remove</button>
             
             {/* Algorithm Selector & Visualize Button */}
             <div className="flex bg-primary/10 p-1 rounded-btn border border-primary/10 shadow-sm">
@@ -290,7 +290,7 @@ export default function ArrayCanvas({ initialData = [45, 10, 24, 92, 7] }: Array
           {/* Media Player Controls */}
           <div className="flex items-center space-x-4 bg-bg-card p-2 rounded-card shadow-premium border border-border-default">
             <button onClick={handleReset} className="px-4 py-2 text-rose-400 hover:bg-bg-main rounded-btn font-medium transition-colors">Stop</button>
-            <div className="w-px h-6 bg-slate-700 mx-2"></div>
+            <div className="w-px h-6 bg-border-default mx-2"></div>
             <button onClick={stepBackward} disabled={currentFrame === 0} className="px-4 py-2 text-text-secondary hover:bg-bg-main disabled:opacity-50 rounded-btn transition-colors">⏮ Prev</button>
             <button onClick={togglePlayPause} className="px-6 py-2 bg-primary text-white font-bold rounded-btn shadow-premium hover:bg-primary transition-colors w-24">
               {isPlaying ? "⏸ Pause" : "▶ Play"}
@@ -318,7 +318,7 @@ export default function ArrayCanvas({ initialData = [45, 10, 24, 92, 7] }: Array
 
       {/* Progress Bar (Visible only during playback) */}
       {isPlaybackMode && (
-        <div className="w-full max-w-2xl bg-slate-200 h-2 rounded-full overflow-hidden mt-4">
+        <div className="w-full max-w-2xl bg-bg-card h-2 border border-border-default rounded-full overflow-hidden mt-4">
           <div 
             className="bg-primary h-full transition-all duration-300" 
             style={{ width: `${((currentFrame + 1) / history.length) * 100}%` }}

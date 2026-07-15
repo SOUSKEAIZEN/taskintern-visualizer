@@ -16,12 +16,9 @@ export default function LoginPage() {
   }
 
   return (
-    <div className="h-full flex items-center justify-center bg-bg-main px-4 sm:px-6 lg:px-8 relative overflow-hidden">
+    <div className="h-full flex items-center justify-center gradient-hero px-4 sm:px-6 lg:px-8 relative overflow-hidden">
       
-      {/* Background blobs for premium feel */}
-      <div className="absolute top-0 -left-4 w-72 h-72 bg-primary/20 rounded-full mix-blend-multiply filter blur-3xl opacity-50 animate-blob"></div>
-      <div className="absolute top-0 -right-4 w-72 h-72 bg-accent-purple/20 rounded-full mix-blend-multiply filter blur-3xl opacity-50 animate-blob animation-delay-2000"></div>
-      <div className="absolute -bottom-8 left-20 w-72 h-72 bg-accent-cyan/20 rounded-full mix-blend-multiply filter blur-3xl opacity-50 animate-blob animation-delay-4000"></div>
+      {/* Background blobs for premium feel removed for minimal theme */}
 
       <div className="max-w-md w-full space-y-8 bg-bg-card p-10 rounded-card shadow-premium z-10 relative border border-border-default">
         <div>
@@ -36,7 +33,7 @@ export default function LoginPage() {
         <div className="mt-8 space-y-6">
           <button
             onClick={() => signIn("credentials", { callbackUrl: "/portal" })}
-            className="w-full flex justify-center py-4 px-4 text-[16px] font-heading font-bold rounded-btn text-white gradient-primary shadow-premium animate-hover focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary/50"
+            className="btn-primary w-full py-4 text-[16px]"
           >
             Sign In (Dummy Login)
           </button>
@@ -55,7 +52,7 @@ export default function LoginPage() {
           <div className="mt-8">
             <button
               onClick={() => signIn("google", { callbackUrl: "/portal" })}
-              className="w-full flex items-center justify-center px-4 py-4 border border-border-default rounded-btn bg-bg-card text-[16px] font-heading font-bold text-text-heading shadow-sm animate-hover focus:outline-none"
+              className="btn-secondary w-full py-4 text-[16px]"
             >
               <svg className="h-5 w-5 mr-3" viewBox="0 0 24 24">
                 <path

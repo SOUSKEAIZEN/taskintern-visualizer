@@ -133,7 +133,7 @@ export default function LinkedListCanvas() {
       case "found":
         return "bg-accent-success/10 border-emerald-500 shadow-emerald-200 scale-110 z-10 ring-4 ring-emerald-100";
       case "new":
-        return "bg-primary/10 border-primary shadow-primary/20 animate-in zoom-in duration-300";
+        return "bg-primary/10 border-primary shadow-sm animate-in zoom-in duration-300";
       default:
         return "bg-bg-card border-border-default shadow-sm hover:border-slate-400";
     }
@@ -153,7 +153,7 @@ export default function LinkedListCanvas() {
       </div>
 
       {/* Mode Selector */}
-      <div className="flex bg-slate-200/50 p-1 rounded-btn w-full max-w-md mx-auto relative z-10 border border-border-default shadow-inner">
+      <div className="flex bg-border-default/50 p-1 rounded-btn w-full max-w-md mx-auto relative z-10 border border-border-default shadow-inner">
         {(["singly", "doubly", "circular"] as const).map((type) => (
           <button
             key={type}
@@ -162,7 +162,7 @@ export default function LinkedListCanvas() {
             className={`flex-1 py-2 text-sm font-bold capitalize rounded-btn transition-all duration-300 ${
               listType === type 
                 ? "bg-bg-card text-primary shadow border border-border-default/50" 
-                : "text-text-secondary hover:text-text-heading hover:bg-slate-200/80 disabled:opacity-50"
+                : "text-text-secondary hover:text-text-heading hover:bg-border-default/80 disabled:opacity-50"
             }`}
           >
             {type}
@@ -203,7 +203,7 @@ export default function LinkedListCanvas() {
                     {listType === "doubly" && (
                       <div className="w-10 h-full flex flex-col items-center justify-center bg-bg-main/50 rounded-l-lg border-r-2 border-inherit relative">
                         <span className="text-[10px] font-bold text-text-placeholder mb-1">Prev</span>
-                        <div className="w-3 h-3 rounded-full bg-slate-400 mt-1"></div>
+                        <div className="w-3 h-3 rounded-full bg-text-muted mt-1"></div>
                       </div>
                     )}
 
@@ -216,7 +216,7 @@ export default function LinkedListCanvas() {
                     {/* Next Pointer Field */}
                     <div className="w-10 h-full flex flex-col items-center justify-center bg-bg-main/50 rounded-r-lg relative">
                       <span className="text-[10px] font-bold text-text-placeholder mb-1">Next</span>
-                      <div className="w-3 h-3 rounded-full bg-slate-400 mt-1"></div>
+                      <div className="w-3 h-3 rounded-full bg-text-muted mt-1"></div>
                     </div>
                   </div>
 
@@ -226,13 +226,13 @@ export default function LinkedListCanvas() {
                       // Bidirectional Arrow
                       <div className="flex items-center text-text-placeholder">
                         <svg className="w-4 h-4 -mr-1" fill="currentColor" viewBox="0 0 20 20"><path fillRule="evenodd" d="M12.707 5.293a1 1 0 010 1.414L9.414 10l3.293 3.293a1 1 0 01-1.414 1.414l-4-4a1 1 0 010-1.414l4-4a1 1 0 011.414 0z" clipRule="evenodd" /></svg>
-                        <div className="w-6 h-1 bg-slate-400"></div>
+                        <div className="w-6 h-1 bg-text-muted"></div>
                         <svg className="w-4 h-4 -ml-1" fill="currentColor" viewBox="0 0 20 20"><path fillRule="evenodd" d="M7.293 14.707a1 1 0 010-1.414L10.586 10 7.293 6.707a1 1 0 011.414-1.414l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0z" clipRule="evenodd" /></svg>
                       </div>
                     ) : (
                       // Unidirectional Arrow
                       <div className="flex items-center text-text-placeholder">
-                        <div className="w-8 h-1 bg-slate-400 rounded-full"></div>
+                        <div className="w-8 h-1 bg-text-muted rounded-full"></div>
                         <svg className="w-4 h-4 -ml-2" fill="currentColor" viewBox="0 0 20 20">
                           <path fillRule="evenodd" d="M7.293 14.707a1 1 0 010-1.414L10.586 10 7.293 6.707a1 1 0 011.414-1.414l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0z" clipRule="evenodd" />
                         </svg>
@@ -315,7 +315,7 @@ export default function LinkedListCanvas() {
           <button 
             onClick={handleResetVisuals} 
             disabled={isAnimating}
-            className="px-4 py-2 text-text-placeholder hover:text-white transition-colors whitespace-nowrap"
+            className="px-4 py-2 text-text-placeholder hover:text-primary transition-colors whitespace-nowrap font-bold"
           >
             Reset Colors
           </button>

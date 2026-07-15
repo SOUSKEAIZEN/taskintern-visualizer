@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import Editor from "@monaco-editor/react";
 
 const SUPPORTED_LANGUAGES = [
@@ -23,6 +23,24 @@ export default function CompilerView() {
   const [stderr, setStderr] = useState("");
   const [isCompiling, setIsCompiling] = useState(false);
   const [executionTime, setExecutionTime] = useState<number | null>(null);
+  const [editorTheme, setEditorTheme] = useState("vs-light");
+
+  useEffect(() => {
+    const checkTheme = () => {
+      if (document.documentElement.classList.contains("dark")) {
+        setEditorTheme("vs-dark");
+      } else {
+        setEditorTheme("vs-light");
+      }
+    };
+    
+    checkTheme();
+    
+    const observer = new MutationObserver(checkTheme);
+    observer.observe(document.documentElement, { attributes: true, attributeFilter: ["class"] });
+    
+    return () => observer.disconnect();
+  }, []);
 
   const handleLanguageChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
     const newLang = e.target.value;
@@ -100,7 +118,7 @@ export default function CompilerView() {
           <Editor
             height="100%"
             language={language}
-            theme="vs-light"
+            theme={editorTheme}
             value={code}
             onChange={(val) => setCode(val || "")}
             options={{ minimap: { enabled: false }, fontSize: 14, padding: { top: 16 } }}

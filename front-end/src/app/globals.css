@@ -8,17 +8,26 @@
   
   --color-primary: var(--primary);
   --color-primary-hover: var(--primary-hover);
+  --color-primary-soft: var(--primary-soft);
+  
+  --color-accent-success: var(--accent-success);
+  --color-accent-warning: var(--accent-warning);
+  --color-accent-error: var(--accent-error);
+  --color-accent-info: var(--primary);
   
   --color-text-heading: var(--text-heading);
   --color-text-body: var(--text-body);
   --color-text-secondary: var(--text-secondary);
-  --color-text-placeholder: var(--text-placeholder);
+  --color-text-muted: var(--text-muted);
+  --color-text-placeholder: var(--text-muted);
   
   --color-border-default: var(--border-default);
   --color-border-hover: var(--border-hover);
   
   --shadow-premium: var(--shadow-premium);
-  --shadow-premium-hover: var(--shadow-premium-hover);
+
+  --color-icon-stroke: var(--icon-stroke);
+  --color-icon-stroke-hover: var(--icon-stroke-hover);
 
   --radius-btn: 16px;
   --radius-card: 24px;
@@ -30,31 +39,30 @@
 }
 
 :root, :root.light {
-  --bg-main: #F7F8FC;
+  --bg-main: #FAFAFA;
+  --bg-sidebar: #F4F4F5;
   --bg-card: #FFFFFF;
-  --bg-sidebar: #FCFCFD;
 
-  --primary: #5B5EF8;
-  --primary-hover: #4A4CF2;
-  --primary-pressed: #393CD9;
+  --primary: #3B82F6;
+  --primary-hover: #2563EB;
+  --primary-soft: #DBEAFE;
+
+  --text-heading: #111827;
+  --text-body: #4B5563;
+  --text-secondary: #4B5563;
+  --text-muted: #9CA3AF;
+
+  --border-default: #E5E7EB;
+  --border-hover: #D1D5DB;
+
+  --shadow-premium: 0 8px 30px rgba(0,0,0,.08);
 
   --accent-success: #22C55E;
   --accent-warning: #F59E0B;
   --accent-error: #EF4444;
-  --accent-info: #3B82F6;
-  --accent-purple: #7C3AED;
-  --accent-cyan: #06B6D4;
-
-  --text-heading: #111827;
-  --text-body: #475569;
-  --text-secondary: #64748B;
-  --text-placeholder: #94A3B8;
-
-  --border-default: #E5E7EB;
-  --border-hover: #CBD5E1;
-
-  --shadow-premium: 0 10px 40px rgba(15,23,42,.08);
-  --shadow-premium-hover: 0 20px 60px rgba(15,23,42,.12);
+  
+  --icon-stroke: #4B5563;
+  --icon-stroke-hover: #3B82F6;
   
   --font-heading: var(--font-plus-jakarta-sans), sans-serif;
   --font-body: var(--font-inter), sans-serif;
@@ -63,60 +71,58 @@
 
 @media (prefers-color-scheme: dark) {
   :root:not(.light) {
-    --bg-main: #0B1120;
-    --bg-card: #111827;
-    --bg-sidebar: #0F172A;
+    --bg-main: #0D1117;
+    --bg-sidebar: #161B22;
+    --bg-card: #1C2128;
 
-    --primary: #7C83FF;
-    --primary-hover: #8B90FF;
-    --primary-pressed: #9A9FFF;
+    --primary: #4F8DFF;
+    --primary-hover: #72A8FF;
+    --primary-soft: rgba(79, 141, 255, 0.15);
+
+    --text-heading: #F8FAFC;
+    --text-body: #CBD5E1;
+    --text-secondary: #CBD5E1;
+    --text-muted: #94A3B8;
+
+    --border-default: #30363D;
+    --border-hover: #484F58;
+
+    --shadow-premium: 0 10px 40px rgba(0,0,0,.35);
 
     --accent-success: #22C55E;
     --accent-warning: #F59E0B;
     --accent-error: #EF4444;
-    --accent-info: #3B82F6;
-    --accent-purple: #7C3AED;
-    --accent-cyan: #06B6D4;
-
-    --text-heading: #F8FAFC;
-    --text-body: #CBD5E1;
-    --text-secondary: #94A3B8;
-    --text-placeholder: #475569;
-
-    --border-default: #334155;
-    --border-hover: #475569;
-
-    --shadow-premium: 0 20px 60px rgba(0,0,0,.45);
-    --shadow-premium-hover: 0 25px 70px rgba(0,0,0,.6);
+    
+    --icon-stroke: #CBD5E1;
+    --icon-stroke-hover: #72A8FF;
   }
 }
 
 :root.dark {
-  --bg-main: #0B1120;
-  --bg-card: #111827;
-  --bg-sidebar: #0F172A;
+    --bg-main: #0D1117;
+    --bg-sidebar: #161B22;
+    --bg-card: #1C2128;
 
-  --primary: #7C83FF;
-  --primary-hover: #8B90FF;
-  --primary-pressed: #9A9FFF;
+    --primary: #4F8DFF;
+    --primary-hover: #72A8FF;
+    --primary-soft: rgba(79, 141, 255, 0.15);
 
-  --accent-success: #22C55E;
-  --accent-warning: #F59E0B;
-  --accent-error: #EF4444;
-  --accent-info: #3B82F6;
-  --accent-purple: #7C3AED;
-  --accent-cyan: #06B6D4;
+    --text-heading: #F8FAFC;
+    --text-body: #CBD5E1;
+    --text-secondary: #CBD5E1;
+    --text-muted: #94A3B8;
 
-  --text-heading: #F8FAFC;
-  --text-body: #CBD5E1;
-  --text-secondary: #94A3B8;
-  --text-placeholder: #475569;
+    --border-default: #30363D;
+    --border-hover: #484F58;
 
-  --border-default: #334155;
-  --border-hover: #475569;
+    --shadow-premium: 0 10px 40px rgba(0,0,0,.35);
 
-  --shadow-premium: 0 20px 60px rgba(0,0,0,.45);
-  --shadow-premium-hover: 0 25px 70px rgba(0,0,0,.6);
+    --accent-success: #22C55E;
+    --accent-warning: #F59E0B;
+    --accent-error: #EF4444;
+    
+    --icon-stroke: #CBD5E1;
+    --icon-stroke-hover: #72A8FF;
 }
 
 body {
@@ -125,49 +131,56 @@ body {
   font-family: var(--font-body);
 }
 
-/* Animations & Transitions */
 .animate-hover {
   transition: all 250ms ease;
 }
 .animate-hover:hover {
   transform: translateY(-3px) scale(1.02);
-  box-shadow: var(--shadow-premium-hover);
+  box-shadow: var(--shadow-premium);
 }
 
-.gradient-primary {
-  background: linear-gradient(135deg, #6366F1, #8B5CF6);
-}
-.gradient-secondary {
-  background: linear-gradient(135deg, #3B82F6, #06B6D4);
-}
-.gradient-success {
-  background: linear-gradient(135deg, #22C55E, #16A34A);
+.btn-primary {
+  @apply bg-primary text-white border-none rounded-btn shadow-premium hover:bg-primary-hover hover:scale-[1.02] active:scale-95 transition-all font-bold px-6 py-2.5 flex items-center justify-center cursor-pointer;
 }
 
-/* --- Custom EdTech UI Styles --- */
+.btn-secondary {
+  @apply bg-transparent text-text-heading border border-border-default rounded-btn hover:bg-primary hover:text-white hover:border-primary hover:scale-[1.02] active:scale-95 transition-all font-bold px-6 py-2.5 flex items-center justify-center cursor-pointer;
+}
 
-/* Webkit (Chrome, Safari, Edge) Custom Scrollbar */
+.icon-container {
+  @apply bg-bg-card border border-border-default rounded-2xl flex items-center justify-center text-icon-stroke transition-all duration-300 w-16 h-16 text-3xl mb-4 shadow-sm;
+}
+.icon-container:hover, .group:hover .icon-container {
+  @apply bg-primary-soft border-primary-hover text-icon-stroke-hover scale-110;
+}
+
+.link-default {
+  @apply text-primary hover:text-primary-hover hover:underline transition-colors;
+}
+
+.gradient-hero {
+  background: linear-gradient(180deg, var(--bg-card), var(--bg-sidebar));
+}
+.gradient-accent {
+  background: linear-gradient(135deg, #3B82F6, #60A5FA);
+}
+
 .custom-scrollbar::-webkit-scrollbar {
   width: 6px;
   height: 6px;
 }
-
 .custom-scrollbar::-webkit-scrollbar-track {
   background: transparent;
   border-radius: 8px;
 }
-
 .custom-scrollbar::-webkit-scrollbar-thumb {
   background-color: var(--border-hover);
   border-radius: 8px;
   transition: background-color 0.3s ease;
 }
-
 .custom-scrollbar::-webkit-scrollbar-thumb:hover {
   background-color: var(--text-secondary);
 }
-
-/* Firefox Custom Scrollbar */
 .custom-scrollbar {
   scrollbar-width: thin;
   scrollbar-color: var(--border-hover) transparent;

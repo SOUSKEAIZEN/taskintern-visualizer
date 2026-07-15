@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import Editor from "@monaco-editor/react";
 
 // Mirroring the backend dataset for frontend rendering
@@ -19,6 +19,24 @@ export default function PracticeView() {
   const [code, setCode] = useState(QUESTIONS[0].starterCode["python"]);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [result, setResult] = useState<any>(null);
+  const [editorTheme, setEditorTheme] = useState("vs-light");
+
+  useEffect(() => {
+    const checkTheme = () => {
+      if (document.documentElement.classList.contains("dark")) {
+        setEditorTheme("vs-dark");
+      } else {
+        setEditorTheme("vs-light");
+      }
+    };
+    
+    checkTheme();
+    
+    const observer = new MutationObserver(checkTheme);
+    observer.observe(document.documentElement, { attributes: true, attributeFilter: ["class"] });
+    
+    return () => observer.disconnect();
+  }, []);
   const [activeTab, setActiveTab] = useState(0);
 
   const handleSelect = (e: React.ChangeEvent<HTMLSelectElement>) => {
@@ -134,7 +152,7 @@ export default function PracticeView() {
             <Editor
               height="100%"
               language={language}
-              theme="vs-light"
+              theme={editorTheme}
               value={code}
               onChange={(val) => setCode(val || "")}
               options={{ minimap: { enabled: false }, fontSize: 14, padding: { top: 16 } }}

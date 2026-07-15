@@ -222,7 +222,7 @@ export default function SearchingCanvas() {
                     <div className="text-text-placeholder text-lg -mt-2 mb-1 leading-none">↑</div>
                   )}
                   {isCurrent && <span className="text-primary bg-primary/10 px-1.5 py-0.5 rounded shadow-sm border border-primary/10">Curr</span>}
-                  {isLow && <span className="text-blue-600 bg-blue-50 px-1.5 py-0.5 rounded shadow-sm border border-blue-100">Low</span>}
+                  {isLow && <span className="text-primary bg-primary-soft px-1.5 py-0.5 rounded shadow-sm border border-primary-hover">Low</span>}
                   {isMid && <span className="text-amber-600 bg-amber-50 px-1.5 py-0.5 rounded shadow-sm border border-amber-100">Mid</span>}
                   {isHigh && <span className="text-red-600 bg-red-50 px-1.5 py-0.5 rounded shadow-sm border border-red-100">High</span>}
                 </div>
@@ -249,7 +249,7 @@ export default function SearchingCanvas() {
               />
               <button 
                 onClick={handleApplyCustomInput}
-                className="px-4 py-2 bg-bg-main text-text-heading font-semibold rounded-btn hover:bg-slate-200 transition-colors whitespace-nowrap"
+                className="btn-secondary"
               >
                 Set Array
               </button>
@@ -268,7 +268,7 @@ export default function SearchingCanvas() {
           </div>
 
           <div className="flex flex-wrap justify-center gap-4 w-full">
-            <button onClick={handleGenerateRandom} className="px-6 py-2 bg-slate-200 text-text-heading font-semibold rounded-btn hover:bg-slate-300 transition-colors whitespace-nowrap">Randomize</button>
+            <button onClick={handleGenerateRandom} className="btn-secondary">Randomize</button>
             
             {/* Algorithm Selector & Visualize Button */}
             <div className="flex bg-primary/10 p-1 rounded-btn border border-primary/10 shadow-sm">
@@ -294,7 +294,7 @@ export default function SearchingCanvas() {
           {/* Media Player Controls */}
           <div className="flex items-center space-x-4 bg-bg-card p-2 rounded-card shadow-premium border border-border-default">
             <button onClick={handleReset} className="px-4 py-2 text-rose-400 hover:bg-bg-main rounded-btn font-medium transition-colors">Stop</button>
-            <div className="w-px h-6 bg-slate-700 mx-2"></div>
+            <div className="w-px h-6 bg-border-default mx-2"></div>
             <button onClick={stepBackward} disabled={currentFrame === 0} className="px-4 py-2 text-text-secondary hover:bg-bg-main disabled:opacity-50 rounded-btn transition-colors">⏮ Prev</button>
             <button onClick={togglePlayPause} className="px-6 py-2 bg-primary text-white font-bold rounded-btn shadow-premium hover:bg-primary transition-colors w-24">
               {isPlaying ? "⏸ Pause" : "▶ Play"}
@@ -320,7 +320,7 @@ export default function SearchingCanvas() {
 
       {/* Progress Bar */}
       {isPlaybackMode && (
-        <div className="w-full max-w-2xl bg-slate-200 h-2 rounded-full overflow-hidden mt-4">
+        <div className="w-full max-w-2xl bg-bg-card h-2 border border-border-default rounded-full overflow-hidden mt-4">
           <div 
             className="bg-primary h-full transition-all duration-300" 
             style={{ width: `${((currentFrame + 1) / history.length) * 100}%` }}

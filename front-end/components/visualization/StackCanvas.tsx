@@ -100,7 +100,7 @@ export default function StackCanvas() {
       case "peeking":
         return "bg-emerald-400 text-emerald-950 border-emerald-500 shadow-emerald-200 scale-110 z-10 ring-4 ring-emerald-100";
       case "new":
-        return "bg-primary text-white border-primary shadow-primary/20 animate-in slide-in-from-top-8 duration-300";
+        return "bg-primary text-white border-primary shadow-sm animate-in slide-in-from-top-8 duration-300";
       default:
         return "bg-bg-card text-text-heading border-border-default shadow-sm hover:border-primary hover:text-primary hover:shadow-premium";
     }

@@ -183,7 +183,7 @@ export default function HashMapCanvas() {
                       {bIndex}
                     </div>
 
-                    <div className="w-8 h-1 bg-slate-200 rounded-full mx-2"></div>
+                    <div className="w-8 h-1 bg-border-default rounded-full mx-2"></div>
 
                     {/* Separate Chaining Array */}
                     <div className="flex flex-1 items-center space-x-3 overflow-x-auto pb-2 custom-scrollbar">
@@ -254,7 +254,7 @@ export default function HashMapCanvas() {
             
             <button 
               onClick={handleAddOperation}
-              className="px-6 py-2 bg-bg-main text-white font-bold rounded-btn hover:bg-bg-card transition-colors whitespace-nowrap"
+              className="btn-secondary whitespace-nowrap"
             >
               + Queue
             </button>
@@ -298,7 +298,7 @@ export default function HashMapCanvas() {
           {/* Media Player Controls */}
           <div className="flex items-center space-x-4 bg-bg-card p-2 rounded-card shadow-premium border border-border-default">
             <button onClick={handleReset} className="px-4 py-2 text-rose-400 hover:bg-bg-main rounded-btn font-medium transition-colors">Stop</button>
-            <div className="w-px h-6 bg-slate-700 mx-2"></div>
+            <div className="w-px h-6 bg-border-default mx-2"></div>
             <button onClick={stepBackward} disabled={currentFrame === 0} className="px-4 py-2 text-text-secondary hover:bg-bg-main disabled:opacity-50 rounded-btn transition-colors">⏮ Prev</button>
             <button onClick={togglePlayPause} className="px-6 py-2 bg-primary text-white font-bold rounded-btn shadow-premium hover:bg-primary transition-colors w-24">
               {isPlaying ? "⏸ Pause" : "▶ Play"}
@@ -324,7 +324,7 @@ export default function HashMapCanvas() {
 
       {/* Progress Bar */}
       {isPlaybackMode && (
-        <div className="w-full max-w-2xl bg-slate-200 h-2 rounded-full overflow-hidden mt-4">
+        <div className="w-full max-w-2xl bg-bg-card h-2 border border-border-default rounded-full overflow-hidden mt-4">
           <div 
             className="bg-primary h-full transition-all duration-300" 
             style={{ width: `${((currentFrame + 1) / history.length) * 100}%` }}

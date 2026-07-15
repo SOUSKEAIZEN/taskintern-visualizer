@@ -181,7 +181,7 @@ function WorkspaceContent() {
         <div className={`w-full h-full mx-auto ${(isFullscreen || activeModule === "compiler" || activeModule === "practice") ? 'max-w-none' : 'max-w-4xl'}`}>
           
           {/* Main Visualization Area */}
-          <div className="bg-bg-card border border-border-default rounded-card shadow-sm p-4 md:p-8 flex flex-col items-center justify-center min-h-[500px] relative overflow-hidden transition-all duration-500 h-full">
+          <div className="bg-bg-card border border-border-default rounded-card shadow-sm p-4 md:p-8 flex flex-col items-center justify-start min-h-[500px] relative overflow-y-auto custom-scrollbar transition-all duration-500 h-full">
             
             <div className="absolute top-0 right-0 -mr-16 -mt-16 w-64 h-64 bg-primary/10 rounded-full blur-3xl opacity-60 pointer-events-none"></div>
 
@@ -243,7 +243,7 @@ function WorkspaceContent() {
                 </p>
                 <button
                   onClick={handleStartVisualization}
-                  className="mt-4 px-10 py-4 bg-primary text-white font-bold rounded-card shadow-premium hover:bg-primary-hover hover:shadow-primary/20 transition-all active:scale-95 capitalize"
+                  className="mt-4 px-10 py-4 bg-primary text-white font-bold rounded-card shadow-premium hover:bg-primary-hover hover:shadow-sm transition-all active:scale-95 capitalize"
                 >
                   Initialize {activeModule.replace("-", " ")} Engine
                 </button>

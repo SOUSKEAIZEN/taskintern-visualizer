@@ -238,7 +238,7 @@ export default function TreeCanvas() {
       case "found":
         return "bg-accent-success border-emerald-600 shadow-emerald-200 scale-125 z-20 ring-4 ring-emerald-200 text-white";
       case "new":
-        return "bg-primary border-primary shadow-primary/20 animate-in zoom-in duration-300 text-white z-10";
+        return "bg-primary border-primary shadow-sm animate-in zoom-in duration-300 text-white z-10";
       default:
         return "bg-bg-card border-border-default shadow-sm hover:border-primary hover:text-primary hover:shadow-premium text-text-heading";
     }

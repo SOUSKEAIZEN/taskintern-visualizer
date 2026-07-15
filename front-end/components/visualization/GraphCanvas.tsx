@@ -158,7 +158,7 @@ export default function GraphCanvas() {
       case "active":
         return "bg-amber-100 border-amber-500 shadow-amber-200 scale-125 z-20 ring-4 ring-amber-100 text-amber-900";
       case "visited":
-        return "bg-primary border-primary shadow-primary/20 scale-110 z-10 text-white";
+        return "bg-primary border-primary shadow-sm scale-110 z-10 text-white";
       default:
         return "bg-bg-card border-border-default shadow-sm text-text-heading";
     }
@@ -233,11 +233,11 @@ export default function GraphCanvas() {
           >
             ▶ Run DFS (Depth First)
           </button>
-          <div className="w-px h-6 bg-slate-700 mx-2"></div>
+          <div className="w-px h-6 bg-border-default mx-2"></div>
           <button 
             onClick={handleReset} 
             disabled={isAnimating}
-            className="px-4 py-2 text-text-placeholder hover:text-white transition-colors disabled:opacity-50"
+            className="px-4 py-2 text-text-placeholder hover:text-primary transition-colors disabled:opacity-50 font-bold"
           >
             Reset Graph
           </button>

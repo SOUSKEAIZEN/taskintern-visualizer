@@ -211,7 +211,7 @@ export default function HeapCanvas() {
       case "swapping":
         return "bg-rose-500 border-rose-600 shadow-rose-200 scale-110 z-20 ring-4 ring-rose-200 text-white";
       case "new":
-        return "bg-primary border-primary shadow-primary/20 animate-in zoom-in duration-300 text-white z-10";
+        return "bg-primary border-primary shadow-sm animate-in zoom-in duration-300 text-white z-10";
       default:
         return "bg-bg-card border-border-default shadow-sm hover:border-primary hover:text-primary hover:shadow-premium text-text-heading";
     }

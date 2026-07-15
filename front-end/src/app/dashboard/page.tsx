@@ -218,7 +218,7 @@ const DashboardPage = () => {
             </div>
             <div className="w-full bg-bg-main rounded-tag h-2">
               <div 
-                className="gradient-primary h-2 rounded-tag transition-all duration-1000 ease-out" 
+                className="bg-primary h-2 rounded-tag transition-all duration-1000 ease-out" 
                 style={{ width: `${completionPercentage}%` }}
               ></div>
             </div>
