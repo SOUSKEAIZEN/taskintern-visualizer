@@ -1,7 +1,7 @@
 "use client";
 
-import { useState, useEffect } from "react";
-import { getSession, signOut } from "next-auth/react";
+import { useState } from "react";
+import { signOut } from "next-auth/react";
 import Link from "next/link";
 import { logger } from "../../lib/logger";
 
@@ -28,20 +28,6 @@ interface SidebarProps {
 
 export default function Sidebar({ mode }: SidebarProps) {
   const [isCollapsed, setIsCollapsed] = useState(false);
-  const [userName, setUserName] = useState<string>("Dashboard");
-
-  useEffect(() => {
-    const fetchSession = async () => {
-      const session = await getSession();
-      if (session?.user?.name) {
-        setUserName(session.user.name);
-      } else if (session?.user?.email) {
-        setUserName(session.user.email.split("@")[0]);
-      }
-    };
-    fetchSession();
-  }, []);
-
   const toggleSidebar = () => {
     logger.info(`UI Interaction: Sidebar ${!isCollapsed ? "collapsed" : "expanded"} by user.`);
     setIsCollapsed(!isCollapsed);
@@ -106,17 +92,7 @@ export default function Sidebar({ mode }: SidebarProps) {
             {!isCollapsed && <span className="whitespace-nowrap flex-1 tracking-wide">Back to Portal</span>}
           </div>
         </Link>
-        <Link 
-          href="/dashboard"
-          onClick={() => logger.info("UI Interaction: User navigated to Dashboard")}
-        >
-          <div className={`p-3 bg-bg-main border border-border-default text-text-secondary rounded-btn cursor-pointer font-heading font-bold hover:bg-primary/10 hover:border-primary/20 hover:text-primary shadow-sm transition-all flex items-center ${
-            isCollapsed ? "justify-center" : "justify-between w-full space-x-2"
-          }`}>
-            <span className="text-lg">📊</span>
-            {!isCollapsed && <span className="whitespace-nowrap flex-1 tracking-wide truncate" title={userName}>{userName}</span>}
-          </div>
-        </Link>
+
         <button 
           onClick={() => signOut({ callbackUrl: "/" })}
           className={`p-3 bg-bg-main border border-border-default text-text-secondary rounded-btn cursor-pointer font-heading font-bold hover:bg-red-500/10 hover:border-red-500/20 hover:text-red-500 shadow-sm transition-all flex items-center ${
