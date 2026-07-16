@@ -4,6 +4,7 @@ import React, { useState, useEffect, useRef } from 'react';
 import { AlgorithmStep, SearchState, VisualState, ArrayElement } from '../../types/dsa';
 import { logger } from '../../lib/logger';
 import { markVisualizationComplete } from '../../lib/actions/progress';
+import { getSession } from "next-auth/react";
 import { generateLinearSearchSteps, generateBinarySearchSteps } from '../../lib/algorithms/searching';
 
 type SearchAlgorithmType = "linear" | "binary";
@@ -101,6 +102,12 @@ export default function SearchingCanvas() {
     setCurrentFrame(0);
     setIsPlaybackMode(true);
     setIsPlaying(true);
+    
+    getSession().then((session) => {
+      if (session?.user?.id) {
+        markVisualizationComplete(session.user.id, "searching", activeAlgorithm).catch(logger.error);
+      }
+    });
   };
 
   const handleReset = () => {

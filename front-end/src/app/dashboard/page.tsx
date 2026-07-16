@@ -2,6 +2,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import { getSession, signOut } from "next-auth/react";
 import Link from "next/link";
 import { logger } from "../../../lib/logger";
 import { fetchUserDashboardData } from "../../../lib/actions/progress";
@@ -75,22 +76,40 @@ const DashboardPage = () => {
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [lastSynced, setLastSynced] = useState<Date>(new Date());
-
-  const CURRENT_USER_ID = "placeholder-student-id-123"; 
+  
+  const [userId, setUserId] = useState<string | null>(null);
+  const [userName, setUserName] = useState<string>("Student");
 
   useEffect(() => {
     let pollInterval: NodeJS.Timeout;
 
     const loadDashboard = async (isBackgroundSync = false) => {
+      let currentId = userId;
+      let currentName = userName;
+
+      if (!currentId) {
+        const session = await getSession();
+        if (session?.user?.id) {
+          currentId = session.user.id;
+          currentName = session.user.name || session.user.email?.split("@")[0] || "Student";
+          setUserId(currentId);
+          setUserName(currentName);
+        } else {
+          setError("User not authenticated.");
+          setIsLoading(false);
+          return;
+        }
+      }
+
       if (!isBackgroundSync) {
-        logger.info(`Dashboard UI Step 1: Initial mount. Fetching data for User ${CURRENT_USER_ID}`);
+        logger.info(`Dashboard UI Step 1: Initial mount. Fetching data for User ${currentId}`);
         setIsLoading(true);
       } else {
-        logger.info(`Dashboard UI Step 1 [Background]: Running background sync for User ${CURRENT_USER_ID}...`);
+        logger.info(`Dashboard UI Step 1 [Background]: Running background sync for User ${currentId}...`);
       }
       
       try {
-        const result = await fetchUserDashboardData(CURRENT_USER_ID);
+        const result = await fetchUserDashboardData(currentId);
         
         if (result.success && result.data) {
           if (!isBackgroundSync) logger.info("Dashboard UI Step 2: Successfully fetched initial database records.");
@@ -113,7 +132,7 @@ const DashboardPage = () => {
 
     // Set up polling for instant sync feel (every 10 seconds)
     pollInterval = setInterval(() => {
-      loadDashboard(true);
+      if (userId) loadDashboard(true);
     }, 10000);
 
     return () => clearInterval(pollInterval);
@@ -145,13 +164,20 @@ const DashboardPage = () => {
       return { ...module, status: "Pending", timeSpent: 0, percentage: 0 };
     }
 
-    // Granular Calculation
-    const theoryScore = dbRecord.theoryCompleted ? 1 : 0;
-    const visScore = dbRecord.visualizationsCompleted?.length || 0;
-    const currentSteps = theoryScore + visScore;
+    // Granular Calculation: Strict 50% Theory, 50% Visualizations
+    const theoryPercentage = dbRecord.theoryCompleted && config?.hasTheory ? 50 : 0;
+    
+    let visPercentage = 0;
+    if (config?.visCount && config.visCount > 0) {
+      const visScore = dbRecord.visualizationsCompleted?.length || 0;
+      visPercentage = (visScore / config.visCount) * 50;
+    } else if (dbRecord.theoryCompleted) {
+      // If a module has no visualizations, theory completion implies 100%
+      visPercentage = 50;
+    }
     
     // Guard against over-100% if visualizations change
-    const calculatedPercentage = Math.min(100, Math.round((currentSteps / totalPossibleSteps) * 100));
+    const calculatedPercentage = Math.min(100, Math.round(theoryPercentage + visPercentage));
     
     // Check master completion flag or if calculated percentage is 100
     const isActuallyComplete = dbRecord.isCompleted || calculatedPercentage === 100;
@@ -160,7 +186,7 @@ const DashboardPage = () => {
       ...module, 
       status: isActuallyComplete ? "Completed" : "Started", 
       timeSpent: dbRecord.timeSpent,
-      percentage: calculatedPercentage
+      percentage: isActuallyComplete ? 100 : calculatedPercentage
     };
   });
 
@@ -204,7 +230,7 @@ const DashboardPage = () => {
       <div className="bg-bg-card p-8 rounded-card shadow-premium flex flex-col md:flex-row justify-between items-start md:items-end gap-6 shrink-0 border border-transparent">
         <div className="flex-1 w-full">
           <div className="flex items-center gap-3 mb-2">
-            <h1 className="text-[42px] font-heading font-extrabold text-text-heading tracking-tight">Dashboard</h1>
+            <h1 className="text-[42px] font-heading font-extrabold text-text-heading tracking-tight">{userName}</h1>
             <span className="text-[13px] font-heading font-bold bg-accent-success/10 text-accent-success px-3 py-1 rounded-tag animate-pulse">
               Live Sync Active
             </span>
@@ -226,17 +252,23 @@ const DashboardPage = () => {
         </div>
 
         <div className="flex flex-col items-end gap-4">
-          <div className={`text-[13px] font-heading font-bold px-4 py-2 rounded-tag border shadow-sm ${tierColor}`}>
-            Tier: {performanceTier}
-          </div>
-          {lastAccessedModule && (
-            <Link 
-              href="/portal"
-              className="px-6 py-3 bg-text-heading hover:opacity-90 text-bg-main text-[14px] font-heading font-bold rounded-btn transition-opacity shadow-sm"
+          <div className="flex gap-3">
+            <div className={`text-[13px] flex items-center justify-center font-heading font-bold px-4 py-2 rounded-tag border shadow-sm ${tierColor}`}>
+              Tier: {performanceTier}
+            </div>
+            <button 
+              onClick={() => signOut({ callbackUrl: "/" })}
+              className="px-6 py-2 bg-bg-main border border-border-default hover:bg-red-500/10 hover:border-red-500/20 hover:text-red-500 text-text-secondary text-[14px] font-heading font-bold rounded-btn transition-colors shadow-sm"
             >
-              Resume Learning &rarr;
-            </Link>
-          )}
+              Sign Out
+            </button>
+          </div>
+          <Link 
+            href="/portal"
+            className="px-6 py-3 bg-text-heading hover:opacity-90 text-bg-main text-[14px] font-heading font-bold rounded-btn transition-opacity shadow-sm"
+          >
+            {lastAccessedModule ? "Resume Learning \u2192" : "Start Learning \u2192"}
+          </Link>
           <span className="text-[13px] font-mono text-text-placeholder">
             Last synced: {lastSynced.toLocaleTimeString()}
           </span>
@@ -286,8 +318,9 @@ const DashboardPage = () => {
             
             <div className="space-y-4 overflow-y-auto custom-scrollbar pr-4 flex-1 min-h-0">
               {moduleStatusList.map((mod) => (
-                <div key={mod.id} className="flex flex-col p-5 rounded-[20px] bg-bg-main border border-border-default gap-4 hover:border-border-hover transition-colors">
-                  <div className="flex items-center justify-between">
+                <Link href={`/learn?module=${mod.id}`} key={mod.id} className="block group">
+                  <div className="flex flex-col p-5 rounded-[20px] bg-bg-main border border-border-default gap-4 group-hover:border-primary transition-colors hover:shadow-md cursor-pointer">
+                    <div className="flex items-center justify-between">
                     <div className="flex flex-col">
                       <span className="font-heading font-bold text-[16px] text-text-heading tracking-wide">{mod.label}</span>
                       <span className="text-[13px] font-mono text-text-secondary mt-1 tabular-nums">Time: {formatTime(mod.timeSpent)}</span>
@@ -307,11 +340,12 @@ const DashboardPage = () => {
                   {/* Individual Module Progress Bar */}
                   <div className="w-full bg-bg-card rounded-tag h-1.5 border border-border-default">
                     <div 
-                      className={`h-1.5 rounded-tag transition-all duration-700 ease-out ${mod.status === 'Completed' ? 'gradient-success' : 'bg-accent-warning'}`}
+                      className={`h-1.5 rounded-tag transition-all duration-700 ease-out ${mod.status === 'Completed' ? 'bg-accent-success' : 'bg-accent-warning'}`}
                       style={{ width: `${mod.percentage}%` }}
                     ></div>
                   </div>
-                </div>
+                  </div>
+                </Link>
               ))}
             </div>
           </div>

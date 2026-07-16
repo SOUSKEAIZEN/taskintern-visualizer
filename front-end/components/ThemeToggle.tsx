@@ -6,16 +6,16 @@ export default function ThemeToggle() {
   const [theme, setTheme] = useState<"light" | "dark" | null>(null);
 
   useEffect(() => {
-    // Initial check on mount
     if (typeof document !== "undefined") {
-      if (document.documentElement.classList.contains("dark")) {
+      const stored = localStorage.getItem("theme");
+      if (stored === "dark") {
         setTheme("dark");
-      } else if (document.documentElement.classList.contains("light")) {
-        setTheme("light");
-      } else if (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches) {
-        setTheme("dark");
+        document.documentElement.classList.add("dark");
+        document.documentElement.classList.remove("light");
       } else {
         setTheme("light");
+        document.documentElement.classList.add("light");
+        document.documentElement.classList.remove("dark");
       }
     }
   }, []);

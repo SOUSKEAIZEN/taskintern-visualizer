@@ -1,7 +1,9 @@
 "use client";
 
 import { useState } from "react";
+import { getSession } from "next-auth/react";
 import { logger } from "../../lib/logger";
+import { markVisualizationComplete } from "../../lib/actions/progress";
 
 interface HeapElement {
   id: string;
@@ -126,6 +128,12 @@ export default function HeapCanvas() {
 
   const handleExtractMax = () => {
     if (heap.length === 0) return;
+    
+    getSession().then((session) => {
+      if (session?.user?.id) {
+        markVisualizationComplete(session.user.id, "heaps", "extract").catch(logger.error);
+      }
+    });
     
     logger.info(`Heap Engine: EXTRACT MAX operation. Removing Root (${heap[0].value}).`);
     setIsAnimating(true);

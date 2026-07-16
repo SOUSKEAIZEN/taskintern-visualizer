@@ -1,7 +1,9 @@
 "use client";
 
 import { useState } from "react";
+import { getSession } from "next-auth/react";
 import { logger } from "../../lib/logger";
+import { markVisualizationComplete } from "../../lib/actions/progress";
 
 interface QueueElement {
   id: string;
@@ -34,6 +36,12 @@ export default function QueueCanvas() {
     const val = customValue ? parseInt(customValue) : Math.floor(Math.random() * 100);
     if (isNaN(val)) return;
 
+    getSession().then((session) => {
+      if (session?.user?.id) {
+        markVisualizationComplete(session.user.id, "queues", "enqueue").catch(logger.error);
+      }
+    });
+
     logger.info(`Memory Operation: ENQUEUE - Adding value ${val} to the Rear of the queue.`);
     const newElement: QueueElement = { id: generateId(), value: val, state: "new" };
     
@@ -51,6 +59,12 @@ export default function QueueCanvas() {
       alert("Queue Underflow! Cannot dequeue from an empty queue.");
       return;
     }
+
+    getSession().then((session) => {
+      if (session?.user?.id) {
+        markVisualizationComplete(session.user.id, "queues", "dequeue").catch(logger.error);
+      }
+    });
 
     const frontElement = queue[0];
     logger.info(`Memory Operation: DEQUEUE - Removing value ${frontElement.value} from the Front of the queue.`);

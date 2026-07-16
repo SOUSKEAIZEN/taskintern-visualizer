@@ -6,21 +6,49 @@ import { prisma } from "../lib/db";
 import bcrypt from "bcryptjs";
 
 export const { handlers, auth, signIn, signOut } = NextAuth({
+  adapter: PrismaAdapter(prisma),
   session: { strategy: "jwt" },
   pages: {
     signIn: "/",
   },
   providers: [
+    GoogleProvider({
+      clientId: process.env.GOOGLE_CLIENT_ID,
+      clientSecret: process.env.GOOGLE_CLIENT_SECRET,
+    }),
     CredentialsProvider({
       name: "Credentials",
-      credentials: {},
+      credentials: {
+        email: { label: "Email", type: "email" },
+        password: { label: "Password", type: "password" }
+      },
       async authorize(credentials) {
-        // Dummy login: always return a fake user
-        return {
-          id: "dummy-user-id",
-          name: "Taskintern User",
-          email: "user@taskintern.com",
-        };
+        if (!credentials?.email || !credentials?.password) {
+          throw new Error("Missing email or password");
+        }
+        
+        const user = await prisma.user.findUnique({
+          where: { email: credentials.email as string }
+        });
+        
+        if (!user) {
+          throw new Error("No user found with this email");
+        }
+        
+        if (!user.isVerified) {
+          throw new Error("Please verify your OTP first");
+        }
+        
+        if (!user.password) {
+          throw new Error("Please log in with Google");
+        }
+        
+        const isMatch = await bcrypt.compare(credentials.password as string, user.password);
+        if (!isMatch) {
+          throw new Error("Invalid password");
+        }
+        
+        return user;
       }
     })
   ],

@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useState, useRef } from "react";
+import { getSession } from "next-auth/react";
 import { logger } from "../../lib/logger";
 import { markTheoryComplete } from "../../lib/actions/progress";
 import arrayData from "../../content/modules/arrays.json";
@@ -42,7 +43,15 @@ export default function TheoryPanel({ topicId = "arrays" }: { topicId?: string }
   
   // Ref for the bottom of the theory content
   const bottomRef = useRef<HTMLDivElement>(null);
-  const CURRENT_USER_ID = "placeholder-student-id-123";
+  const [userId, setUserId] = useState<string | null>(null);
+
+  useEffect(() => {
+    getSession().then((session) => {
+      if (session?.user?.id) {
+        setUserId(session.user.id);
+      }
+    });
+  }, []);
 
   useEffect(() => {
     logger.info(`UI Mount Step 1: Initializing TheoryPanel for topic: ${topicId}`);
@@ -86,10 +95,10 @@ export default function TheoryPanel({ topicId = "arrays" }: { topicId?: string }
     const observer = new IntersectionObserver(
       (entries) => {
         const [entry] = entries;
-        if (entry.isIntersecting) {
+        if (entry.isIntersecting && userId) {
           logger.info(`UI Action Step 1: User reached the bottom of ${topicId} theory. Firing completion event...`);
           
-          markTheoryComplete(CURRENT_USER_ID, topicId)
+          markTheoryComplete(userId, topicId)
             .then((res) => {
               if (res.success) {
                 logger.info(`UI Action Step 2: Successfully registered theory completion for ${topicId} in database.`);
@@ -118,7 +127,7 @@ export default function TheoryPanel({ topicId = "arrays" }: { topicId?: string }
     return () => {
       observer.disconnect();
     };
-  }, [data, topicId]);
+  }, [data, topicId, userId]);
 
   // Helper function to render basic Markdown and LaTeX variables
   const renderFormattedText = (text: string) => {

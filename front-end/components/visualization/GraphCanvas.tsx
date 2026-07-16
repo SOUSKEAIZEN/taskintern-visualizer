@@ -1,7 +1,9 @@
 "use client";
 
 import { useState } from "react";
+import { getSession } from "next-auth/react";
 import { logger } from "../../lib/logger";
+import { markVisualizationComplete } from "../../lib/actions/progress";
 
 interface GraphNode {
   id: number;
@@ -55,7 +57,7 @@ export default function GraphCanvas() {
   const [isAnimating, setIsAnimating] = useState(false);
 
   // --- Animation Engine ---
-  const runFrames = (frames: GraphNode[][], delay: number = 800) => {
+  const runFrames = (frames: GraphNode[][], delay: number = 800, algorithm: "bfs" | "dfs") => {
     let frameIdx = 0;
     const interval = setInterval(() => {
       if (frameIdx < frames.length) {
@@ -65,6 +67,12 @@ export default function GraphCanvas() {
         clearInterval(interval);
         setIsAnimating(false);
         logger.info("Graph Engine: Traversal animation complete.");
+        
+        getSession().then((session) => {
+          if (session?.user?.id) {
+            markVisualizationComplete(session.user.id, "graphs", algorithm).catch(logger.error);
+          }
+        });
       }
     }, delay);
   };
@@ -108,7 +116,7 @@ export default function GraphCanvas() {
       frames.push(JSON.parse(JSON.stringify(workingNodes)));
     }
 
-    runFrames(frames);
+    runFrames(frames, 800, "bfs");
   };
 
   const handleDFS = () => {
@@ -144,7 +152,7 @@ export default function GraphCanvas() {
     };
 
     dfsRecursive(0);
-    runFrames(frames);
+    runFrames(frames, 800, "dfs");
   };
 
   const handleReset = () => {

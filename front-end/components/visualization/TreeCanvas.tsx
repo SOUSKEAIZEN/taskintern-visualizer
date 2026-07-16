@@ -1,7 +1,9 @@
 "use client";
 
-import { useState, useRef } from "react";
+import { useState, useRef, useEffect } from "react";
+import { getSession } from "next-auth/react";
 import { logger } from "../../lib/logger";
+import { markVisualizationComplete } from "../../lib/actions/progress";
 
 // --- BST Data Structures ---
 interface TreeNode {
@@ -82,6 +84,12 @@ export default function TreeCanvas() {
   const handleInsert = () => {
     const val = customValue ? parseInt(customValue) : Math.floor(Math.random() * 100);
     if (isNaN(val)) return;
+    
+    getSession().then((session) => {
+      if (session?.user?.id) {
+        markVisualizationComplete(session.user.id, "trees", "insert").catch(logger.error);
+      }
+    });
 
     logger.info(`BST Engine: Initiating INSERT operation for value ${val}.`);
     if (isAnimating) return;
@@ -170,6 +178,12 @@ export default function TreeCanvas() {
   const handleSearch = () => {
     const target = parseInt(searchValue);
     if (isNaN(target) || !root || isAnimating) return;
+    
+    getSession().then((session) => {
+      if (session?.user?.id) {
+        markVisualizationComplete(session.user.id, "trees", "search").catch(logger.error);
+      }
+    });
 
     logger.info(`BST Engine: Initiating SEARCH operation for value ${target}.`);
     setIsAnimating(true);
@@ -225,6 +239,14 @@ export default function TreeCanvas() {
   };
 
   const handleClear = () => {
+    if (isAnimating) return;
+    
+    getSession().then((session) => {
+      if (session?.user?.id) {
+        markVisualizationComplete(session.user.id, "trees", "clear").catch(logger.error);
+      }
+    });
+    
     logger.info("UI State: User cleared the BST.");
     setRoot(null);
     updateVisuals(null);

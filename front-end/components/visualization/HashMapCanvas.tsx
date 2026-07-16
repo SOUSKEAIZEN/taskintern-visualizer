@@ -4,6 +4,7 @@ import React, { useState, useEffect, useRef } from 'react';
 import { AlgorithmStep, HashMapState, VisualState, HashNode } from '../../types/dsa';
 import { logger } from '../../lib/logger';
 import { markVisualizationComplete } from '../../lib/actions/progress';
+import { getSession } from 'next-auth/react';
 import { generateHashMapSteps, HashOperation } from '../../lib/algorithms/hashmaps';
 
 const getColorForState = (state: VisualState) => {
@@ -71,6 +72,12 @@ export default function HashMapCanvas() {
     setCurrentFrame(0);
     setIsPlaybackMode(true);
     setIsPlaying(true);
+    
+    getSession().then((session) => {
+      if (session?.user?.id) {
+        markVisualizationComplete(session.user.id, "hashmaps", "chaining").catch(logger.error);
+      }
+    });
   };
 
   const handleReset = () => {

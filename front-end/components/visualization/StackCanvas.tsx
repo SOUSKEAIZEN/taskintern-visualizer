@@ -1,7 +1,9 @@
 "use client";
 
 import { useState } from "react";
+import { getSession } from "next-auth/react";
 import { logger } from "../../lib/logger";
+import { markVisualizationComplete } from "../../lib/actions/progress";
 
 interface StackElement {
   id: string;
@@ -35,6 +37,12 @@ export default function StackCanvas() {
     const val = customValue ? parseInt(customValue) : Math.floor(Math.random() * 100);
     if (isNaN(val)) return;
 
+    getSession().then((session) => {
+      if (session?.user?.id) {
+        markVisualizationComplete(session.user.id, "stacks", "push").catch(logger.error);
+      }
+    });
+
     logger.info(`Memory Operation: PUSH - Adding value ${val} to the top of the stack.`);
     const newElement: StackElement = { id: generateId(), value: val, state: "new" };
     
@@ -54,6 +62,12 @@ export default function StackCanvas() {
       alert("Stack Underflow! Cannot pop from an empty stack.");
       return;
     }
+
+    getSession().then((session) => {
+      if (session?.user?.id) {
+        markVisualizationComplete(session.user.id, "stacks", "pop").catch(logger.error);
+      }
+    });
 
     const topElement = stack[stack.length - 1];
     logger.info(`Memory Operation: POP - Removing value ${topElement.value} from the top of the stack.`);

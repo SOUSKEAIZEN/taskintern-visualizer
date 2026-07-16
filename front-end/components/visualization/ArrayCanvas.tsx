@@ -3,6 +3,7 @@
 import { useState, useEffect, useRef } from "react";
 import { logger } from "../../lib/logger";
 import { markVisualizationComplete } from "../../lib/actions/progress";
+import { getSession } from "next-auth/react";
 import { ArrayElement, AlgorithmStep } from "../../types/dsa";
 import { 
   generateBubbleSortSteps, 
@@ -114,6 +115,12 @@ export default function ArrayCanvas({ initialData = [45, 10, 24, 92, 7] }: Array
     setCurrentFrame(0);
     setIsPlaybackMode(true);
     setIsPlaying(true);
+    
+    getSession().then((session) => {
+      if (session?.user?.id) {
+        markVisualizationComplete(session.user.id, "arrays", activeAlgorithm).catch(logger.error);
+      }
+    });
   };
 
   const handleReset = () => {

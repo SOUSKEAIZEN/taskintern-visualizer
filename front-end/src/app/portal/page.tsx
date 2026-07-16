@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { auth } from "../../auth";
 import { redirect } from "next/navigation";
+import LogoutButton from "../../../components/LogoutButton";
 
 export default async function PortalPage() {
   const session = await auth();
@@ -12,7 +13,10 @@ export default async function PortalPage() {
   return (
     <div className="h-full flex flex-col items-center justify-center p-8 gradient-hero relative overflow-hidden">
       
-      {/* Decorative premium background elements removed to enforce strictly minimal theme */}
+      {/* Top Corner Logout */}
+      <div className="absolute top-6 right-6 z-50">
+        <LogoutButton />
+      </div>
 
       <div className="z-10 text-center mb-16 animate-in fade-in slide-in-from-bottom-4 duration-700">
         <h1 className="text-[56px] font-heading font-extrabold text-text-heading tracking-tight mb-4 leading-tight">

@@ -1,7 +1,9 @@
 "use client";
 
 import { useState, useRef, useEffect } from "react";
+import { getSession } from "next-auth/react";
 import { logger } from "../../lib/logger";
+import { markVisualizationComplete } from "../../lib/actions/progress";
 
 interface LinkedListNode {
   id: string;
@@ -34,13 +36,24 @@ export default function LinkedListCanvas() {
 
   // --- Operations ---
   const handleAppend = () => {
+    if (!customValue || isAnimating) return;
+    setIsAnimating(true);
+    logger.info(`Linked List Engine: Appending value ${customValue}`);
+    
+    getSession().then((session) => {
+      if (session?.user?.id) {
+        markVisualizationComplete(session.user.id, "linked-lists", "append").catch(logger.error);
+      }
+    });
+
     if (nodes.length >= MAX_NODES) {
       logger.warn(`Constraint Hit: Cannot append. ${listType.toUpperCase()} List reached max size of ${MAX_NODES}.`);
+      setIsAnimating(false);
       return;
     }
     
     const val = customValue ? parseInt(customValue) : Math.floor(Math.random() * 100);
-    if (isNaN(val)) return;
+    if (isNaN(val)) { setIsAnimating(false); return; }
 
     logger.info(`Memory Operation: Appending new node with value ${val} to the tail of the ${listType} list.`);
     const newNode: LinkedListNode = { id: generateId(), value: val, state: "new" };
@@ -50,17 +63,29 @@ export default function LinkedListCanvas() {
     
     setTimeout(() => {
       setNodes((prev) => prev.map(n => n.id === newNode.id ? { ...n, state: "default" } : n));
+      setIsAnimating(false);
     }, 1000);
   };
 
   const handlePrepend = () => {
+    if (!customValue || isAnimating) return;
+    setIsAnimating(true);
+    logger.info(`Linked List Engine: Prepending value ${customValue}`);
+    
+    getSession().then((session) => {
+      if (session?.user?.id) {
+        markVisualizationComplete(session.user.id, "linked-lists", "prepend").catch(logger.error);
+      }
+    });
+
     if (nodes.length >= MAX_NODES) {
       logger.warn(`Constraint Hit: Cannot prepend. ${listType.toUpperCase()} List reached max size of ${MAX_NODES}.`);
+      setIsAnimating(false);
       return;
     }
 
     const val = customValue ? parseInt(customValue) : Math.floor(Math.random() * 100);
-    if (isNaN(val)) return;
+    if (isNaN(val)) { setIsAnimating(false); return; }
 
     logger.info(`Memory Operation: Prepending new node with value ${val} to the head of the ${listType} list.`);
     const newNode: LinkedListNode = { id: generateId(), value: val, state: "new" };
@@ -70,16 +95,24 @@ export default function LinkedListCanvas() {
 
     setTimeout(() => {
       setNodes((prev) => prev.map(n => n.id === newNode.id ? { ...n, state: "default" } : n));
+      setIsAnimating(false);
     }, 1000);
   };
 
   const handlePop = () => {
-    if (nodes.length === 0) {
-      logger.error(`Memory Error: Attempted to pop from an empty ${listType} Linked List.`);
-      return;
-    }
+    if (nodes.length === 0 || isAnimating) return;
+    setIsAnimating(true);
+    logger.info(`Linked List Engine: Popping end node.`);
+    
+    getSession().then((session) => {
+      if (session?.user?.id) {
+        markVisualizationComplete(session.user.id, "linked-lists", "pop").catch(logger.error);
+      }
+    });
+
     logger.info(`Memory Operation: Removing the tail node from the ${listType} list.`);
     setNodes((prev) => prev.slice(0, -1));
+    setIsAnimating(false);
   };
 
   // --- Traversal Animation Engine ---
