@@ -1,30 +1,11 @@
 // taskintern-visualizer/src/app/layout.tsx
 
 import type { Metadata } from "next";
-import { Plus_Jakarta_Sans, Inter, JetBrains_Mono } from "next/font/google";
+
 import Link from "next/link";
 import "./globals.css";
 import { logger } from "../../lib/logger";
-import Sidebar from "../../components/workspace/Sidebar";
 import ThemeToggle from "../../components/ThemeToggle";
-
-const fontHeading = Plus_Jakarta_Sans({
-  variable: "--font-plus-jakarta-sans",
-  subsets: ["latin"],
-  weight: ["700", "800"],
-});
-
-const fontBody = Inter({
-  variable: "--font-inter",
-  subsets: ["latin"],
-  weight: ["400", "500"],
-});
-
-const fontMono = JetBrains_Mono({
-  variable: "--font-jetbrains-mono",
-  subsets: ["latin"],
-});
-
 export const metadata: Metadata = {
   title: "Taskintern DSA Visualizer",
   description: "Interactive Data Structures and Algorithms Visualizer Platform",
@@ -41,9 +22,12 @@ export default function RootLayout({
     <html
       lang="en"
       suppressHydrationWarning
-      className={`${fontHeading.variable} ${fontBody.variable} ${fontMono.variable} h-full antialiased`}
+      className="font-sans h-full antialiased"
     >
       <head>
+        <link rel="preconnect" href="https://fonts.googleapis.com" />
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
+        <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500&family=JetBrains+Mono&family=Plus+Jakarta+Sans:wght@700;800&display=swap" rel="stylesheet" />
         <script
           dangerouslySetInnerHTML={{
             __html: `
