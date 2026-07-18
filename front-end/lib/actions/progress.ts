@@ -18,6 +18,7 @@ const prismaClientSingleton = () => {
   });
   const adapter = new PrismaPg(pool);
   
+  // @ts-ignore - Prisma 5.14.0 experimental driverAdapters type mismatch
   return new PrismaClient({ adapter });
 };
 
