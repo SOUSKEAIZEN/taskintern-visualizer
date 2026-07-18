@@ -23,24 +23,20 @@ export const runInDocker = async (
   fs.mkdirSync(runDir, { recursive: true });
 
   let fileName = "";
-  let dockerImage = "";
   let compileCmd = "";
   let runCmd = "";
 
   if (language === "python") {
     fileName = "main.py";
-    dockerImage = "judge-python:latest";
-    runCmd = `python3 /app/main.py < /app/input.txt`;
+    runCmd = `python3 ${path.join(runDir, fileName)} < ${path.join(runDir, "input.txt")}`;
   } else if (language === "cpp") {
     fileName = "main.cpp";
-    dockerImage = "judge-cpp:latest";
-    compileCmd = `g++ -O2 -std=c++20 /app/main.cpp -o /app/a.out`;
-    runCmd = `/app/a.out < /app/input.txt`;
+    compileCmd = `g++ -O2 -std=c++20 ${path.join(runDir, fileName)} -o ${path.join(runDir, "a.out")}`;
+    runCmd = `${path.join(runDir, "a.out")} < ${path.join(runDir, "input.txt")}`;
   } else if (language === "java") {
     fileName = "Main.java";
-    dockerImage = "judge-java:latest";
-    compileCmd = `javac /app/Main.java`;
-    runCmd = `java -cp /app Main < /app/input.txt`;
+    compileCmd = `javac ${path.join(runDir, fileName)}`;
+    runCmd = `java -cp ${runDir} Main < ${path.join(runDir, "input.txt")}`;
   } else {
     throw new Error("Unsupported language");
   }
@@ -48,25 +44,17 @@ export const runInDocker = async (
   fs.writeFileSync(path.join(runDir, fileName), code);
   fs.writeFileSync(path.join(runDir, "input.txt"), stdin);
 
-  // We map the user id to 1000 to prevent root execution inside the container
-  const dockerRunOptions = `--rm --network none --memory 256m --cpus 0.5 -v ${runDir}:/app`;
-  
-  const pathExport = `export PATH=$PATH:/usr/local/bin:/opt/homebrew/bin:/Users/aizen/.docker/bin:/Applications/Docker.app/Contents/Resources/bin;`;
-  
   let finalCmd = "";
   if (compileCmd) {
-    finalCmd = `${pathExport} docker run ${dockerRunOptions} ${dockerImage} sh -c "${compileCmd} && ${runCmd}"`;
+    finalCmd = `${compileCmd} && ${runCmd}`;
   } else {
-    finalCmd = `${pathExport} docker run ${dockerRunOptions} ${dockerImage} sh -c "${runCmd}"`;
+    finalCmd = `${runCmd}`;
   }
 
   const startTime = Date.now();
   try {
-    // Docker execution with a slight buffer over the timeLimit for container spinup
-    const customEnv = { ...process.env, PATH: `${process.env.PATH || ''}:/usr/local/bin:/opt/homebrew/bin:/Users/${process.env.USER}/.docker/bin` };
     const { stdout, stderr } = await execAsync(finalCmd, { 
-      timeout: timeLimit * 1000 + 2000,
-      env: customEnv
+      timeout: timeLimit * 1000 + 1000
     });
     const executionTime = Date.now() - startTime;
     return { stdout, stderr, executionTime };
