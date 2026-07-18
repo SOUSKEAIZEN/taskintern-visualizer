@@ -55,7 +55,8 @@ export default function CompilerView() {
     setExecutionTime(null);
 
     try {
-      const response = await fetch("http://localhost:5005/api/run", {
+      const apiUrl = process.env.NEXT_PUBLIC_API_URL || "http://localhost:5005";
+      const response = await fetch(`${apiUrl}/api/run`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ language, code, stdin }),
