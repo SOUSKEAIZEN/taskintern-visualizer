@@ -52,9 +52,14 @@ export const runInDocker = async (
   }
 
   const startTime = Date.now();
+  let actualTimeout = timeLimit * 1000 + 1000;
+  if (language === "java") {
+    actualTimeout += 6000; // JVM cold start penalty on free tier
+  }
+
   try {
     const { stdout, stderr } = await execAsync(finalCmd, { 
-      timeout: timeLimit * 1000 + 1000
+      timeout: actualTimeout
     });
     const executionTime = Date.now() - startTime;
     return { stdout, stderr, executionTime };
