@@ -3,11 +3,14 @@ import type { NextRequest } from "next/server";
 import { getToken } from "next-auth/jwt";
 
 export async function middleware(req: NextRequest) {
-  // Use getToken from next-auth/jwt to read the session token securely on Edge runtime
-  const token = await getToken({ 
-    req, 
-    secret: process.env.NEXTAUTH_SECRET || process.env.AUTH_SECRET 
-  });
+  // Check for session cookies directly to bypass NextAuth v5 Edge runtime token decoding issues
+  const hasSessionToken = 
+    req.cookies.has("authjs.session-token") || 
+    req.cookies.has("__Secure-authjs.session-token") ||
+    req.cookies.has("next-auth.session-token") || 
+    req.cookies.has("__Secure-next-auth.session-token");
+
+  const token = hasSessionToken;
 
   const { pathname } = req.nextUrl;
   
