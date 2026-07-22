@@ -3,6 +3,8 @@
 import { useState } from "react";
 import { signOut } from "next-auth/react";
 import Link from "next/link";
+import { useSearchParams } from "next/navigation";
+import { motion, AnimatePresence } from "framer-motion";
 import { logger } from "../../lib/logger";
 
 const LEARN_MODULES = [
@@ -28,6 +30,9 @@ interface SidebarProps {
 
 export default function Sidebar({ mode }: SidebarProps) {
   const [isCollapsed, setIsCollapsed] = useState(false);
+  const searchParams = useSearchParams();
+  const currentModule = searchParams.get("module") || (mode === "learn" ? "arrays" : "compiler");
+
   const toggleSidebar = () => {
     logger.info(`UI Interaction: Sidebar ${!isCollapsed ? "collapsed" : "expanded"} by user.`);
     setIsCollapsed(!isCollapsed);
@@ -37,10 +42,10 @@ export default function Sidebar({ mode }: SidebarProps) {
   const basePath = mode === "learn" ? "/learn" : "/practice";
 
   return (
-    <aside 
-      className={`relative transition-all duration-300 ease-in-out border-r border-border-default bg-bg-sidebar z-20 flex flex-col ${
-        isCollapsed ? "w-20 items-center" : "w-64 px-4"
-      }`}
+    <motion.aside 
+      initial={false}
+      animate={{ width: isCollapsed ? 80 : 256 }}
+      className="relative border-r border-border-default bg-bg-sidebar z-20 flex flex-col shrink-0 overflow-visible h-full"
     >
       {/* Collapse/Expand Toggle Button */}
       <button 
@@ -53,56 +58,102 @@ export default function Sidebar({ mode }: SidebarProps) {
         </svg>
       </button>
 
-      <nav className="flex-1 space-y-1 text-[14px] font-heading font-bold pt-4 overflow-y-auto overflow-x-hidden custom-scrollbar">
-        {!isCollapsed && (
-          <div className="text-[12px] font-heading font-extrabold text-text-placeholder uppercase tracking-widest mb-4 mt-2 px-2">
-            {mode === "learn" ? "Learning Modules" : "Practice Hub"}
-          </div>
-        )}
-
-        {modules.map((mod) => (
-          <Link 
-            key={mod.id} 
-            href={`${basePath}?module=${mod.id}`}
-            onClick={() => logger.info(`UI Interaction: User navigated to module [${mod.id}]`)}
-          >
-            <div 
-              className={`flex items-center rounded-btn cursor-pointer transition-colors duration-200 group ${
-                isCollapsed ? "justify-center p-3 mb-2" : "p-3 mb-1 space-x-3"
-              } hover:bg-primary/10 hover:text-primary text-text-secondary border border-transparent`}
-              title={isCollapsed ? mod.label : ""}
+      <nav className={`flex-1 space-y-1 text-[14px] font-heading font-bold pt-4 overflow-y-auto overflow-x-hidden custom-scrollbar ${isCollapsed ? 'px-2' : 'px-4'}`}>
+        <AnimatePresence>
+          {!isCollapsed && (
+            <motion.div 
+              initial={{ opacity: 0, height: 0 }}
+              animate={{ opacity: 1, height: "auto" }}
+              exit={{ opacity: 0, height: 0 }}
+              className="text-[12px] font-heading font-extrabold text-text-placeholder uppercase tracking-widest mb-4 mt-2 px-2 whitespace-nowrap"
             >
-              <span className="text-xl group-hover:scale-110 transition-transform">{mod.icon}</span>
-              {!isCollapsed && <span className="whitespace-nowrap tracking-wide">{mod.label}</span>}
-            </div>
-          </Link>
-        ))}
+              {mode === "learn" ? "Learning Modules" : "Practice Hub"}
+            </motion.div>
+          )}
+        </AnimatePresence>
+
+        {modules.map((mod) => {
+          const isActive = currentModule === mod.id;
+          return (
+            <Link 
+              key={mod.id} 
+              href={`${basePath}?module=${mod.id}`}
+              onClick={() => logger.info(`UI Interaction: User navigated to module [${mod.id}]`)}
+              className="block"
+            >
+              <div 
+                className={`flex items-center rounded-btn cursor-pointer transition-all duration-200 group ${
+                  isCollapsed ? "justify-center p-3 mb-2" : "p-3 mb-1 space-x-3"
+                } ${isActive ? 'bg-primary text-white shadow-md shadow-primary/20' : 'hover:bg-primary-soft hover:text-primary text-text-secondary border border-transparent'}`}
+                title={isCollapsed ? mod.label : ""}
+              >
+                <span className="text-xl group-hover:scale-110 transition-transform block">{mod.icon}</span>
+                <AnimatePresence>
+                  {!isCollapsed && (
+                    <motion.span 
+                      initial={{ opacity: 0, x: -10 }}
+                      animate={{ opacity: 1, x: 0 }}
+                      exit={{ opacity: 0, x: -10 }}
+                      className="whitespace-nowrap tracking-wide block flex-1"
+                    >
+                      {mod.label}
+                    </motion.span>
+                  )}
+                </AnimatePresence>
+              </div>
+            </Link>
+          );
+        })}
       </nav>
 
       {/* Bottom Links */}
-      <div className={`pt-4 pb-6 mt-2 border-t border-border-default flex flex-col gap-3 ${isCollapsed ? 'items-center' : ''}`}>
+      <div className={`pt-4 pb-6 mt-2 border-t border-border-default flex flex-col gap-3 ${isCollapsed ? 'px-2' : 'px-4'}`}>
         <Link 
           href="/portal"
           onClick={() => logger.info("UI Interaction: User navigated back to Portal")}
+          className="block w-full"
         >
-          <div className={`p-3 bg-bg-main border border-border-default text-text-secondary rounded-btn cursor-pointer font-heading font-bold hover:bg-primary/10 hover:border-primary/20 hover:text-primary shadow-sm transition-all flex items-center ${
-            isCollapsed ? "justify-center" : "justify-between w-full space-x-2"
+          <div className={`p-3 bg-bg-main border border-border-default text-text-secondary rounded-btn cursor-pointer font-heading font-bold hover:bg-primary-soft hover:border-primary-soft hover:text-primary shadow-sm transition-all flex items-center ${
+            isCollapsed ? "justify-center" : "space-x-3"
           }`}>
-            <span className="text-lg">🚪</span>
-            {!isCollapsed && <span className="whitespace-nowrap flex-1 tracking-wide">Back to Portal</span>}
+            <span className="text-lg block">🚪</span>
+            <AnimatePresence>
+              {!isCollapsed && (
+                <motion.span 
+                  initial={{ opacity: 0 }}
+                  animate={{ opacity: 1 }}
+                  exit={{ opacity: 0 }}
+                  className="whitespace-nowrap flex-1 tracking-wide block"
+                >
+                  Back to Portal
+                </motion.span>
+              )}
+            </AnimatePresence>
           </div>
         </Link>
 
         <button 
           onClick={() => signOut({ callbackUrl: "/" })}
-          className={`p-3 bg-bg-main border border-border-default text-text-secondary rounded-btn cursor-pointer font-heading font-bold hover:bg-red-500/10 hover:border-red-500/20 hover:text-red-500 shadow-sm transition-all flex items-center ${
-            isCollapsed ? "justify-center" : "justify-between w-full space-x-2"
+          className={`p-3 bg-bg-main border border-border-default text-text-secondary rounded-btn cursor-pointer font-heading font-bold hover:bg-accent-error/10 hover:border-accent-error/20 hover:text-accent-error shadow-sm transition-all flex items-center w-full ${
+            isCollapsed ? "justify-center" : "space-x-3"
           }`}
+          title={isCollapsed ? "Logout" : ""}
         >
-          <span className="text-lg">🚪</span>
-          {!isCollapsed && <span className="whitespace-nowrap flex-1 tracking-wide text-left">Logout</span>}
+          <span className="text-lg block">⏏️</span>
+          <AnimatePresence>
+            {!isCollapsed && (
+              <motion.span 
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                exit={{ opacity: 0 }}
+                className="whitespace-nowrap flex-1 tracking-wide text-left block"
+              >
+                Logout
+              </motion.span>
+            )}
+          </AnimatePresence>
         </button>
       </div>
-    </aside>
+    </motion.aside>
   );
 }

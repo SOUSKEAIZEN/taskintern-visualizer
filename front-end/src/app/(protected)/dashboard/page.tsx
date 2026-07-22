@@ -4,6 +4,7 @@
 import { useEffect, useState } from "react";
 import { getSession, signOut } from "next-auth/react";
 import Link from "next/link";
+import { motion } from "framer-motion";
 import { logger } from "../../../../lib/logger";
 import { fetchUserDashboardData } from "../../../../lib/actions/progress";
 
@@ -223,135 +224,192 @@ const DashboardPage = () => {
     (a, b) => new Date(b.lastAccessed).getTime() - new Date(a.lastAccessed).getTime()
   )[0];
 
+  const recommendedModule = moduleStatusList.find(mod => mod.status !== "Completed") || moduleStatusList[0];
+  const hasNoData = userProgress.length === 0;
+
   return (
-    <div className="max-w-5xl mx-auto p-8 h-full flex flex-col gap-8 animate-in fade-in duration-500">
+    <div className="max-w-6xl mx-auto p-4 md:p-8 h-full flex flex-col gap-8 custom-scrollbar overflow-y-auto">
       
-      {/* Dashboard Header */}
-      <div className="bg-bg-card p-8 rounded-card shadow-premium flex flex-col md:flex-row justify-between items-start md:items-end gap-6 shrink-0 border border-transparent">
-        <div className="flex-1 w-full">
-          <div className="flex items-center gap-3 mb-2">
-            <h1 className="text-[42px] font-heading font-extrabold text-text-heading tracking-tight">{userName}</h1>
-            <span className="text-[13px] font-heading font-bold bg-accent-success/10 text-accent-success px-3 py-1 rounded-tag animate-pulse">
-              Live Sync Active
+      {/* Hero Section */}
+      <motion.div 
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        className="relative overflow-hidden rounded-[32px] bg-bg-card border border-border-default shadow-premium p-8 md:p-12 shrink-0 flex flex-col md:flex-row justify-between items-start md:items-center gap-8"
+      >
+        {/* Background Decorative Gradient */}
+        <div className="absolute top-0 left-0 w-full h-full bg-gradient-to-br from-primary/10 via-transparent to-accent-info/5 pointer-events-none" />
+        
+        <div className="relative z-10 flex-1">
+          <div className="flex items-center gap-3 mb-3">
+            <h1 className="text-[36px] md:text-[48px] font-heading font-extrabold text-text-heading tracking-tight leading-tight">
+              Welcome back, {userName}
+            </h1>
+            <span className="text-[12px] font-heading font-bold bg-accent-success/15 text-accent-success px-3 py-1 rounded-tag animate-pulse shadow-sm">
+              Live Sync
             </span>
           </div>
-          <p className="text-[16px] text-text-secondary font-body mb-8">Real-time overview of your algorithmic journey.</p>
+          <p className="text-[16px] text-text-secondary font-body mb-8 max-w-xl leading-relaxed">
+            Ready to conquer your next algorithm? Pick up where you left off or dive into a new topic to keep your streak alive.
+          </p>
           
-          <div className="w-full max-w-md">
-            <div className="flex justify-between text-[14px] mb-3">
-              <span className="font-heading font-bold text-text-heading tracking-wide">Overall Syllabus Progress</span>
+          <div className="flex flex-wrap gap-4">
+            <Link 
+              href={`/learn?module=${recommendedModule.id}`}
+              className="px-8 py-3.5 bg-primary hover:bg-primary-hover text-white text-[15px] font-heading font-bold rounded-btn transition-colors shadow-lg shadow-primary/30 flex items-center gap-2"
+            >
+              <span>🚀</span> Continue: {recommendedModule.label}
+            </Link>
+          </div>
+        </div>
+
+        {/* Hero Right Metrics */}
+        <div className="relative z-10 flex flex-col items-end gap-5 bg-bg-main/50 backdrop-blur-sm p-6 rounded-[24px] border border-border-default shadow-inner">
+          <div className="flex flex-col items-end">
+            <span className="text-[13px] font-heading font-bold text-text-placeholder uppercase tracking-widest mb-1">Current Tier</span>
+            <div className={`text-[15px] flex items-center justify-center font-heading font-extrabold px-5 py-2.5 rounded-tag border shadow-sm ${tierColor}`}>
+              🏆 {performanceTier}
+            </div>
+          </div>
+          
+          <div className="w-full min-w-[240px]">
+            <div className="flex justify-between text-[13px] mb-2">
+              <span className="font-heading font-bold text-text-secondary">Course Progress</span>
               <span className="font-heading font-extrabold text-primary tabular-nums">{completionPercentage}%</span>
             </div>
-            <div className="w-full bg-bg-main rounded-tag h-2">
+            <div className="w-full bg-bg-main rounded-tag h-2.5 shadow-inner overflow-hidden border border-border-default/50">
               <div 
-                className="bg-primary h-2 rounded-tag transition-all duration-1000 ease-out" 
+                className="bg-primary h-full rounded-tag transition-all duration-1000 ease-out relative overflow-hidden" 
                 style={{ width: `${completionPercentage}%` }}
-              ></div>
+              >
+                <div className="absolute inset-0 bg-white/20 w-full h-full animate-[shimmer_2s_infinite]" />
+              </div>
             </div>
           </div>
         </div>
+      </motion.div>
 
-        <div className="flex flex-col items-end gap-4">
-          <div className="flex gap-3">
-            <div className={`text-[13px] flex items-center justify-center font-heading font-bold px-4 py-2 rounded-tag border shadow-sm ${tierColor}`}>
-              Tier: {performanceTier}
-            </div>
-            <button 
-              onClick={() => signOut({ callbackUrl: "/" })}
-              className="px-6 py-2 bg-bg-main border border-border-default hover:bg-red-500/10 hover:border-red-500/20 hover:text-red-500 text-text-secondary text-[14px] font-heading font-bold rounded-btn transition-colors shadow-sm"
-            >
-              Sign Out
-            </button>
-          </div>
-          <Link 
-            href="/portal"
-            className="px-6 py-3 bg-text-heading hover:opacity-90 text-bg-main text-[14px] font-heading font-bold rounded-btn transition-opacity shadow-sm"
-          >
-            {lastAccessedModule ? "Resume Learning \u2192" : "Start Learning \u2192"}
-          </Link>
-          <span className="text-[13px] font-mono text-text-placeholder">
-            Last synced: {lastSynced.toLocaleTimeString()}
-          </span>
-        </div>
-      </div>
-
-      {error ? (
-        <div className="bg-accent-warning/10 border border-accent-warning text-accent-warning p-6 rounded-card text-center font-heading font-bold shadow-sm">
-          {error}
-        </div>
-      ) : (
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-8 flex-1 min-h-0">
-          
-          {/* Speed & Analytics Card */}
-          <div className="bg-bg-card p-8 rounded-card shadow-premium border border-transparent">
-            <h2 className="text-[22px] font-heading font-bold text-text-heading mb-6 flex items-center gap-3">
-              <span className="w-10 h-10 rounded-2xl bg-accent-info/10 flex items-center justify-center text-accent-info">⏱️</span>
-              Speed Analytics
+      {/* Main Content Grid */}
+      <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 flex-1 min-h-0">
+        
+        {/* Analytics Section */}
+        <motion.div 
+          initial={{ opacity: 0, x: -20 }}
+          animate={{ opacity: 1, x: 0 }}
+          transition={{ delay: 0.1 }}
+          className="lg:col-span-5 flex flex-col gap-6"
+        >
+          <div className="bg-bg-card p-8 rounded-[32px] shadow-premium border border-border-default">
+            <h2 className="text-[20px] font-heading font-extrabold text-text-heading mb-6 flex items-center gap-3">
+              <span className="w-10 h-10 rounded-2xl bg-accent-info/15 flex items-center justify-center text-accent-info text-xl">⚡</span>
+              Performance Metrics
             </h2>
             
             <div className="grid grid-cols-2 gap-4">
-              <div className="bg-bg-main p-5 rounded-[20px] border border-border-default">
-                <p className="text-[13px] text-text-secondary font-heading font-bold uppercase tracking-widest mb-2">Total Time</p>
-                <p className="text-[28px] font-mono font-bold text-text-heading tabular-nums">{formatTime(totalTimeSeconds)}</p>
-              </div>
-              <div className="bg-bg-main p-5 rounded-[20px] border border-border-default">
-                <p className="text-[13px] text-text-secondary font-heading font-bold uppercase tracking-widest mb-2">Avg. Finish</p>
-                <p className="text-[28px] font-mono font-bold text-text-heading tabular-nums">{formatTime(avgTimePerCompleted)}</p>
-              </div>
-              <div className="bg-bg-main p-5 rounded-[20px] border border-border-default">
-                <p className="text-[13px] text-text-secondary font-heading font-bold uppercase tracking-widest mb-2">Started</p>
-                <p className="text-[28px] font-mono font-bold text-text-heading tabular-nums">{startedModules.length} / {TOTAL_MODULES}</p>
-              </div>
-              <div className="bg-bg-main p-5 rounded-[20px] border border-border-default">
-                <p className="text-[13px] text-text-secondary font-heading font-bold uppercase tracking-widest mb-2">Finished</p>
-                <p className="text-[28px] font-mono font-bold text-text-heading tabular-nums">{completedModules.length} / {TOTAL_MODULES}</p>
-              </div>
-            </div>
-          </div>
-
-          {/* Module Master Status Card */}
-          <div className="bg-bg-card p-8 rounded-card shadow-premium border border-transparent flex flex-col min-h-0">
-            <h2 className="text-[22px] font-heading font-bold text-text-heading mb-6 flex items-center gap-3 shrink-0">
-              <span className="w-10 h-10 rounded-2xl bg-accent-success/10 flex items-center justify-center text-accent-success">📋</span>
-              Module Status
-            </h2>
-            
-            <div className="space-y-4 overflow-y-auto custom-scrollbar pr-4 flex-1 min-h-0">
-              {moduleStatusList.map((mod) => (
-                <Link href={`/learn?module=${mod.id}`} key={mod.id} className="block group">
-                  <div className="flex flex-col p-5 rounded-[20px] bg-bg-main border border-border-default gap-4 group-hover:border-primary transition-colors hover:shadow-md cursor-pointer">
-                    <div className="flex items-center justify-between">
-                    <div className="flex flex-col">
-                      <span className="font-heading font-bold text-[16px] text-text-heading tracking-wide">{mod.label}</span>
-                      <span className="text-[13px] font-mono text-text-secondary mt-1 tabular-nums">Time: {formatTime(mod.timeSpent)}</span>
-                    </div>
-                    
-                    {mod.status === "Completed" && (
-                      <span className="px-3 py-1 bg-accent-success/10 text-accent-success text-[13px] font-heading font-bold rounded-tag">Completed</span>
-                    )}
-                    {mod.status === "Started" && (
-                      <span className="px-3 py-1 bg-accent-warning/10 text-accent-warning text-[13px] font-heading font-bold rounded-tag tabular-nums">{mod.percentage}%</span>
-                    )}
-                    {mod.status === "Pending" && (
-                      <span className="px-3 py-1 bg-border-default text-text-secondary text-[13px] font-heading font-bold rounded-tag">Pending</span>
-                    )}
+              {[
+                { label: "Total Time", value: formatTime(totalTimeSeconds), icon: "⏳" },
+                { label: "Avg. Speed", value: formatTime(avgTimePerCompleted), icon: "⚡" },
+                { label: "In Progress", value: `${startedModules.length}`, icon: "🚧" },
+                { label: "Mastered", value: `${completedModules.length}`, icon: "🎯" }
+              ].map((metric, i) => (
+                <div key={i} className="bg-bg-main p-5 rounded-[20px] border border-border-default hover:border-primary/30 hover:shadow-md transition-all group">
+                  <div className="flex items-center gap-2 mb-2">
+                    <span className="opacity-70 group-hover:opacity-100 transition-opacity">{metric.icon}</span>
+                    <p className="text-[12px] text-text-secondary font-heading font-bold uppercase tracking-widest">{metric.label}</p>
                   </div>
-
-                  {/* Individual Module Progress Bar */}
-                  <div className="w-full bg-bg-card rounded-tag h-1.5 border border-border-default">
-                    <div 
-                      className={`h-1.5 rounded-tag transition-all duration-700 ease-out ${mod.status === 'Completed' ? 'bg-accent-success' : 'bg-accent-warning'}`}
-                      style={{ width: `${mod.percentage}%` }}
-                    ></div>
-                  </div>
-                  </div>
-                </Link>
+                  <p className="text-[26px] font-mono font-bold text-text-heading tabular-nums">{metric.value}</p>
+                </div>
               ))}
             </div>
           </div>
+
+          {/* Empty State / Motivational Card */}
+          {hasNoData && (
+            <div className="bg-gradient-to-br from-primary/10 to-accent-info/10 p-8 rounded-[32px] border border-primary/20 flex flex-col items-center text-center mt-auto">
+              <span className="text-5xl mb-4">🌱</span>
+              <h3 className="text-[18px] font-heading font-bold text-text-heading mb-2">Your Journey Begins</h3>
+              <p className="text-[14px] text-text-secondary font-body">
+                You haven't completed any modules yet. Head over to the Learning Hub and start with Arrays!
+              </p>
+            </div>
+          )}
+        </motion.div>
+
+        {/* Modules List Section */}
+        <motion.div 
+          initial={{ opacity: 0, x: 20 }}
+          animate={{ opacity: 1, x: 0 }}
+          transition={{ delay: 0.2 }}
+          className="lg:col-span-7 bg-bg-card p-8 rounded-[32px] shadow-premium border border-border-default flex flex-col min-h-0"
+        >
+          <div className="flex justify-between items-center mb-6 shrink-0">
+            <h2 className="text-[20px] font-heading font-extrabold text-text-heading flex items-center gap-3">
+              <span className="w-10 h-10 rounded-2xl bg-accent-success/15 flex items-center justify-center text-accent-success text-xl">📚</span>
+              Syllabus Tracker
+            </h2>
+            <span className="text-[13px] font-heading font-bold text-text-secondary bg-bg-main px-3 py-1.5 rounded-tag border border-border-default">
+              {completedModules.length} of {TOTAL_MODULES} Completed
+            </span>
+          </div>
           
-        </div>
-      )}
+          <div className="space-y-4 overflow-y-auto custom-scrollbar pr-2 pb-4">
+            {moduleStatusList.map((mod, index) => (
+              <motion.div
+                initial={{ opacity: 0, y: 10 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: 0.1 + index * 0.05 }}
+                key={mod.id}
+              >
+                <Link href={`/learn?module=${mod.id}`} className="block group">
+                  <div className="flex flex-col p-5 rounded-[20px] bg-bg-main border border-border-default gap-4 hover:border-primary hover:shadow-lg transition-all cursor-pointer relative overflow-hidden">
+                    
+                    {/* Hover Glow Effect */}
+                    <div className="absolute inset-0 bg-gradient-to-r from-primary/0 via-primary/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none" />
+
+                    <div className="flex items-center justify-between relative z-10">
+                      <div className="flex flex-col">
+                        <span className="font-heading font-bold text-[16px] text-text-heading tracking-wide group-hover:text-primary transition-colors">
+                          {mod.label}
+                        </span>
+                        <span className="text-[12px] font-mono text-text-placeholder mt-1 tabular-nums">
+                          Time spent: {formatTime(mod.timeSpent)}
+                        </span>
+                      </div>
+                      
+                      {mod.status === "Completed" && (
+                        <span className="px-3 py-1.5 bg-accent-success/15 text-accent-success text-[12px] font-heading font-bold rounded-tag flex items-center gap-1.5 border border-accent-success/20 shadow-sm">
+                          <span className="w-1.5 h-1.5 rounded-full bg-accent-success"></span> Completed
+                        </span>
+                      )}
+                      {mod.status === "Started" && (
+                        <span className="px-3 py-1.5 bg-accent-warning/15 text-accent-warning text-[12px] font-heading font-bold rounded-tag flex items-center gap-1.5 border border-accent-warning/20 shadow-sm tabular-nums">
+                          <span className="w-1.5 h-1.5 rounded-full bg-accent-warning animate-pulse"></span> {mod.percentage}%
+                        </span>
+                      )}
+                      {mod.status === "Pending" && (
+                        <span className="px-3 py-1.5 bg-bg-card border border-border-default text-text-placeholder text-[12px] font-heading font-bold rounded-tag shadow-sm">
+                          Not Started
+                        </span>
+                      )}
+                    </div>
+
+                    {/* Progress Bar */}
+                    <div className="w-full bg-bg-card rounded-tag h-2 border border-border-default/50 overflow-hidden relative z-10">
+                      <div 
+                        className={`h-full rounded-tag transition-all duration-700 ease-out ${
+                          mod.status === 'Completed' ? 'bg-accent-success' : 
+                          mod.status === 'Started' ? 'bg-accent-warning' : 'bg-transparent'
+                        }`}
+                        style={{ width: `${mod.percentage}%` }}
+                      ></div>
+                    </div>
+                  </div>
+                </Link>
+              </motion.div>
+            ))}
+          </div>
+        </motion.div>
+        
+      </div>
     </div>
   );
 };
