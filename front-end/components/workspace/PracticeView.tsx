@@ -1,19 +1,16 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import dynamic from "next/dynamic";
+import Editor from "@monaco-editor/react";
 
-const Editor = dynamic(() => import("@monaco-editor/react"), { 
-  ssr: false,
-  loading: () => (
-    <div className="h-full w-full flex items-center justify-center bg-bg-main text-text-placeholder">
-      <div className="flex flex-col items-center space-y-3">
-        <div className="w-8 h-8 border-4 border-primary/30 border-t-primary rounded-full animate-spin"></div>
-        <span className="text-sm font-mono font-medium">Initializing Monaco Engine...</span>
-      </div>
+const EditorLoading = () => (
+  <div className="h-full w-full flex items-center justify-center bg-bg-main text-text-placeholder">
+    <div className="flex flex-col items-center space-y-3">
+      <div className="w-8 h-8 border-4 border-primary/30 border-t-primary rounded-full animate-spin"></div>
+      <span className="text-sm font-mono font-medium">Initializing Editor Engine...</span>
     </div>
-  )
-});
+  </div>
+);
 
 // Mirroring the backend dataset for frontend rendering
 const QUESTIONS = [
@@ -169,6 +166,7 @@ export default function PracticeView() {
               value={code}
               onChange={(val) => setCode(val || "")}
               options={{ minimap: { enabled: false }, fontSize: 14, padding: { top: 16 } }}
+              loading={<EditorLoading />}
             />
           </div>
 
