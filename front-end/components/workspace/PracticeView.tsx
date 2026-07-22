@@ -191,7 +191,11 @@ export default function PracticeView() {
               
               {/* Status Header */}
               <div className={`px-4 py-2 font-bold text-white flex justify-between items-center ${result.status === 'Accepted' ? 'bg-accent-success' : result.status === 'Connection Error' ? 'bg-slate-500' : 'bg-rose-500'}`}>
-                <span className="flex items-center space-x-2">
+                <span 
+                  className="flex items-center space-x-2 cursor-pointer hover:opacity-80 transition-opacity" 
+                  onClick={() => setResult(null)}
+                  title="Click to close"
+                >
                   {result.status === 'Accepted' ? <span>✅</span> : result.status === 'Connection Error' ? <span>🔌</span> : <span>❌</span>}
                   <span>{result.status}</span>
                 </span>
