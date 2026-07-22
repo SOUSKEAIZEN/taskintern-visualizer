@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from "react";
 import Editor from "@monaco-editor/react";
+import { motion } from "framer-motion";
 
 const EditorLoading = () => (
   <div className="h-full w-full flex items-center justify-center bg-bg-main text-text-placeholder">
@@ -86,7 +87,12 @@ export default function PracticeView() {
   const currentTestcase = result?.testcases?.[activeTab];
 
   return (
-    <div className="flex flex-col h-full w-full bg-bg-main border border-border-default rounded-card overflow-hidden shadow-sm">
+    <motion.div 
+      initial={{ opacity: 0, y: 10 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ duration: 0.4, ease: "easeOut" }}
+      className="flex flex-col h-full w-full bg-bg-main border border-border-default rounded-card overflow-hidden shadow-card"
+    >
       {/* Header Toolbar */}
       <div className="flex items-center justify-between p-3 bg-bg-card border-b border-border-default shrink-0">
         <div className="flex items-center space-x-4">
@@ -133,10 +139,10 @@ export default function PracticeView() {
       </div>
 
       {/* Main 2-Pane Content Area */}
-      <div className="flex flex-1 overflow-hidden">
+      <div className="flex flex-col lg:flex-row flex-1 overflow-hidden">
         
         {/* Left Pane: Question Details */}
-        <div className="w-1/2 overflow-y-auto p-6 border-r border-border-default bg-bg-card flex flex-col">
+        <div className="w-full lg:w-1/2 overflow-y-auto p-6 border-b lg:border-b-0 lg:border-r border-border-default bg-bg-card flex flex-col min-h-[40vh] lg:min-h-0">
           <div className="flex items-center space-x-3 mb-4">
             <h1 className="text-2xl font-extrabold text-text-heading">{selectedQuestion.title}</h1>
             <span className={`px-2.5 py-1 text-xs font-bold uppercase rounded-full ${selectedQuestion.difficulty === 'Easy' ? 'bg-accent-success/10 text-accent-success' : 'bg-amber-100 text-amber-700'}`}>
@@ -156,7 +162,7 @@ export default function PracticeView() {
         </div>
         
         {/* Right Pane: Editor & Results */}
-        <div className="w-1/2 flex flex-col bg-bg-main relative">
+        <div className="w-full lg:w-1/2 flex flex-col bg-bg-main relative flex-1 min-h-[50vh] lg:min-h-0">
           {/* Editor Area */}
           <div className={`flex flex-col transition-all duration-300 ${result ? 'h-1/2' : 'h-full'}`}>
             <Editor
@@ -236,6 +242,6 @@ export default function PracticeView() {
           )}
         </div>
       </div>
-    </div>
+    </motion.div>
   );
 }

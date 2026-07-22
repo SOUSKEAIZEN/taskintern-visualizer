@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from "react";
 import Editor from "@monaco-editor/react";
+import { motion } from "framer-motion";
 
 const EditorLoading = () => (
   <div className="h-full w-full flex items-center justify-center bg-bg-main text-text-placeholder">
@@ -89,7 +90,12 @@ export default function CompilerView() {
   };
 
   return (
-    <div className="flex flex-col h-full w-full bg-bg-main border border-border-default rounded-card overflow-hidden shadow-sm">
+    <motion.div 
+      initial={{ opacity: 0, y: 10 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ duration: 0.4, ease: "easeOut" }}
+      className="flex flex-col h-full w-full bg-bg-main border border-border-default rounded-card overflow-hidden shadow-card"
+    >
       {/* Header Toolbar */}
       <div className="flex items-center justify-between p-3 bg-bg-card border-b border-border-default shrink-0">
         <h2 className="text-xl font-bold text-text-heading ml-2">Online Compiler</h2>
@@ -137,10 +143,10 @@ export default function CompilerView() {
         </div>
 
         {/* I/O Section (Bottom) */}
-        <div className="h-64 flex bg-bg-card border-t-2 border-border-default shadow-[0_-4px_6px_-1px_rgba(0,0,0,0.05)] z-10 shrink-0">
+        <div className="h-48 xl:h-64 flex flex-col md:flex-row bg-bg-card border-t-2 border-border-default shadow-[0_-4px_6px_-1px_rgba(0,0,0,0.05)] z-10 shrink-0">
           
           {/* Stdin (Left) */}
-          <div className="w-1/3 border-r border-border-default flex flex-col bg-bg-main">
+          <div className="w-full md:w-1/3 border-b md:border-b-0 md:border-r border-border-default flex flex-col bg-bg-main">
             <div className="px-4 py-2 bg-bg-card border-b border-border-default text-xs font-bold text-text-secondary uppercase flex items-center space-x-2">
               <span>⌨️</span><span>Input (stdin)</span>
             </div>
@@ -153,7 +159,7 @@ export default function CompilerView() {
           </div>
           
           {/* Output (Right) */}
-          <div className="w-2/3 flex flex-col bg-bg-card">
+          <div className="w-full md:w-2/3 flex flex-col bg-bg-card flex-1 min-h-0">
             <div className="px-4 py-2 bg-bg-card border-b border-border-default text-xs font-bold text-text-secondary uppercase flex justify-between items-center">
               <div className="flex items-center space-x-2">
                 <span>🖥️</span><span>Output Console</span>
@@ -174,6 +180,6 @@ export default function CompilerView() {
           </div>
         </div>
       </div>
-    </div>
+    </motion.div>
   );
 }
