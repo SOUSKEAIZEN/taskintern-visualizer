@@ -33,8 +33,7 @@ export default function LoginPage() {
       if (res?.error) {
         setError(res.error);
       } else {
-        router.push("/portal");
-        router.refresh();
+        window.location.href = "/portal";
       }
     } catch (err) {
       setError("An unexpected error occurred");
@@ -96,8 +95,7 @@ export default function LoginPage() {
           setError(signInRes.error);
           setLoading(false);
         } else {
-          router.push("/portal");
-          router.refresh();
+          window.location.href = "/portal";
         }
       }
     } catch (err) {
