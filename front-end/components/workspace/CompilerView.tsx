@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import Editor from "@monaco-editor/react";
+import dynamic from "next/dynamic";
 import { motion } from "framer-motion";
 
 const EditorLoading = () => (
@@ -12,6 +12,8 @@ const EditorLoading = () => (
     </div>
   </div>
 );
+
+const Editor = dynamic(() => import("@monaco-editor/react"), { ssr: false, loading: () => <EditorLoading /> });
 
 const SUPPORTED_LANGUAGES = [
   { id: "cpp", label: "C++ (GCC 20)" },
@@ -138,7 +140,6 @@ export default function CompilerView() {
             value={code}
             onChange={(val) => setCode(val || "")}
             options={{ minimap: { enabled: false }, fontSize: 14, padding: { top: 16 } }}
-            loading={<EditorLoading />}
           />
         </div>
 

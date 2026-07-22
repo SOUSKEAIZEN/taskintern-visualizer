@@ -56,7 +56,11 @@ export const runInDocker = async (
       try {
         await execAsync(compileCmd, { timeout: 10000 }); // 10s for compilation
       } catch (compileErr: any) {
-        return { stdout: "", stderr: compileErr.stderr || compileErr.message || "Compilation Error", executionTime: Date.now() - startTime };
+        let errMsg = compileErr.stderr || compileErr.message || "Compilation Error";
+        if (errMsg.includes("javac: command not found") || errMsg.includes("Unable to locate a Java Runtime")) {
+           errMsg = "Java compiler (javac) is not installed on the server environment. Please install the JDK.";
+        }
+        return { stdout: "", stderr: errMsg, executionTime: Date.now() - startTime };
       }
     }
 
