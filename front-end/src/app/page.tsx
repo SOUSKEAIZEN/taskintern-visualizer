@@ -154,7 +154,7 @@ export default function LoginPage() {
                 disabled={loading}
                 className="btn-primary w-full py-4 text-[16px] flex justify-center items-center"
               >
-                {loading ? "Signing in..." : "Sign In"}
+                {loading ? "Signing in..." : "Secure Sign In"}
               </button>
             </form>
           )}
