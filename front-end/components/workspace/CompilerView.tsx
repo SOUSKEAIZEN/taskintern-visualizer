@@ -5,7 +5,14 @@ import dynamic from "next/dynamic";
 
 const Editor = dynamic(() => import("@monaco-editor/react"), { 
   ssr: false,
-  loading: () => <div className="h-full flex items-center justify-center text-text-placeholder font-bold text-sm bg-bg-card animate-pulse">Loading Editor...</div>
+  loading: () => (
+    <div className="h-full w-full flex items-center justify-center bg-bg-main text-text-placeholder">
+      <div className="flex flex-col items-center space-y-3">
+        <div className="w-8 h-8 border-4 border-primary/30 border-t-primary rounded-full animate-spin"></div>
+        <span className="text-sm font-mono font-medium">Initializing Monaco Engine...</span>
+      </div>
+    </div>
+  )
 });
 
 const SUPPORTED_LANGUAGES = [

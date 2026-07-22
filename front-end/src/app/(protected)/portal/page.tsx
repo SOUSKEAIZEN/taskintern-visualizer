@@ -1,14 +1,10 @@
 import Link from "next/link";
-import { auth } from "../../auth";
+import { auth } from "../../../auth";
 import { redirect } from "next/navigation";
-import LogoutButton from "../../../components/LogoutButton";
+import LogoutButton from "../../../../components/LogoutButton";
 
 export default async function PortalPage() {
   const session = await auth();
-  
-  if (!session) {
-    redirect("/");
-  }
 
   return (
     <div className="h-full flex flex-col items-center justify-center p-8 gradient-hero relative overflow-hidden">

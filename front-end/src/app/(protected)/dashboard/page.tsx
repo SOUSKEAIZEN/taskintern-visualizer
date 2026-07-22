@@ -4,8 +4,8 @@
 import { useEffect, useState } from "react";
 import { getSession, signOut } from "next-auth/react";
 import Link from "next/link";
-import { logger } from "../../../lib/logger";
-import { fetchUserDashboardData } from "../../../lib/actions/progress";
+import { logger } from "../../../../lib/logger";
+import { fetchUserDashboardData } from "../../../../lib/actions/progress";
 
 // TypeScript interfaces mirroring our Prisma Schema
 interface QuizScore {
