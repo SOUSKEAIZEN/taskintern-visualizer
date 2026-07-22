@@ -44,21 +44,24 @@ export const runInDocker = async (
   fs.writeFileSync(path.join(runDir, fileName), code);
   fs.writeFileSync(path.join(runDir, "input.txt"), stdin);
 
-  let finalCmd = "";
-  if (compileCmd) {
-    finalCmd = `${compileCmd} && ${runCmd}`;
-  } else {
-    finalCmd = `${runCmd}`;
-  }
-
   const startTime = Date.now();
-  let actualTimeout = timeLimit * 1000 + 1000;
+  let actualTimeout = timeLimit * 1000;
   if (language === "java") {
-    actualTimeout += 12000; // JVM cold start penalty on free tier
+    actualTimeout += 2000; // JVM cold start penalty
   }
 
   try {
-    const { stdout, stderr } = await execAsync(finalCmd, { 
+    // 1. Compile Phase (if needed)
+    if (compileCmd) {
+      try {
+        await execAsync(compileCmd, { timeout: 10000 }); // 10s for compilation
+      } catch (compileErr: any) {
+        return { stdout: "", stderr: compileErr.stderr || compileErr.message || "Compilation Error", executionTime: Date.now() - startTime };
+      }
+    }
+
+    // 2. Execution Phase
+    const { stdout, stderr } = await execAsync(runCmd, { 
       timeout: actualTimeout
     });
     const executionTime = Date.now() - startTime;
