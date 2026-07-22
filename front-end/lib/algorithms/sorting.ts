@@ -19,26 +19,45 @@ export const generateBubbleSortSteps = (initialValues: number[]): AlgorithmStep<
   const history: AlgorithmStep<ArrayElement[]>[] = [];
   let currentArray: ArrayElement[] = initialValues.map((val) => ({ id: generateId(), value: val, state: "default" }));
 
-  history.push({ snapshot: cloneState(currentArray), description: "Starting Bubble Sort.", activeIds: [] });
+  let comparisons = 0;
+  let swaps = 0;
+  let currentPass = 1;
+
+  const getStats = () => ({
+    comparisons,
+    swaps,
+    currentPass,
+    timeComplexity: "O(n²)",
+    spaceComplexity: "O(1)"
+  });
+
+  history.push({ snapshot: cloneState(currentArray), description: "Starting Bubble Sort.", activeIds: [], stats: getStats() });
   const n = currentArray.length;
 
   for (let i = 0; i < n; i++) {
+    currentPass = i + 1;
     for (let j = 0; j < n - i - 1; j++) {
       currentArray[j].state = "comparing";
       currentArray[j + 1].state = "comparing";
+      comparisons++;
+      
       history.push({
         snapshot: cloneState(currentArray),
         description: `Comparing ${currentArray[j].value} and ${currentArray[j + 1].value}.`,
         activeIds: [currentArray[j].id, currentArray[j + 1].id],
+        stats: getStats()
       });
 
       if (currentArray[j].value > currentArray[j + 1].value) {
         currentArray[j].state = "swapping";
         currentArray[j + 1].state = "swapping";
+        swaps++;
+        
         history.push({
           snapshot: cloneState(currentArray),
           description: `${currentArray[j].value} > ${currentArray[j + 1].value}. Swapping!`,
           activeIds: [currentArray[j].id, currentArray[j + 1].id],
+          stats: getStats()
         });
 
         const temp = currentArray[j];
@@ -49,6 +68,7 @@ export const generateBubbleSortSteps = (initialValues: number[]): AlgorithmStep<
           snapshot: cloneState(currentArray),
           description: `Swapped ${currentArray[j].value} and ${currentArray[j + 1].value}.`,
           activeIds: [currentArray[j].id, currentArray[j + 1].id],
+          stats: getStats()
         });
       }
       currentArray[j].state = "default";
@@ -59,12 +79,13 @@ export const generateBubbleSortSteps = (initialValues: number[]): AlgorithmStep<
       snapshot: cloneState(currentArray),
       description: `${currentArray[n - i - 1].value} is locked in its final position.`,
       activeIds: [currentArray[n - i - 1].id],
+      stats: getStats()
     });
   }
 
   logger.info(`Algorithm Engine: Bubble Sort complete. Generated ${history.length} video frames.`);
   currentArray = currentArray.map(el => ({ ...el, state: "sorted" }));
-  history.push({ snapshot: cloneState(currentArray), description: "Array is fully sorted!", activeIds: [] });
+  history.push({ snapshot: cloneState(currentArray), description: "Array is fully sorted!", activeIds: [], stats: getStats() });
 
   return history;
 };
@@ -78,10 +99,23 @@ export const generateSelectionSortSteps = (initialValues: number[]): AlgorithmSt
   const history: AlgorithmStep<ArrayElement[]>[] = [];
   let currentArray: ArrayElement[] = initialValues.map((val) => ({ id: generateId(), value: val, state: "default" }));
 
-  history.push({ snapshot: cloneState(currentArray), description: "Starting Selection Sort.", activeIds: [] });
+  let comparisons = 0;
+  let swaps = 0;
+  let currentPass = 1;
+
+  const getStats = () => ({
+    comparisons,
+    swaps,
+    currentPass,
+    timeComplexity: "O(n²)",
+    spaceComplexity: "O(1)"
+  });
+
+  history.push({ snapshot: cloneState(currentArray), description: "Starting Selection Sort.", activeIds: [], stats: getStats() });
   const n = currentArray.length;
 
   for (let i = 0; i < n; i++) {
+    currentPass = i + 1;
     let minIdx = i;
     currentArray[minIdx].state = "active"; // Highlight the assumed minimum
     
@@ -89,14 +123,18 @@ export const generateSelectionSortSteps = (initialValues: number[]): AlgorithmSt
       snapshot: cloneState(currentArray),
       description: `Assuming ${currentArray[minIdx].value} is the minimum in the unsorted portion.`,
       activeIds: [currentArray[minIdx].id],
+      stats: getStats()
     });
 
     for (let j = i + 1; j < n; j++) {
       currentArray[j].state = "comparing";
+      comparisons++;
+      
       history.push({
         snapshot: cloneState(currentArray),
         description: `Comparing current min (${currentArray[minIdx].value}) with ${currentArray[j].value}.`,
         activeIds: [currentArray[minIdx].id, currentArray[j].id],
+        stats: getStats()
       });
 
       if (currentArray[j].value < currentArray[minIdx].value) {
@@ -108,6 +146,7 @@ export const generateSelectionSortSteps = (initialValues: number[]): AlgorithmSt
           snapshot: cloneState(currentArray),
           description: `Found a new minimum: ${currentArray[minIdx].value}.`,
           activeIds: [currentArray[minIdx].id],
+          stats: getStats()
         });
       } else {
         currentArray[j].state = "default"; // Reset if not a new minimum
@@ -117,10 +156,13 @@ export const generateSelectionSortSteps = (initialValues: number[]): AlgorithmSt
     if (minIdx !== i) {
       currentArray[i].state = "swapping";
       currentArray[minIdx].state = "swapping";
+      swaps++;
+      
       history.push({
         snapshot: cloneState(currentArray),
         description: `Swapping ${currentArray[i].value} with the minimum ${currentArray[minIdx].value}.`,
         activeIds: [currentArray[i].id, currentArray[minIdx].id],
+        stats: getStats()
       });
 
       const temp = currentArray[i];
@@ -136,12 +178,13 @@ export const generateSelectionSortSteps = (initialValues: number[]): AlgorithmSt
       snapshot: cloneState(currentArray),
       description: `${currentArray[i].value} is now in its correct sorted position.`,
       activeIds: [currentArray[i].id],
+      stats: getStats()
     });
   }
 
   logger.info(`Algorithm Engine: Selection Sort complete. Generated ${history.length} video frames.`);
   currentArray = currentArray.map(el => ({ ...el, state: "sorted" }));
-  history.push({ snapshot: cloneState(currentArray), description: "Array is fully sorted!", activeIds: [] });
+  history.push({ snapshot: cloneState(currentArray), description: "Array is fully sorted!", activeIds: [], stats: getStats() });
 
   return history;
 };
@@ -155,18 +198,31 @@ export const generateInsertionSortSteps = (initialValues: number[]): AlgorithmSt
   const history: AlgorithmStep<ArrayElement[]>[] = [];
   let currentArray: ArrayElement[] = initialValues.map((val) => ({ id: generateId(), value: val, state: "default" }));
 
-  history.push({ snapshot: cloneState(currentArray), description: "Starting Insertion Sort.", activeIds: [] });
+  let comparisons = 0;
+  let swaps = 0;
+  let currentPass = 1;
+
+  const getStats = () => ({
+    comparisons,
+    swaps,
+    currentPass,
+    timeComplexity: "O(n²)",
+    spaceComplexity: "O(1)"
+  });
+
+  history.push({ snapshot: cloneState(currentArray), description: "Starting Insertion Sort.", activeIds: [], stats: getStats() });
   const n = currentArray.length;
 
-  // The first element is conceptually "sorted" in a sub-array of 1
   currentArray[0].state = "sorted";
   history.push({
     snapshot: cloneState(currentArray),
     description: `The first element (${currentArray[0].value}) is considered trivially sorted.`,
     activeIds: [currentArray[0].id],
+    stats: getStats()
   });
 
   for (let i = 1; i < n; i++) {
+    currentPass = i;
     let j = i;
     
     currentArray[j].state = "active";
@@ -174,33 +230,47 @@ export const generateInsertionSortSteps = (initialValues: number[]): AlgorithmSt
       snapshot: cloneState(currentArray),
       description: `Evaluating ${currentArray[j].value} to insert into the sorted portion.`,
       activeIds: [currentArray[j].id],
+      stats: getStats()
     });
 
-    while (j > 0 && currentArray[j - 1].value > currentArray[j].value) {
-      currentArray[j].state = "swapping";
-      currentArray[j - 1].state = "swapping";
-      
-      history.push({
-        snapshot: cloneState(currentArray),
-        description: `${currentArray[j].value} is less than ${currentArray[j - 1].value}. Swapping backwards.`,
-        activeIds: [currentArray[j].id, currentArray[j - 1].id],
-      });
+    while (j > 0) {
+      comparisons++;
+      if (currentArray[j - 1].value > currentArray[j].value) {
+        currentArray[j].state = "swapping";
+        currentArray[j - 1].state = "swapping";
+        swaps++;
+        
+        history.push({
+          snapshot: cloneState(currentArray),
+          description: `${currentArray[j].value} is less than ${currentArray[j - 1].value}. Swapping backwards.`,
+          activeIds: [currentArray[j].id, currentArray[j - 1].id],
+          stats: getStats()
+        });
 
-      const temp = currentArray[j];
-      currentArray[j] = currentArray[j - 1];
-      currentArray[j - 1] = temp;
+        const temp = currentArray[j];
+        currentArray[j] = currentArray[j - 1];
+        currentArray[j - 1] = temp;
 
-      // Ensure the boundary keeps its conceptual sorted color temporarily while moving
-      currentArray[j].state = "sorted";
-      currentArray[j - 1].state = "active";
+        currentArray[j].state = "sorted";
+        currentArray[j - 1].state = "active";
 
-      history.push({
-        snapshot: cloneState(currentArray),
-        description: `Moved ${currentArray[j - 1].value} backwards.`,
-        activeIds: [currentArray[j - 1].id],
-      });
+        history.push({
+          snapshot: cloneState(currentArray),
+          description: `Moved ${currentArray[j - 1].value} backwards.`,
+          activeIds: [currentArray[j - 1].id],
+          stats: getStats()
+        });
 
-      j--;
+        j--;
+      } else {
+        history.push({
+          snapshot: cloneState(currentArray),
+          description: `${currentArray[j].value} >= ${currentArray[j - 1].value}. No more swaps needed.`,
+          activeIds: [currentArray[j].id, currentArray[j - 1].id],
+          stats: getStats()
+        });
+        break;
+      }
     }
 
     currentArray[j].state = "sorted";
@@ -208,12 +278,13 @@ export const generateInsertionSortSteps = (initialValues: number[]): AlgorithmSt
       snapshot: cloneState(currentArray),
       description: `${currentArray[j].value} has found its correct relative position.`,
       activeIds: [currentArray[j].id],
+      stats: getStats()
     });
   }
 
   logger.info(`Algorithm Engine: Insertion Sort complete. Generated ${history.length} video frames.`);
   currentArray = currentArray.map(el => ({ ...el, state: "sorted" }));
-  history.push({ snapshot: cloneState(currentArray), description: "Array is fully sorted!", activeIds: [] });
+  history.push({ snapshot: cloneState(currentArray), description: "Array is fully sorted!", activeIds: [], stats: getStats() });
 
   return history;
 };
@@ -227,7 +298,19 @@ export const generateMergeSortSteps = (initialValues: number[]): AlgorithmStep<A
   const history: AlgorithmStep<ArrayElement[]>[] = [];
   let currentArray: ArrayElement[] = initialValues.map((val) => ({ id: generateId(), value: val, state: "default" }));
 
-  history.push({ snapshot: cloneState(currentArray), description: "Starting Merge Sort.", activeIds: [] });
+  let comparisons = 0;
+  let swaps = 0; // Interpreted as array writes for Merge Sort
+  let currentPass = 0; // Interpreted as merge operations completed
+
+  const getStats = () => ({
+    comparisons,
+    swaps,
+    currentPass,
+    timeComplexity: "O(n log n)",
+    spaceComplexity: "O(n)"
+  });
+
+  history.push({ snapshot: cloneState(currentArray), description: "Starting Merge Sort.", activeIds: [], stats: getStats() });
 
   const mergeSortHelper = (arr: ArrayElement[], l: number, r: number) => {
     if (l >= r) return;
@@ -239,12 +322,14 @@ export const generateMergeSortSteps = (initialValues: number[]): AlgorithmStep<A
       snapshot: cloneState(currentArray),
       description: `Dividing array from index ${l} to ${r} into two halves.`,
       activeIds: arr.slice(l, r + 1).map(x => x.id),
+      stats: getStats()
     });
     for(let i = l; i <= r; i++) arr[i].state = "default";
 
     mergeSortHelper(arr, l, m);
     mergeSortHelper(arr, m + 1, r);
     merge(arr, l, m, r);
+    currentPass++;
   };
 
   const merge = (arr: ArrayElement[], l: number, m: number, r: number) => {
@@ -256,12 +341,16 @@ export const generateMergeSortSteps = (initialValues: number[]): AlgorithmStep<A
     while (i < left.length && j < right.length) {
       left[i].state = "comparing";
       right[j].state = "comparing";
+      comparisons++;
+      
       history.push({
         snapshot: cloneState(currentArray),
         description: `Comparing ${left[i].value} and ${right[j].value}.`,
         activeIds: [left[i].id, right[j].id],
+        stats: getStats()
       });
       
+      swaps++;
       if (left[i].value <= right[j].value) {
         arr[k] = { ...left[i], state: "swapping" };
         i++;
@@ -273,17 +362,20 @@ export const generateMergeSortSteps = (initialValues: number[]): AlgorithmStep<A
         snapshot: cloneState(currentArray),
         description: `Placed ${arr[k].value} into the merged array.`,
         activeIds: [arr[k].id],
+        stats: getStats()
       });
       arr[k].state = "default";
       k++;
     }
     
     while (i < left.length) {
+      swaps++;
       arr[k] = { ...left[i], state: "swapping" };
       history.push({
         snapshot: cloneState(currentArray),
         description: `Copying remaining element ${arr[k].value} from left half.`,
         activeIds: [arr[k].id],
+        stats: getStats()
       });
       arr[k].state = "default";
       i++;
@@ -291,11 +383,13 @@ export const generateMergeSortSteps = (initialValues: number[]): AlgorithmStep<A
     }
     
     while (j < right.length) {
+      swaps++;
       arr[k] = { ...right[j], state: "swapping" };
       history.push({
         snapshot: cloneState(currentArray),
         description: `Copying remaining element ${arr[k].value} from right half.`,
         activeIds: [arr[k].id],
+        stats: getStats()
       });
       arr[k].state = "default";
       j++;
@@ -307,6 +401,7 @@ export const generateMergeSortSteps = (initialValues: number[]): AlgorithmStep<A
       snapshot: cloneState(currentArray),
       description: `Merged subarray from index ${l} to ${r}.`,
       activeIds: arr.slice(l, r + 1).map(x => x.id),
+      stats: getStats()
     });
     for(let x = l; x <= r; x++) arr[x].state = "default";
   };
@@ -315,7 +410,7 @@ export const generateMergeSortSteps = (initialValues: number[]): AlgorithmStep<A
 
   logger.info(`Algorithm Engine: Merge Sort complete. Generated ${history.length} video frames.`);
   currentArray = currentArray.map(el => ({ ...el, state: "sorted" }));
-  history.push({ snapshot: cloneState(currentArray), description: "Array is fully sorted!", activeIds: [] });
+  history.push({ snapshot: cloneState(currentArray), description: "Array is fully sorted!", activeIds: [], stats: getStats() });
 
   return history;
 };
@@ -329,7 +424,19 @@ export const generateQuickSortSteps = (initialValues: number[]): AlgorithmStep<A
   const history: AlgorithmStep<ArrayElement[]>[] = [];
   let currentArray: ArrayElement[] = initialValues.map((val) => ({ id: generateId(), value: val, state: "default" }));
 
-  history.push({ snapshot: cloneState(currentArray), description: "Starting Quick Sort.", activeIds: [] });
+  let comparisons = 0;
+  let swaps = 0;
+  let currentPass = 0; // Interpreted as partitions completed
+
+  const getStats = () => ({
+    comparisons,
+    swaps,
+    currentPass,
+    timeComplexity: "O(n log n)",
+    spaceComplexity: "O(log n)"
+  });
+
+  history.push({ snapshot: cloneState(currentArray), description: "Starting Quick Sort.", activeIds: [], stats: getStats() });
 
   const partition = (arr: ArrayElement[], low: number, high: number): number => {
     const pivot = arr[high];
@@ -338,27 +445,33 @@ export const generateQuickSortSteps = (initialValues: number[]): AlgorithmStep<A
       snapshot: cloneState(currentArray),
       description: `Choosing ${pivot.value} as the pivot.`,
       activeIds: [pivot.id],
+      stats: getStats()
     });
 
     let i = low - 1;
 
     for (let j = low; j < high; j++) {
       arr[j].state = "comparing";
+      comparisons++;
+      
       history.push({
         snapshot: cloneState(currentArray),
         description: `Comparing ${arr[j].value} with pivot ${pivot.value}.`,
         activeIds: [arr[j].id, pivot.id],
+        stats: getStats()
       });
 
       if (arr[j].value < pivot.value) {
         i++;
         if (i !== j) {
+           swaps++;
            arr[i].state = "swapping";
            arr[j].state = "swapping";
            history.push({
              snapshot: cloneState(currentArray),
              description: `${arr[j].value} < ${pivot.value}. Swapping ${arr[i].value} and ${arr[j].value}.`,
              activeIds: [arr[i].id, arr[j].id],
+             stats: getStats()
            });
            const temp = arr[i];
            arr[i] = arr[j];
@@ -370,12 +483,14 @@ export const generateQuickSortSteps = (initialValues: number[]): AlgorithmStep<A
       arr[j].state = "default";
     }
 
+    swaps++;
     arr[i + 1].state = "swapping";
     pivot.state = "swapping";
     history.push({
       snapshot: cloneState(currentArray),
       description: `Moving pivot ${pivot.value} to its correct position. Swapping with ${arr[i + 1].value}.`,
       activeIds: [arr[i + 1].id, pivot.id],
+      stats: getStats()
     });
 
     const temp = arr[i + 1];
@@ -387,6 +502,7 @@ export const generateQuickSortSteps = (initialValues: number[]): AlgorithmStep<A
       snapshot: cloneState(currentArray),
       description: `Pivot ${arr[i + 1].value} is now in its sorted position.`,
       activeIds: [arr[i + 1].id],
+      stats: getStats()
     });
 
     return i + 1;
@@ -395,6 +511,7 @@ export const generateQuickSortSteps = (initialValues: number[]): AlgorithmStep<A
   const quickSortHelper = (arr: ArrayElement[], low: number, high: number) => {
     if (low < high) {
       const pi = partition(arr, low, high);
+      currentPass++;
       quickSortHelper(arr, low, pi - 1);
       quickSortHelper(arr, pi + 1, high);
     } else if (low === high) {
@@ -403,6 +520,7 @@ export const generateQuickSortSteps = (initialValues: number[]): AlgorithmStep<A
         snapshot: cloneState(currentArray),
         description: `Element ${arr[low].value} is sorted trivially.`,
         activeIds: [arr[low].id],
+        stats: getStats()
       });
     }
   };
@@ -411,7 +529,7 @@ export const generateQuickSortSteps = (initialValues: number[]): AlgorithmStep<A
 
   logger.info(`Algorithm Engine: Quick Sort complete. Generated ${history.length} video frames.`);
   currentArray = currentArray.map(el => ({ ...el, state: "sorted" }));
-  history.push({ snapshot: cloneState(currentArray), description: "Array is fully sorted!", activeIds: [] });
+  history.push({ snapshot: cloneState(currentArray), description: "Array is fully sorted!", activeIds: [], stats: getStats() });
 
   return history;
 };

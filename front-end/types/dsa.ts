@@ -41,6 +41,14 @@ export interface TreeNode {
 // Playback Engine Interfaces
 // ---------------------------------------------------------
 
+export interface AlgorithmStats {
+  comparisons: number;
+  swaps: number;
+  currentPass?: number;
+  timeComplexity?: string;
+  spaceComplexity?: string;
+}
+
 /**
  * Used to record every single step of an algorithm.
  * This allows the user to "Time Travel" (Play, Pause, Step Back, Step Forward).
@@ -50,6 +58,7 @@ export interface AlgorithmStep<T> {
   description: string; // Text explaining what is happening (e.g., "Comparing 24 and 45")
   activeIds: string[]; // The specific elements that are interacting right now
   logMessage?: string; // Point of failure tracking log (e.g., "Step 4: Checking if array[mid] === target")
+  stats?: AlgorithmStats; // Realtime statistics for the HUD
 }
 
 // ---------------------------------------------------------

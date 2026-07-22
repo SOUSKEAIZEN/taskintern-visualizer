@@ -203,15 +203,15 @@ export default function ArrayCanvas({ initialData = [45, 10, 24, 92, 7] }: Array
   const getStyleForState = (state?: string) => {
     switch (state) {
       case "comparing":
-        return "bg-amber-400 text-amber-900 border-amber-500 shadow-amber-200 scale-110 z-10";
+        return "bg-gradient-to-br from-amber-300 to-amber-500 text-amber-950 border-amber-400 shadow-lg shadow-amber-500/30 scale-110 z-10";
       case "swapping":
-        return "bg-rose-500 text-white border-rose-600 shadow-rose-200 scale-110 -rotate-6 z-10";
+        return "bg-gradient-to-br from-rose-400 to-rose-600 text-white border-rose-500 shadow-lg shadow-rose-500/40 scale-110 -rotate-6 z-10";
       case "active":
-        return "bg-purple-500 text-white border-purple-600 shadow-purple-200 scale-110 z-10 ring-4 ring-purple-100";
+        return "bg-gradient-to-br from-primary to-primary-hover text-white border-primary shadow-lg shadow-primary/30 scale-110 z-10 ring-4 ring-primary/20";
       case "sorted":
-        return "bg-accent-success text-white border-emerald-600 shadow-emerald-200";
+        return "bg-gradient-to-br from-emerald-400 to-emerald-600 text-white border-emerald-500 shadow-md shadow-emerald-500/20";
       default: 
-        return "bg-bg-card text-blue-700 border-blue-400 shadow-sm hover:border-blue-500";
+        return "bg-bg-card text-text-heading border-border-default shadow-sm hover:border-primary/50";
     }
   };
 
@@ -243,6 +243,33 @@ export default function ArrayCanvas({ initialData = [45, 10, 24, 92, 7] }: Array
           ))
         )}
       </div>
+
+      {/* Live Statistics HUD */}
+      {isPlaybackMode && history.length > 0 && history[currentFrame]?.stats && (
+        <div className="w-full max-w-4xl grid grid-cols-2 md:grid-cols-4 gap-4 animate-in fade-in slide-in-from-bottom-4">
+          <div className="bg-bg-card p-4 rounded-[20px] border border-border-default shadow-sm flex flex-col items-center justify-center relative overflow-hidden group">
+            <div className="absolute inset-0 bg-gradient-to-b from-primary/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity"></div>
+            <span className="text-[11px] uppercase tracking-widest font-bold text-text-placeholder mb-1 relative z-10">Pass / Step</span>
+            <span className="text-2xl font-mono font-bold text-primary relative z-10">{history[currentFrame].stats.currentPass || "-"}</span>
+          </div>
+          <div className="bg-bg-card p-4 rounded-[20px] border border-border-default shadow-sm flex flex-col items-center justify-center relative overflow-hidden group">
+            <div className="absolute inset-0 bg-gradient-to-b from-amber-500/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity"></div>
+            <span className="text-[11px] uppercase tracking-widest font-bold text-text-placeholder mb-1 relative z-10">Comparisons</span>
+            <span className="text-2xl font-mono font-bold text-amber-500 relative z-10">{history[currentFrame].stats.comparisons}</span>
+          </div>
+          <div className="bg-bg-card p-4 rounded-[20px] border border-border-default shadow-sm flex flex-col items-center justify-center relative overflow-hidden group">
+            <div className="absolute inset-0 bg-gradient-to-b from-rose-500/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity"></div>
+            <span className="text-[11px] uppercase tracking-widest font-bold text-text-placeholder mb-1 relative z-10">Swaps / Writes</span>
+            <span className="text-2xl font-mono font-bold text-rose-500 relative z-10">{history[currentFrame].stats.swaps}</span>
+          </div>
+          <div className="bg-bg-card p-4 rounded-[20px] border border-border-default shadow-sm flex flex-col items-center justify-center relative overflow-hidden group">
+            <div className="absolute inset-0 bg-gradient-to-b from-accent-info/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity"></div>
+            <span className="text-[11px] uppercase tracking-widest font-bold text-text-placeholder mb-1 relative z-10">Complexity</span>
+            <span className="text-[13px] font-mono font-bold text-accent-info mt-1 relative z-10">Time: {history[currentFrame].stats.timeComplexity}</span>
+            <span className="text-[13px] font-mono font-bold text-text-secondary relative z-10">Space: {history[currentFrame].stats.spaceComplexity}</span>
+          </div>
+        </div>
+      )}
 
       {/* Dynamic Control Panel */}
       {!isPlaybackMode ? (
