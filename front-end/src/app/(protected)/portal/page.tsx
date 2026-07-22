@@ -16,7 +16,7 @@ export default async function PortalPage() {
 
       <div className="z-10 text-center mb-16 animate-in fade-in slide-in-from-bottom-4 duration-700">
         <h1 className="text-[56px] font-heading font-extrabold text-text-heading tracking-tight mb-4 leading-tight">
-          Welcome back, {session.user?.name || "Developer"}
+          Welcome back, {session?.user?.name || "Developer"}
         </h1>
         <p className="text-[16px] text-text-secondary font-body max-w-2xl mx-auto tracking-wide">
           Choose your module. Do you want to visualize data structures or test your skills in the compiler?
