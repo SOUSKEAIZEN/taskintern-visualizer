@@ -1,7 +1,12 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import Editor from "@monaco-editor/react";
+import dynamic from "next/dynamic";
+
+const Editor = dynamic(() => import("@monaco-editor/react"), { 
+  ssr: false,
+  loading: () => <div className="h-full flex items-center justify-center text-text-placeholder font-bold text-sm bg-bg-card animate-pulse">Loading Editor...</div>
+});
 
 const SUPPORTED_LANGUAGES = [
   { id: "cpp", label: "C++ (GCC 20)" },
