@@ -31,7 +31,7 @@ export const runInDocker = async (
     runCmd = `python3 ${path.join(runDir, fileName)} < ${path.join(runDir, "input.txt")}`;
   } else if (language === "cpp") {
     fileName = "main.cpp";
-    compileCmd = `g++ -O2 -std=c++20 ${path.join(runDir, fileName)} -o ${path.join(runDir, "a.out")}`;
+    compileCmd = `g++ -std=c++20 ${path.join(runDir, fileName)} -o ${path.join(runDir, "a.out")}`;
     runCmd = `${path.join(runDir, "a.out")} < ${path.join(runDir, "input.txt")}`;
   } else if (language === "java") {
     fileName = "Main.java";
@@ -60,18 +60,19 @@ export const runInDocker = async (
         if (errMsg.includes("javac: command not found") || errMsg.includes("Unable to locate a Java Runtime")) {
            errMsg = "Java compiler (javac) is not installed on the server environment. Please install the JDK.";
         }
-        return { stdout: "", stderr: errMsg, executionTime: Date.now() - startTime };
+        return { stdout: "", stderr: errMsg, executionTime: 0 };
       }
     }
 
     // 2. Execution Phase
+    const execStartTime = Date.now();
     const { stdout, stderr } = await execAsync(runCmd, { 
       timeout: actualTimeout
     });
-    const executionTime = Date.now() - startTime;
+    const executionTime = Date.now() - execStartTime;
     return { stdout, stderr, executionTime };
   } catch (err: any) {
-    const executionTime = Date.now() - startTime;
+    const executionTime = 0;
     let errorMsg = err.stderr || err.message;
     if (err.killed) {
       errorMsg = "Time Limit Exceeded";

@@ -195,7 +195,16 @@ export default function PracticeView() {
                   {result.status === 'Accepted' ? <span>✅</span> : result.status === 'Connection Error' ? <span>🔌</span> : <span>❌</span>}
                   <span>{result.status}</span>
                 </span>
-                {result.total !== undefined && <span>{result.passed} / {result.total} Testcases Passed</span>}
+                <div className="flex items-center space-x-4">
+                  {result.total !== undefined && <span>{result.passed} / {result.total} Testcases Passed</span>}
+                  <button 
+                    onClick={() => setResult(null)} 
+                    className="hover:text-slate-200 transition-colors p-1" 
+                    title="Close Results"
+                  >
+                    ✕
+                  </button>
+                </div>
               </div>
 
               {/* Testcase Tabs */}
