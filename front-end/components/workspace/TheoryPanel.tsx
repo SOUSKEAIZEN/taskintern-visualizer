@@ -185,18 +185,40 @@ export default function TheoryPanel({ topicId = "arrays" }: { topicId?: string }
       <hr className="border-border-default mb-8" />
 
       {/* Dynamic Text Sections */}
-      <div className="space-y-8 mb-12">
-        {data.sections.map((section) => (
-          <section key={section.id} className="animate-in fade-in slide-in-from-bottom-4 duration-500">
-            <h2 className="text-2xl font-bold text-text-heading mb-3 flex items-center">
-              <span className="w-1.5 h-6 bg-primary rounded-full mr-3"></span>
-              {section.title}
-            </h2>
-            <div className="text-text-secondary leading-relaxed">
-              {renderFormattedText(section.content)}
-            </div>
-          </section>
-        ))}
+      <div className="space-y-6 mb-12">
+        {data.sections.map((section) => {
+          const lowerTitle = section.title.toLowerCase();
+          let bgClass = "bg-bg-main border-border-default";
+          let icon = "📘";
+          
+          if (lowerTitle.includes("concept") || lowerTitle.includes("definition")) {
+            bgClass = "bg-primary/5 border-primary/20";
+            icon = "💡";
+          } else if (lowerTitle.includes("example") || lowerTitle.includes("application")) {
+            bgClass = "bg-accent-success/5 border-accent-success/20";
+            icon = "🛠️";
+          } else if (lowerTitle.includes("code") || lowerTitle.includes("implementation")) {
+            bgClass = "bg-slate-900 border-slate-700 text-slate-300";
+            icon = "💻";
+          } else if (lowerTitle.includes("tip") || lowerTitle.includes("note")) {
+            bgClass = "bg-accent-warning/5 border-accent-warning/20";
+            icon = "📝";
+          } else if (lowerTitle.includes("warning") || lowerTitle.includes("caution")) {
+            bgClass = "bg-accent-error/5 border-accent-error/20";
+            icon = "⚠️";
+          }
+
+          return (
+            <section key={section.id} className={`animate-in fade-in slide-in-from-bottom-4 duration-500 p-6 rounded-card border shadow-sm ${bgClass}`}>
+              <h2 className={`text-[18px] font-heading font-extrabold mb-3 flex items-center gap-2 ${lowerTitle.includes("code") ? "text-white" : "text-text-heading"}`}>
+                <span>{icon}</span> {section.title}
+              </h2>
+              <div className={`leading-relaxed ${lowerTitle.includes("code") ? "text-slate-300" : "text-text-secondary"}`}>
+                {renderFormattedText(section.content)}
+              </div>
+            </section>
+          );
+        })}
       </div>
 
       {/* Graphic Design: Time Complexity Table */}

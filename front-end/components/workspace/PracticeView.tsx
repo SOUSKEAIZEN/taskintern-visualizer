@@ -144,11 +144,20 @@ export default function PracticeView() {
         
         {/* Left Pane: Question Details */}
         <div className="w-full lg:w-1/2 overflow-y-auto p-6 border-b lg:border-b-0 lg:border-r border-border-default bg-bg-card flex flex-col min-h-[40vh] lg:min-h-0">
-          <div className="flex items-center space-x-3 mb-4">
-            <h1 className="text-2xl font-extrabold text-text-heading">{selectedQuestion.title}</h1>
-            <span className={`px-2.5 py-1 text-xs font-bold uppercase rounded-full ${selectedQuestion.difficulty === 'Easy' ? 'bg-accent-success/10 text-accent-success' : 'bg-amber-100 text-amber-700'}`}>
-              {selectedQuestion.difficulty}
-            </span>
+          <div className="flex flex-wrap items-center gap-3 mb-6">
+            <h1 className="text-[22px] lg:text-[28px] font-heading font-extrabold text-text-heading tracking-tight">{selectedQuestion.title}</h1>
+            <div className="flex items-center gap-2">
+              <span className={`px-3 py-1 text-[11px] font-bold uppercase tracking-widest rounded-full border ${
+                selectedQuestion.difficulty === 'Easy' ? 'bg-emerald-500/10 text-emerald-500 border-emerald-500/20 shadow-[0_0_10px_rgba(16,185,129,0.1)]' : 
+                selectedQuestion.difficulty === 'Medium' ? 'bg-amber-500/10 text-amber-500 border-amber-500/20 shadow-[0_0_10px_rgba(245,158,11,0.1)]' :
+                'bg-rose-500/10 text-rose-500 border-rose-500/20 shadow-[0_0_10px_rgba(244,63,94,0.1)]'
+              }`}>
+                {selectedQuestion.difficulty}
+              </span>
+              <span className="px-3 py-1 text-[11px] font-bold uppercase tracking-widest rounded-full bg-primary/10 text-primary border border-primary/20 shadow-[0_0_10px_rgba(59,130,246,0.1)]">
+                {selectedQuestion.category}
+              </span>
+            </div>
           </div>
           
           <div className="prose prose-slate max-w-none">

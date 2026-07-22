@@ -58,16 +58,28 @@ export default function Sidebar({ mode }: SidebarProps) {
         </svg>
       </button>
 
-      <nav className={`flex-1 space-y-1 text-[14px] font-heading font-bold pt-4 overflow-y-auto overflow-x-hidden custom-scrollbar ${isCollapsed ? 'px-2' : 'px-4'}`}>
+      <nav className={`flex-1 space-y-2 text-[14px] font-heading font-bold pt-4 overflow-y-auto overflow-x-hidden custom-scrollbar ${isCollapsed ? 'px-2' : 'px-4'}`}>
         <AnimatePresence>
           {!isCollapsed && (
             <motion.div 
               initial={{ opacity: 0, height: 0 }}
               animate={{ opacity: 1, height: "auto" }}
               exit={{ opacity: 0, height: 0 }}
-              className="text-[12px] font-heading font-extrabold text-text-placeholder uppercase tracking-widest mb-4 mt-2 px-2 whitespace-nowrap"
+              className="mb-6 mt-2"
             >
-              {mode === "learn" ? "Learning Modules" : "Practice Hub"}
+              {/* Search Bar */}
+              <div className="relative mb-6">
+                <span className="absolute left-3 top-1/2 -translate-y-1/2 text-text-muted">🔍</span>
+                <input 
+                  type="text"
+                  placeholder="Search modules..."
+                  className="w-full bg-bg-main border border-border-default rounded-input py-2 pl-9 pr-3 text-[13px] font-body text-text-heading placeholder:text-text-placeholder focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary transition-all shadow-sm"
+                />
+              </div>
+
+              <div className="text-[12px] font-heading font-extrabold text-text-placeholder uppercase tracking-widest px-2 whitespace-nowrap">
+                {mode === "learn" ? "Learning Modules" : "Practice Hub"}
+              </div>
             </motion.div>
           )}
         </AnimatePresence>
@@ -79,22 +91,30 @@ export default function Sidebar({ mode }: SidebarProps) {
               key={mod.id} 
               href={`${basePath}?module=${mod.id}`}
               onClick={() => logger.info(`UI Interaction: User navigated to module [${mod.id}]`)}
-              className="block"
+              className="block relative"
             >
+              {isActive && (
+                <motion.div 
+                  layoutId="activeIndicator"
+                  className="absolute left-0 top-0 bottom-0 w-1 bg-primary rounded-r-full"
+                  initial={false}
+                  transition={{ type: "spring", stiffness: 300, damping: 30 }}
+                />
+              )}
               <div 
-                className={`flex items-center rounded-btn cursor-pointer transition-all duration-200 group ${
-                  isCollapsed ? "justify-center p-3 mb-2" : "p-3 mb-1 space-x-3"
-                } ${isActive ? 'bg-primary text-white shadow-md shadow-primary/20' : 'hover:bg-primary-soft hover:text-primary text-text-secondary border border-transparent'}`}
+                className={`flex items-center rounded-btn cursor-pointer transition-all duration-300 group ${
+                  isCollapsed ? "justify-center p-3 mb-2" : "p-3.5 mb-2 ml-2 space-x-3"
+                } ${isActive ? 'bg-primary-soft text-primary shadow-sm border border-primary/20' : 'hover:bg-primary-soft/50 hover:text-primary text-text-secondary border border-transparent'}`}
                 title={isCollapsed ? mod.label : ""}
               >
-                <span className="text-xl group-hover:scale-110 transition-transform block">{mod.icon}</span>
+                <span className={`text-xl transition-all duration-300 block ${isActive ? 'scale-110' : 'group-hover:scale-110 group-hover:-rotate-3'}`}>{mod.icon}</span>
                 <AnimatePresence>
                   {!isCollapsed && (
                     <motion.span 
                       initial={{ opacity: 0, x: -10 }}
                       animate={{ opacity: 1, x: 0 }}
                       exit={{ opacity: 0, x: -10 }}
-                      className="whitespace-nowrap tracking-wide block flex-1"
+                      className={`whitespace-nowrap tracking-wide block flex-1 ${isActive ? 'font-extrabold' : ''}`}
                     >
                       {mod.label}
                     </motion.span>

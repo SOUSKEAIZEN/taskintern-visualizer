@@ -203,15 +203,15 @@ export default function ArrayCanvas({ initialData = [45, 10, 24, 92, 7] }: Array
   const getStyleForState = (state?: string) => {
     switch (state) {
       case "comparing":
-        return "bg-gradient-to-br from-amber-300 to-amber-500 text-amber-950 border-amber-400 shadow-lg shadow-amber-500/30 scale-110 z-10";
+        return "bg-gradient-to-br from-orange-400 to-orange-500 text-white border-orange-400 shadow-lg shadow-orange-500/30 scale-110 z-10";
       case "swapping":
-        return "bg-gradient-to-br from-rose-400 to-rose-600 text-white border-rose-500 shadow-lg shadow-rose-500/40 scale-110 -rotate-6 z-10";
+        return "bg-gradient-to-br from-green-400 to-green-600 text-white border-green-500 shadow-lg shadow-green-500/40 scale-110 -rotate-6 z-10";
       case "active":
-        return "bg-gradient-to-br from-primary to-primary-hover text-white border-primary shadow-lg shadow-primary/30 scale-110 z-10 ring-4 ring-primary/20";
+        return "bg-gradient-to-br from-blue-500 to-blue-600 text-white border-blue-500 shadow-lg shadow-blue-500/30 scale-110 z-10 ring-4 ring-blue-500/20";
       case "sorted":
-        return "bg-gradient-to-br from-emerald-400 to-emerald-600 text-white border-emerald-500 shadow-md shadow-emerald-500/20";
+        return "bg-gradient-to-br from-purple-500 to-purple-600 text-white border-purple-500 shadow-md shadow-purple-500/20";
       default: 
-        return "bg-bg-card text-text-heading border-border-default shadow-sm hover:border-primary/50";
+        return "bg-slate-100 dark:bg-slate-800 text-slate-500 dark:text-slate-400 border-slate-300 dark:border-slate-700 shadow-sm";
     }
   };
 

@@ -130,55 +130,93 @@ export default function CompilerView() {
         </div>
       </div>
 
-      <div className="flex flex-col flex-1 overflow-hidden relative">
-        {/* Editor Section (Top) */}
-        <div className="flex-1 min-h-[50%]">
-          <Editor
-            height="100%"
-            language={language}
-            theme={editorTheme}
-            value={code}
-            onChange={(val) => setCode(val || "")}
-            options={{ minimap: { enabled: false }, fontSize: 14, padding: { top: 16 } }}
-          />
+      <div className="flex flex-1 overflow-hidden relative">
+        {/* Fake File Explorer Sidebar */}
+        <div className="w-48 bg-bg-sidebar border-r border-border-default hidden md:flex flex-col z-10 shadow-sm shrink-0">
+          <div className="px-4 py-3 text-[11px] font-heading font-bold text-text-placeholder uppercase tracking-widest border-b border-border-default">
+            Explorer
+          </div>
+          <div className="p-2 flex flex-col space-y-1">
+            {SUPPORTED_LANGUAGES.map(lang => (
+              <div 
+                key={lang.id} 
+                onClick={() => {
+                  setLanguage(lang.id);
+                  setCode(DEFAULT_CODE[lang.id]);
+                }}
+                className={`flex items-center px-3 py-1.5 rounded-tag cursor-pointer text-[13px] font-mono transition-colors ${language === lang.id ? 'bg-primary/10 text-primary font-bold' : 'text-text-secondary hover:bg-bg-main'}`}
+              >
+                <span className="mr-2 opacity-60">📄</span>
+                main.{lang.id === 'python' ? 'py' : lang.id}
+              </div>
+            ))}
+          </div>
         </div>
 
-        {/* I/O Section (Bottom) */}
-        <div className="h-48 xl:h-64 flex flex-col md:flex-row bg-bg-card border-t-2 border-border-default shadow-[0_-4px_6px_-1px_rgba(0,0,0,0.05)] z-10 shrink-0">
-          
-          {/* Stdin (Left) */}
-          <div className="w-full md:w-1/3 border-b md:border-b-0 md:border-r border-border-default flex flex-col bg-bg-main">
-            <div className="px-4 py-2 bg-bg-card border-b border-border-default text-xs font-bold text-text-secondary uppercase flex items-center space-x-2">
-              <span>⌨️</span><span>Input (stdin)</span>
+        {/* Editor Area */}
+        <div className="flex flex-col flex-1 overflow-hidden relative bg-[#1e1e1e]">
+          {/* Fake Tabs */}
+          <div className="flex items-center bg-bg-main border-b border-border-default h-10 shrink-0 shadow-sm">
+            <div className="flex items-center px-4 h-full bg-bg-card border-r border-border-default border-t-2 border-t-primary text-text-heading text-[13px] font-mono font-bold cursor-default shadow-[0_2px_4px_rgba(0,0,0,0.02)] relative z-10">
+              <span className="mr-2 opacity-60">📄</span>
+              main.{language === 'python' ? 'py' : language}
             </div>
-            <textarea
-              className="flex-1 w-full p-4 resize-none outline-none font-mono text-sm text-text-heading bg-transparent"
-              placeholder="Enter input here..."
-              value={stdin}
-              onChange={(e) => setStdin(e.target.value)}
+          </div>
+          <div className="flex-1 w-full relative">
+            <Editor
+              height="100%"
+              language={language}
+              theme={editorTheme}
+              value={code}
+              onChange={(val) => setCode(val || "")}
+              options={{ 
+                minimap: { enabled: false }, 
+                fontSize: 14, 
+                padding: { top: 16 },
+                cursorBlinking: "smooth",
+                smoothScrolling: true,
+                cursorSmoothCaretAnimation: "on"
+              }}
             />
           </div>
-          
-          {/* Output (Right) */}
-          <div className="w-full md:w-2/3 flex flex-col bg-bg-card flex-1 min-h-0">
-            <div className="px-4 py-2 bg-bg-card border-b border-border-default text-xs font-bold text-text-secondary uppercase flex justify-between items-center">
-              <div className="flex items-center space-x-2">
-                <span>🖥️</span><span>Output Console</span>
-              </div>
-              <button onClick={handleClear} className="text-text-placeholder hover:text-rose-500 transition-colors">Clear</button>
-            </div>
-            <div className="flex-1 overflow-auto p-4 font-mono text-sm whitespace-pre-wrap custom-scrollbar">
-              {stdout && <div className="text-accent-success bg-accent-success/10 p-3 rounded-btn border border-emerald-100 mb-2">{stdout}</div>}
-              {stderr && <div className="text-rose-700 bg-rose-50 p-3 rounded-btn border border-rose-100">{stderr}</div>}
-              {!stdout && !stderr && <div className="text-text-placeholder italic flex items-center justify-center h-full">No output yet...</div>}
-            </div>
-            {executionTime !== null && (
-              <div className="px-4 py-2 bg-bg-main border-t border-border-default text-xs font-bold text-text-secondary flex justify-between">
-                <span>Execution Time: {executionTime}ms</span>
-                <span>Limits: 3.0s, 256MB</span>
-              </div>
-            )}
+        </div>
+      </div>
+
+      {/* I/O Section (Bottom) */}
+      <div className="h-48 xl:h-64 flex flex-col md:flex-row bg-bg-card border-t border-border-default shadow-[0_-4px_6px_-1px_rgba(0,0,0,0.05)] z-10 shrink-0">
+        
+        {/* Stdin (Left) */}
+        <div className="w-full md:w-1/3 border-b md:border-b-0 md:border-r border-border-default flex flex-col bg-bg-main">
+          <div className="px-4 py-2 bg-bg-card border-b border-border-default text-xs font-bold text-text-secondary uppercase flex items-center space-x-2">
+            <span>⌨️</span><span>Input (stdin)</span>
           </div>
+          <textarea
+            className="flex-1 w-full p-4 resize-none outline-none font-mono text-sm text-text-heading bg-transparent transition-colors focus:bg-white dark:focus:bg-[#0b0f19] shadow-inner"
+            placeholder="Enter input here..."
+            value={stdin}
+            onChange={(e) => setStdin(e.target.value)}
+          />
+        </div>
+        
+        {/* Output (Right) Terminal Style */}
+        <div className="w-full md:w-2/3 flex flex-col bg-slate-900 flex-1 min-h-0 border-l border-slate-800 shadow-inner relative">
+          <div className="px-4 py-2 bg-slate-950 border-b border-slate-800 text-xs font-bold text-slate-400 uppercase flex justify-between items-center shadow-sm">
+            <div className="flex items-center space-x-2">
+              <span>🖥️</span><span>Terminal Output</span>
+            </div>
+            <button onClick={handleClear} className="text-slate-500 hover:text-white transition-colors">Clear</button>
+          </div>
+          <div className="flex-1 overflow-auto p-4 font-mono text-[13px] whitespace-pre-wrap custom-scrollbar">
+            {stdout && <div className="text-emerald-400">{stdout}</div>}
+            {stderr && <div className="text-rose-400">{stderr}</div>}
+            {!stdout && !stderr && <div className="text-slate-600 flex items-center h-full">user@taskintern:~$ _</div>}
+          </div>
+          {executionTime !== null && (
+            <div className="px-4 py-1.5 bg-slate-950 border-t border-slate-800 text-[11px] font-bold text-slate-500 flex justify-between uppercase tracking-widest">
+              <span>Time: {executionTime}ms</span>
+              <span>Memory: 256MB</span>
+            </div>
+          )}
         </div>
       </div>
     </motion.div>

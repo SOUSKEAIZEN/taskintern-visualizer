@@ -234,56 +234,55 @@ const DashboardPage = () => {
       <motion.div 
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
-        className="relative overflow-hidden rounded-[32px] bg-bg-card border border-border-default shadow-premium p-8 md:p-12 shrink-0 flex flex-col md:flex-row justify-between items-start md:items-center gap-8"
+        className="relative overflow-hidden rounded-[32px] bg-bg-card border border-border-default shadow-premium p-8 md:p-12 shrink-0 flex flex-col gap-8"
       >
-        {/* Background Decorative Gradient */}
-        <div className="absolute top-0 left-0 w-full h-full bg-gradient-to-br from-primary/10 via-transparent to-accent-info/5 pointer-events-none" />
+        <div className="absolute top-0 left-0 w-full h-full bg-gradient-to-br from-primary/5 via-transparent to-accent-info/5 pointer-events-none" />
         
-        <div className="relative z-10 flex-1">
-          <div className="flex items-center gap-3 mb-3">
-            <h1 className="text-[36px] md:text-[48px] font-heading font-extrabold text-text-heading tracking-tight leading-tight">
-              Welcome back, {userName}
+        <div className="relative z-10 flex flex-col md:flex-row justify-between items-start md:items-center gap-8 border-b border-border-default pb-8">
+          <div>
+            <h1 className="text-[36px] md:text-[48px] font-heading font-extrabold text-text-heading tracking-tight leading-tight mb-2">
+              👋 Welcome Back, {userName}
             </h1>
-            <span className="text-[12px] font-heading font-bold bg-accent-success/15 text-accent-success px-3 py-1 rounded-tag animate-pulse shadow-sm">
-              Live Sync
-            </span>
+            <p className="text-[18px] text-text-secondary font-body">
+              Continue where you left off.
+            </p>
           </div>
-          <p className="text-[16px] text-text-secondary font-body mb-8 max-w-xl leading-relaxed">
-            Ready to conquer your next algorithm? Pick up where you left off or dive into a new topic to keep your streak alive.
-          </p>
           
-          <div className="flex flex-wrap gap-4">
-            <Link 
-              href={`/learn?module=${recommendedModule.id}`}
-              className="px-8 py-3.5 bg-primary hover:bg-primary-hover text-white text-[15px] font-heading font-bold rounded-btn transition-colors shadow-lg shadow-primary/30 flex items-center gap-2"
-            >
-              <span>🚀</span> Continue: {recommendedModule.label}
-            </Link>
-          </div>
+          <Link 
+            href={`/learn?module=${recommendedModule.id}`}
+            className="btn-primary py-4 px-8 shadow-lg hover:shadow-xl text-[16px]"
+          >
+            🚀 Continue Learning
+          </Link>
         </div>
 
-        {/* Hero Right Metrics */}
-        <div className="relative z-10 flex flex-col items-end gap-5 bg-bg-main/50 backdrop-blur-sm p-6 rounded-[24px] border border-border-default shadow-inner">
-          <div className="flex flex-col items-end">
-            <span className="text-[13px] font-heading font-bold text-text-placeholder uppercase tracking-widest mb-1">Current Tier</span>
-            <div className={`text-[15px] flex items-center justify-center font-heading font-extrabold px-5 py-2.5 rounded-tag border shadow-sm ${tierColor}`}>
-              🏆 {performanceTier}
-            </div>
+        {/* Hero Stats Grid */}
+        <div className="relative z-10 grid grid-cols-2 md:grid-cols-4 gap-6">
+          <div className="card-hoverable p-6 bg-bg-main">
+            <p className="text-[13px] font-heading font-bold text-text-secondary uppercase tracking-wider mb-2 flex items-center gap-2">
+              <span className="text-primary">📚</span> Algorithms Completed
+            </p>
+            <p className="text-[32px] font-mono font-extrabold text-text-heading">{completedModules.length}</p>
           </div>
-          
-          <div className="w-full min-w-[240px]">
-            <div className="flex justify-between text-[13px] mb-2">
-              <span className="font-heading font-bold text-text-secondary">Course Progress</span>
-              <span className="font-heading font-extrabold text-primary tabular-nums">{completionPercentage}%</span>
-            </div>
-            <div className="w-full bg-bg-main rounded-tag h-2.5 shadow-inner overflow-hidden border border-border-default/50">
-              <div 
-                className="bg-primary h-full rounded-tag transition-all duration-1000 ease-out relative overflow-hidden" 
-                style={{ width: `${completionPercentage}%` }}
-              >
-                <div className="absolute inset-0 bg-white/20 w-full h-full animate-[shimmer_2s_infinite]" />
-              </div>
-            </div>
+          <div className="card-hoverable p-6 bg-bg-main">
+            <p className="text-[13px] font-heading font-bold text-text-secondary uppercase tracking-wider mb-2 flex items-center gap-2">
+              <span className="text-accent-success">🎯</span> Problems Solved
+            </p>
+            <p className="text-[32px] font-mono font-extrabold text-text-heading">
+              {data?.scores?.reduce((acc, s) => acc + s.score, 0) || 0}
+            </p>
+          </div>
+          <div className="card-hoverable p-6 bg-bg-main">
+            <p className="text-[13px] font-heading font-bold text-text-secondary uppercase tracking-wider mb-2 flex items-center gap-2">
+              <span className="text-accent-info">⏳</span> Learning Time
+            </p>
+            <p className="text-[32px] font-mono font-extrabold text-text-heading">{Math.floor(totalTimeSeconds / 3600)}<span className="text-[20px] text-text-secondary">h</span> {Math.floor((totalTimeSeconds % 3600) / 60)}<span className="text-[20px] text-text-secondary">m</span></p>
+          </div>
+          <div className="card-hoverable p-6 bg-bg-main">
+            <p className="text-[13px] font-heading font-bold text-text-secondary uppercase tracking-wider mb-2 flex items-center gap-2">
+              <span className="text-accent-warning">🔥</span> Current Streak
+            </p>
+            <p className="text-[32px] font-mono font-extrabold text-text-heading">3 <span className="text-[20px] text-text-secondary font-body font-bold">Days</span></p>
           </div>
         </div>
       </motion.div>

@@ -45,18 +45,19 @@ export default function RootLayout({
       <body className="h-screen flex flex-col bg-bg-main text-text-body overflow-hidden">
         
         {/* Top Navigation Header - Premium Redesign */}
-        <header className="h-16 border-b border-border-default bg-bg-card/80 backdrop-blur-md flex items-center justify-between px-6 font-bold z-30 shrink-0">
-          <div className="flex items-center cursor-pointer">
-            <Link href="/portal">
-              <span className="text-primary mr-2 text-xl tracking-tight">Taskintern</span> 
+        <header className="sticky top-0 h-16 border-b border-border-default bg-bg-card/80 backdrop-blur-xl flex items-center justify-between px-6 lg:px-8 font-bold z-50 shrink-0 shadow-sm transition-all">
+          <div className="flex items-center cursor-pointer gap-2">
+            <Link href="/portal" className="flex items-center gap-2 group">
+              <span className="text-primary text-2xl group-hover:scale-110 transition-transform">⚡</span>
+              <span className="text-primary mr-2 text-xl tracking-tight font-extrabold group-hover:text-primary-hover transition-colors">Taskintern</span> 
               <span className="text-text-heading text-lg font-bold tracking-tight">DSA Visualizer</span>
             </Link>
           </div>
-          <div className="flex items-center gap-4">
+          <div className="flex items-center gap-6">
             <ThemeToggle />
             <Link href="/dashboard">
-               <span className="text-sm font-bold px-5 py-2 text-primary hover:bg-primary/10 rounded-btn cursor-pointer transition-colors shadow-sm border border-transparent hover:border-primary/20">
-                 My Dashboard
+               <span className="text-sm font-bold px-5 py-2.5 bg-primary/10 text-primary hover:bg-primary hover:text-white rounded-btn cursor-pointer transition-all shadow-sm flex items-center gap-2">
+                 <span>📊</span> My Dashboard
                </span>
             </Link>
           </div>
